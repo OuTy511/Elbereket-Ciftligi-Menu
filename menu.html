@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>المنيو – مزارع البركات</title>
+
+    <!-- Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style/menu.css" />
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container header__inner">
+        <a class="logo" href="index.html"
+          ><img src="img/logos/logo-3.png" alt="مزارع البركات"
+        /></a>
+
+        <nav class="nav-desktop" aria-label="القائمة الرئيسية">
+          <ul class="nav-list">
+            <li><a href="index.html">الصفحة الرئيسية</a></li>
+            <li><a class="active" href="menu.html">المنيو</a></li>
+            <li><a href="index.html#about">من نحن</a></li>
+            <li><a href="index.html#contact">تواصل معنا</a></li>
+          </ul>
+        </nav>
+
+        <!-- موبايل -->
+        <div class="mobile-actions">
+          <a class="nav-home" href="index.html">الصفحة الرئيسية</a>
+          <button
+            class="menu-toggle"
+            aria-label="فتح القائمة"
+            aria-expanded="false"
+          >
+            <span class="bar"></span><span class="bar"></span
+            ><span class="bar"></span>
+          </button>
+        </div>
+
+        <nav class="nav-mobile" aria-label="قائمة الموبايل">
+          <ul class="navm-list">
+            <li><a class="active" href="menu.html">المنيو</a></li>
+            <li><a href="index.html#about">من نحن</a></li>
+            <li><a href="index.html#contact">تواصل معنا</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- أدوات المنيو -->
+    <section class="menu-tools container">
+      <div class="tools-row">
+        <div id="categoryFilters" class="filters"></div>
+        <input id="searchInput" type="text" placeholder="ابحث عن منتج..." />
+      </div>
+    </section>
+
+    <!-- العروض -->
+    <section id="offers" class="offers-section container" style="display: none">
+      <h2><i class="fa-solid fa-tags"></i> عروض اليوم</h2>
+      <div id="offersGrid" class="menu-grid"></div>
+    </section>
+
+    <!-- شبكة المنتجات -->
+    <section class="menu-section container">
+      <h2>قائمة المنتجات</h2>
+      <div id="menuGrid" class="menu-grid"></div>
+    </section>
+
+    <!-- فاب للسلة -->
+    <button id="cartFab" class="cart-fab" aria-label="فتح السلة">
+      <i class="fa-solid fa-basket-shopping"></i>
+      <span class="count">0</span>
+    </button>
+
+    <!-- درج السلة -->
+    <aside id="cartDrawer" class="cart-drawer" aria-hidden="true">
+      <div class="drawer-head">
+        <h3><i class="fa-solid fa-basket-shopping"></i> سلتك</h3>
+        <button class="drawer-close" aria-label="إغلاق">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="cartItems" class="drawer-body">
+        <p class="muted">السلة فارغة</p>
+      </div>
+      <div class="drawer-footer">
+        <div class="total">
+          <span>الإجمالي:</span> <b class="ltr-text" id="cartTotal">0₺</b>
+        </div>
+        <a id="waCheckout" class="wa-btn" target="_blank"
+          ><i class="fa-brands fa-whatsapp"></i> إرسال الطلب عبر واتساب</a
+        >
+      </div>
+    </aside>
+    <div id="drawerBackdrop" class="backdrop"></div>
+
+    <!-- مودال تفاصيل الطلب -->
+    <div id="orderModal" class="modal" aria-hidden="true">
+      <div class="modal-content">
+        <div class="modal-head">
+          <h3 id="modalTitle">
+            <i class="fa-solid fa-list-check"></i> تفاصيل الطلب
+          </h3>
+          <button class="modal-close" aria-label="إغلاق">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-product">
+            <img id="modalImg" src="" alt="" />
+            <div>
+              <div class="name" id="modalName"></div>
+              <div class="cat" id="modalCat"></div>
+            </div>
+          </div>
+
+          <!-- نُخفيه تلقائيًا لو مفيش تقطيع -->
+          <div id="cutRow">
+            <label class="lbl">اختر طريقة التقطيع</label>
+            <select id="cutSelect"></select>
+          </div>
+
+          <label class="lbl">الكمية</label>
+          <div class="qty">
+            <button id="qtyMinus" type="button">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <input id="qtyInput" type="number" min="1" step="1" value="1" />
+            <button id="qtyPlus" type="button">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+          <label class="lbl with-count">
+            ملاحظة (اختياري)
+            <span class="char-count"><b id="noteCount">0</b>/160</span>
+          </label>
+          <textarea
+            id="noteInput"
+            maxlength="160"
+            placeholder="يمكنك كتابة ملاحظة قصيرة بحد أقصى 160 حرفًا. مثال: قطع صغيرة؛ بدون دهن؛ تعبئة مزدوجة."
+          ></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" id="modalCancel">إلغاء</button>
+          <button class="btn-primary" id="modalAdd">
+            <i class="fa-solid fa-cart-plus"></i> أضف للسلة
+          </button>
+        </div>
+      </div>
+      <div class="backdrop"></div>
+    </div>
+
+    <script src="js/menu.js"></script>
+  </body>
+</html>

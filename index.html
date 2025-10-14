@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>مزارع البركات | الصفحة الرئيسية</title>
+
+    <!-- Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style/home.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container header__inner">
+        <a class="logo" href="index.html"
+          ><img src="img/logos/logo-3.png" alt="مزارع البركات"
+        /></a>
+
+        <nav class="nav-desktop" aria-label="القائمة الرئيسية">
+          <ul class="nav-list">
+            <li><a class="active" href="index.html">الصفحة الرئيسية</a></li>
+            <li><a href="menu.html">المنيو</a></li>
+            <li><a href="#about">من نحن</a></li>
+            <li><a href="#contact">تواصل معنا</a></li>
+          </ul>
+        </nav>
+
+        <!-- موبايل -->
+        <div class="mobile-actions">
+          <a class="nav-home" href="index.html">الصفحة الرئيسية</a>
+          <button
+            class="menu-toggle"
+            aria-label="فتح القائمة"
+            aria-expanded="false"
+          >
+            <span class="bar"></span><span class="bar"></span
+            ><span class="bar"></span>
+          </button>
+        </div>
+
+        <nav class="nav-mobile" aria-label="قائمة الموبايل">
+          <ul class="navm-list">
+            <li><a href="menu.html">المنيو</a></li>
+            <li><a href="#about">من نحن</a></li>
+            <li><a href="#contact">تواصل معنا</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="video-bg">
+      <video
+        src="videos/sheep video.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+      <div class="overlay-content">
+        <h1>مزارع البركات</h1>
+        <p>
+          بفضل الذبح الحلال واليومي نحصل على لحوم طازجة دائمًا، وبفضل أفضل طرق
+          التغليف تبقى نظيفة وآمنة في كل الأوقات. يمكنكم اختيار لحومنا بكل
+          اطمئنان، فهي تصل إلى موائدكم بطعمها الطبيعي الأصيل.
+        </p>
+
+        <!-- زر مباشر للمنيو -->
+        <div class="hero-cta">
+          <a class="cta-btn" href="menu.html" aria-label="افتح المنيو الآن">
+            <i class="fa-solid fa-utensils"></i> افتح المنيو الآن
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- من نحن (مع تداخل الفاصل الأبيض) -->
+    <section class="about-us section-overlap" id="about">
+      <div class="text">
+        <h2>من نحن</h2>
+        <p>
+          "مزارع البركات تأسست لتقديم أجود أنواع اللحوم الطازجة من مزارعنا في
+          أدرنة إلى منازلكم في إسطنبول. نذبح يوميًا تحت إشراف بيطري، ونوفر تغليف
+          محكم وتوصيل سريع إلى بشاك شهير وكايا شهير."
+        </p>
+      </div>
+      <div class="video-us">
+        <video
+          src="videos/about us.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+      </div>
+    </section>
+
+    <!-- تواصل معنا (تصميم جديد) -->
+    <section class="contact-v2" id="contact">
+      <div class="container">
+        <h2 class="c-title"><i class="fa-solid fa-headset"></i> تواصل معنا</h2>
+
+        <div class="c-grid">
+          <!-- الهاتف -->
+          <article class="c-card">
+            <div class="c-icon"><i class="fa-solid fa-phone"></i></div>
+            <h3>رقم الهاتف</h3>
+            <p class="c-sub">متاح عبر المكالمات</p>
+            <div class="c-actions">
+              <a class="c-btn c-primary ltr-text" href="tel:+905524821848"
+                >+90 552 482 18 48</a
+              >
+              <button
+                class="c-btn c-ghost c-copy"
+                data-copy="+905524821848"
+                title="نسخ الرقم"
+              >
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </article>
+
+          <!-- الشكاوى -->
+          <article class="c-card">
+            <div class="c-icon">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3>رقم الشكاوى</h3>
+            <p class="c-sub">للشكاوى والملاحظات</p>
+            <div class="c-actions">
+              <a class="c-btn c-primary ltr-text" href="tel:+905444266009"
+                >+90 544 426 60 09</a
+              >
+              <button
+                class="c-btn c-ghost c-copy"
+                data-copy="+905444266009"
+                title="نسخ الرقم"
+              >
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </article>
+
+          <!-- واتساب مباشر -->
+          <article class="c-card">
+            <div class="c-icon"><i class="fa-brands fa-whatsapp"></i></div>
+            <h3>واتساب</h3>
+            <p class="c-sub">راسلنا مباشرة</p>
+            <div class="c-actions">
+              <a
+                class="c-btn c-wa"
+                target="_blank"
+                href="https://wa.me/905524821848"
+              >
+                فتح واتساب
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            </div>
+          </article>
+
+          <!-- جروب واتساب -->
+          <article class="c-card">
+            <div class="c-icon"><i class="fa-solid fa-users"></i></div>
+            <h3>جروب واتساب</h3>
+            <p class="c-sub">عروض يومية وتحديثات</p>
+            <div class="c-actions">
+              <a
+                class="c-btn c-light"
+                target="_blank"
+                href="https://chat.whatsapp.com/EMzA7uOlnEy3RHwKaZSQkp"
+                >انضم للجروب</a
+              >
+            </div>
+          </article>
+
+          <!-- تليجرام -->
+          <article class="c-card">
+            <div class="c-icon"><i class="fa-brands fa-telegram"></i></div>
+            <h3>تليجرام</h3>
+            <p class="c-sub">قناتنا الرسمية</p>
+            <div class="c-actions">
+              <a
+                class="c-btn c-light ltr-text"
+                target="_blank"
+                href="https://t.me/elbereketciftligi"
+                >t.me/elbereketciftligi</a
+              >
+            </div>
+          </article>
+
+          <!-- البريد الإلكتروني -->
+          <article class="c-card">
+            <div class="c-icon"><i class="fa-regular fa-envelope"></i></div>
+            <h3>البريد الإلكتروني</h3>
+            <p class="c-sub">للطلبات والشكاوى</p>
+            <div class="c-actions">
+              <a
+                class="c-btn c-primary ltr-text"
+                href="mailto:elbereketciftilgi@gmail.com"
+                >elbereketciftilgi@gmail.com</a
+              >
+              <button
+                class="c-btn c-ghost c-copy"
+                data-copy="elbereketciftilgi@gmail.com"
+                title="نسخ البريد"
+              >
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </article>
+
+          <!-- إنستجرام -->
+          <article class="c-card">
+            <div class="c-icon"><i class="fa-brands fa-instagram"></i></div>
+            <h3>إنستجرام</h3>
+            <p class="c-sub">تابع أحدث الصور</p>
+            <div class="c-actions">
+              <a
+                class="c-btn c-light ltr-text"
+                target="_blank"
+                href="https://instagram.com/elbereketciftligi"
+                >@elbereketciftligi</a
+              >
+            </div>
+          </article>
+
+          <!-- فيسبوك -->
+          <article class="c-card">
+            <div class="c-icon"><i class="fa-brands fa-facebook"></i></div>
+            <h3>فيسبوك</h3>
+            <p class="c-sub">صفحتنا الرسمية</p>
+            <div class="c-actions">
+              <a
+                class="c-btn c-light"
+                target="_blank"
+                href="https://www.facebook.com/elbereketciftligi/?locale=tr_TR"
+                >زر الصفحة</a
+              >
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Toast للنسخ -->
+      <div id="copyToast" class="c-toast" role="status" aria-live="polite">
+        تم النسخ ✅
+      </div>
+    </section>
+
+    <script src="js/home.js"></script>
+  </body>
+</html>

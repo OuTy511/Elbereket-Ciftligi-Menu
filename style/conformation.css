@@ -18,6 +18,16 @@ body {
   color: var(--text);
 }
 
+.numeric-input {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  font-family: inherit;
+}
+
+.numeric-input::placeholder {
+  text-align: left;
+}
+
 .confirm-container {
   max-width: 980px;
   margin: 24px auto;

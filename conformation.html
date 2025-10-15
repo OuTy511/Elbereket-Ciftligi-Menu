@@ -121,9 +121,14 @@
             <label class="lbl">رقم الهاتف</label>
             <input
               id="custPhone"
-              class="inp"
+              class="inp numeric-input"
+              type="tel"
               inputmode="tel"
+              pattern="[0-9]*"
+              autocomplete="tel"
               placeholder="05xx xxx xx xx"
+              lang="en"
+              dir="ltr"
             />
           </div>
         </div>

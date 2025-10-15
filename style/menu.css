@@ -32,6 +32,16 @@ body {
   max-width: min(1200px, 100%);
 }
 
+.numeric-input {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  font-family: inherit;
+}
+
+.numeric-input::placeholder {
+  text-align: left;
+}
+
 @media (max-width: 1024px) {
   .menu-page .container {
     max-width: none;

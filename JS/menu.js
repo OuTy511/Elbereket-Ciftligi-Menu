@@ -30,13 +30,69 @@ const formatQtyValue = (qty) => {
   if (!isFinite(n)) return "0";
   return parseFloat(n.toFixed(2)).toString();
 };
+
+const DIGIT_MAP = {
+  "٠": "0",
+  "١": "1",
+  "٢": "2",
+  "٣": "3",
+  "٤": "4",
+  "٥": "5",
+  "٦": "6",
+  "٧": "7",
+  "٨": "8",
+  "٩": "9",
+  "۰": "0",
+  "۱": "1",
+  "۲": "2",
+  "۳": "3",
+  "۴": "4",
+  "۵": "5",
+  "۶": "6",
+  "۷": "7",
+  "۸": "8",
+  "۹": "9",
+};
+const normalizeDigits = (value = "") =>
+  String(value).replace(/[٠-٩۰-۹]/g, (d) => DIGIT_MAP[d] ?? d);
+const sanitizeNumericInput = (value = "", allowDecimal = false) => {
+  let v = normalizeDigits(value).replace(/[^0-9.,]/g, "");
+  if (allowDecimal) {
+    v = v.replace(/,/g, ".");
+    const [lead, ...rest] = v.split(".");
+    v = lead + (rest.length ? "." + rest.join("") : "");
+  } else {
+    v = v.replace(/[.,]/g, "");
+  }
+  return v;
+};
 const toNum = (v, def = 0) => {
   if (v == null) return def;
-  const s = String(v)
-    .replace(",", ".")
-    .replace(/[^\d.]/g, "");
-  const n = parseFloat(s);
+  const cleaned = sanitizeNumericInput(v, true);
+  const n = parseFloat(cleaned);
   return isNaN(n) ? def : n;
+};
+const bindNumericInput = (el, opts = {}) => {
+  if (!el) return;
+  const allowDecimal = () =>
+    typeof opts.allowDecimal === "function"
+      ? opts.allowDecimal()
+      : Boolean(opts.allowDecimal);
+  el.addEventListener("input", () => {
+    const cleaned = sanitizeNumericInput(el.value, allowDecimal());
+    if (cleaned !== el.value) {
+      el.value = cleaned;
+      if (el.setSelectionRange) {
+        const caret = cleaned.length;
+        requestAnimationFrame(() => el.setSelectionRange(caret, caret));
+      }
+    }
+  });
+  el.addEventListener("focus", () => {
+    requestAnimationFrame(() => {
+      if (document.activeElement === el && el.select) el.select();
+    });
+  });
 };
 
 /* ===== عناصر الصفحة ===== */
@@ -85,6 +141,10 @@ const state = {
   cart: [],
   modalProduct: null,
 };
+
+bindNumericInput(els.qtyInput, {
+  allowDecimal: () => state.modalProduct?.sellMode === 1,
+});
 
 /* ===== تحميل CSV ===== */
 if (window.Papa) {

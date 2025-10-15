@@ -81,6 +81,16 @@ h2 {
   font-weight: 800;
   padding-top: 8px;
 }
+.total-note {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: right;
+}
+.note-em {
+  font-weight: 800;
+  color: var(--brand);
+}
 
 /* Form */
 .lbl {
@@ -252,6 +262,8 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 .btn-primary {
   background: linear-gradient(180deg, #60d551, #49b628);
@@ -263,11 +275,14 @@ h2 {
   transform: translateY(-1px);
 }
 .btn-dark {
-  background: #111;
-  color: #fff;
+  background: #fff;
+  color: var(--brand);
+  border: 1px solid rgba(84, 180, 53, 0.3);
+  box-shadow: 0 10px 24px rgba(84, 180, 53, 0.15);
 }
 .btn-dark:hover {
-  filter: saturate(105%);
+  background: #f4fbef;
+  color: var(--brand);
   transform: translateY(-1px);
 }
 .btn-outline {

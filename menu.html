@@ -65,7 +65,9 @@
     <!-- أدوات المنيو -->
     <section class="menu-tools container">
       <div class="tools-row">
-        <div id="categoryFilters" class="filters"></div>
+        <div class="filters-scroller">
+          <div id="categoryFilters" class="filters"></div>
+        </div>
         <input id="searchInput" type="text" placeholder="ابحث عن منتج..." />
       </div>
     </section>
@@ -101,8 +103,13 @@
       </div>
       <div class="drawer-footer">
         <div class="total">
-          <span>الإجمالي:</span> <b class="ltr-text" id="cartTotal">0₺</b>
+          <span>الإجمالي التقريبي:</span>
+          <b class="ltr-text" id="cartTotal">0₺</b>
         </div>
+        <p class="muted total-note">
+          الإجمالي تقريبي وقد تختلف القيمة النهائية بعد الوزن الفعلي.
+          <span class="note-em">احتمال فروقات بسيطة باختلاف الوزن.</span>
+        </p>
         <button id="goConfirm" class="btn-confirm" type="button">
           <span class="ico"><i class="fa-solid fa-list-check"></i></span>
           <span>تأكيد الطلب</span>
@@ -178,6 +185,6 @@
       <div class="backdrop"></div>
     </div>
 
-    <script src="js/menu.js"></script>
+    <script src="JS/menu.js"></script>
   </body>
 </html>

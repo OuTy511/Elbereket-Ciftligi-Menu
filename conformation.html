@@ -19,14 +19,6 @@
       rel="stylesheet"
     />
 
-    <!-- Leaflet CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
-
     <!-- نفس ستايل الموقع (لازم ييجي قبل conformation.css) -->
     <link rel="stylesheet" href="style/menu.css" />
     <!-- ستايل الصفحة دي بس -->
@@ -94,7 +86,7 @@
                 <th>الصنف</th>
                 <th>الكمية</th>
                 <th>السعر/وحدة</th>
-                <th>الإجمالي</th>
+                <th>الإجمالي التقريبي</th>
                 <th>حذف</th>
               </tr>
             </thead>
@@ -102,9 +94,13 @@
           </table>
         </div>
         <div class="total">
-          <div>الإجمالي</div>
+          <div>الإجمالي التقريبي</div>
           <div class="ltr-text"><span id="totalAmount">0</span> TL</div>
         </div>
+        <p class="muted total-note">
+          الإجمالي تقريبي وقد تختلف القيمة النهائية بعد الوزن الفعلي.
+          <span class="note-em">احتمال فروقات بسيطة باختلاف الوزن.</span>
+        </p>
       </section>
 
       <section class="card">
@@ -166,12 +162,12 @@
             <label class="lbl">طريقة الدفع</label>
             <div class="pill-row">
               <label class="chip"
-                ><input type="radio" name="pay" value="كاش" checked />
-                كاش</label
+                ><input type="radio" name="pay" value="نقدًا" checked />
+                نقدًا</label
               >
               <label class="chip"
-                ><input type="radio" name="pay" value="POS" /> بالـ POS عند
-                التسليم</label
+                ><input type="radio" name="pay" value="كريدي كارت (POS)" />
+                كريدي كارت (POS)</label
               >
             </div>
           </div>
@@ -193,7 +189,7 @@
       <section class="card">
         <div class="actions end">
           <a href="menu.html" class="btn btn-dark"
-            ><i class="fa-solid fa-arrow-right"></i> رجوع للمنيو</a
+            ><i class="fa-solid fa-arrow-right"></i> الرجوع إلى المنيو</a
           >
           <button id="sendBtn" class="btn btn-primary">
             <i class="fa-brands fa-whatsapp"></i> تأكيد وإرسال على واتساب
@@ -202,13 +198,8 @@
       </section>
     </main>
 
-    <!-- Leaflet JS -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
     <div id="toast"></div>
+    <script src="js/config.js"></script>
     <script src="js/conformation.js"></script>
   </body>
 </html>

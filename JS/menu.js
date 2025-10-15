@@ -493,16 +493,21 @@ function updateCartUI() {
   if (els.goConfirm) els.goConfirm.disabled = false; // << ده المقصود بـ "بعد ما ترسم عناصر السلة"
 
   // ملاحظة توضيحية لو في أصناف كاملة بلا وزن تقريبي
-  let note = els.cartDrawer.querySelector(".cart-note");
-  if (!note) {
-    note = document.createElement("div");
-    note.className = "cart-note";
-    note.style.cssText = "color:#666;font-size:12px;margin-top:8px;";
-    els.cartDrawer.querySelector(".drawer-footer").appendChild(note);
+  const footer = els.cartDrawer.querySelector(".drawer-footer");
+  if (footer) {
+    let note = footer.querySelector(".cart-note");
+    if (!note) {
+      note = document.createElement("div");
+      note.className = "cart-note muted";
+      note.style.cssText = "font-size:12px;margin-top:4px;";
+      const confirmBtn = footer.querySelector("#goConfirm");
+      footer.insertBefore(note, confirmBtn || footer.firstChild);
+    }
+    note.textContent = hasUnpriced
+      ? "تنبيه: يوجد أصناف تُباع كاملة وسيتم تحديد سعرها النهائي بعد الوزن الفعلي."
+      : "";
+    note.style.display = hasUnpriced ? "block" : "none";
   }
-  note.textContent = hasUnpriced
-    ? "تنبيه: يوجد أصناف تُباع كاملة وسيُحدد سعرها النهائي بعد الوزن. الإجمالي لا يشملها."
-    : "";
 
   updateWALink();
 }
@@ -525,13 +530,15 @@ function updateWALink() {
   });
 
   const { total, hasUnpriced } = calcTotals();
-  const totalLine = `الإجمالي: ${priceFmt(total)}${
+  const totalLine = `الإجمالي التقريبي: ${priceFmt(total)}${
     hasUnpriced ? " (لا يشمل أصناف كاملة بدون وزن تقريبي)" : ""
   }`;
+  const approxLine =
+    "⚠️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
 
   const msgRaw = `طلب جديد من موقع مزارع البركات:\n\n${lines.join(
     "\n"
-  )}\n\n${totalLine}`;
+  )}\n\n${totalLine}\n${approxLine}`;
   const encoded = encodeURIComponent(msgRaw);
   els.waCheckout.href = `https://wa.me/905524821848?text=${encoded}`;
 }

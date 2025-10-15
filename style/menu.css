@@ -191,7 +191,8 @@ body {
 .filters-scroller {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 0 12px 4px;
   mask-image: linear-gradient(
     90deg,
@@ -792,10 +793,16 @@ body.modal-open {
     display: flex;
   }
   .menu-grid {
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    grid-template-columns: 1fr;
   }
   .image-wrap img {
     height: 150px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
   }
 }
 .flags-row {

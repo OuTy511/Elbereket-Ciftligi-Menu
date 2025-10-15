@@ -708,6 +708,8 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
 
       return {
         name: x.name,
+        category: x.category || "",
+        image: x.image || "",
         qty,
         unit,
         price,

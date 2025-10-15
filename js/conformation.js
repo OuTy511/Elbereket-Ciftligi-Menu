@@ -17,6 +17,7 @@ if (btn && navMobile && list) {
 
 /* ===== إعدادات عامة ===== */
 let WA_NUMBER = "905524821848"; // سيتبدل لو موجود في orderDraft
+const CART_KEY = "elb_cart_v1";
 const $ = (sel) => document.querySelector(sel);
 
 const DIGIT_MAP = {
@@ -87,6 +88,36 @@ if (!order || !order.items || !order.items.length) {
   window.location.href = "menu.html";
 }
 
+let cartSnapshot = [];
+try {
+  cartSnapshot = JSON.parse(localStorage.getItem(CART_KEY) || "null") || [];
+} catch {}
+
+if (order && Array.isArray(order.items) && cartSnapshot.length) {
+  const map = new Map(
+    cartSnapshot.map((item) => [
+      `${item?.name || ""}__${item?.cut || ""}`,
+      item,
+    ])
+  );
+  order.items.forEach((it) => {
+    const key = `${it?.name || ""}__${it?.cut || ""}`;
+    const src = map.get(key);
+    if (src) {
+      if (!it.category && src.category) it.category = src.category;
+      if (!it.image && src.image) it.image = src.image;
+      if (typeof it.sellMode === "undefined" && src.sellMode != null)
+        it.sellMode = src.sellMode;
+      if ((!it.approxKg || !Number(it.approxKg)) && src.approxKg)
+        it.approxKg = src.approxKg;
+    }
+    if (typeof it.sellMode === "undefined") {
+      if (it.unit === "كجم") it.sellMode = 1;
+      else it.sellMode = 0;
+    }
+  });
+}
+
 /* ===== عناصر الصفحة ===== */
 const tbody = $("#itemsBody");
 const totalEl = $("#totalAmount");
@@ -148,10 +179,48 @@ function priceLabelForMessage(it) {
   return "سعر الكيلو";
 }
 
+function buildCartSnapshot() {
+  if (!order || !Array.isArray(order.items)) return [];
+  return order.items.map((it) => {
+    const mode = resolveMode(it);
+    let qty = toNum(it.qty, mode === 1 ? 0.1 : 1);
+    if (mode === 1) qty = Math.max(0.1, Math.round(qty * 100) / 100);
+    else qty = Math.max(1, Math.floor(qty));
+
+    return {
+      name: it.name,
+      category: it.category || "",
+      image: it.image || "",
+      price: toNum(it.price, 0),
+      cut: it.cut || "",
+      note: it.note || "",
+      qty,
+      sellMode: mode,
+      approxKg: toNum(it.approxKg, 0),
+    };
+  });
+}
+
+function syncCartStorage() {
+  try {
+    const snapshot = buildCartSnapshot();
+    if (snapshot.length) localStorage.setItem(CART_KEY, JSON.stringify(snapshot));
+    else localStorage.removeItem(CART_KEY);
+  } catch (err) {
+    console.error("cart sync error:", err);
+  }
+}
+
 function saveDraft() {
   try {
-    localStorage.setItem("orderDraft", JSON.stringify(order));
+    if (order && Array.isArray(order.items) && order.items.length) {
+      order.total = calcTotal();
+      localStorage.setItem("orderDraft", JSON.stringify(order));
+    } else {
+      localStorage.removeItem("orderDraft");
+    }
   } catch {}
+  syncCartStorage();
 }
 function lineTotal(it) {
   const price = toNum(it.price, 0);
@@ -295,9 +364,12 @@ function renderRows() {
     tr.append(tdName, tdQty, tdPrice, tdLine, tdDel);
     tbody.appendChild(tr);
   });
-  totalEl.textContent = money(calcTotal());
+  const total = calcTotal();
+  totalEl.textContent = money(total);
+  if (order) order.total = total;
 }
 renderRows();
+syncCartStorage();
 
 /* ===== خريطة OpenStreetMap (Leaflet) ===== */
 let marker = null;

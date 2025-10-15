@@ -18,10 +18,34 @@ body {
   color: var(--text);
 }
 
+.numeric-input {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  letter-spacing: 0.02em;
+}
+
+.numeric-input::placeholder {
+  text-align: left;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
 .confirm-container {
   max-width: 980px;
   margin: 24px auto;
   padding: 0 16px;
+}
+
+@media (max-width: 1024px) {
+  .confirm-container {
+    max-width: none;
+    padding-inline: clamp(16px, 4vw, 24px);
+  }
+  .card {
+    border-radius: 18px;
+  }
 }
 
 /* Cards */
@@ -75,11 +99,29 @@ h2 {
 .table th {
   background: #fafafa;
 }
+.cell-title {
+  font-weight: 800;
+}
+.cell-extra {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
 .total {
   display: flex;
   justify-content: space-between;
   font-weight: 800;
   padding-top: 8px;
+}
+.total-note {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: right;
+}
+.note-em {
+  font-weight: 800;
+  color: var(--brand);
 }
 
 /* Form */
@@ -218,6 +260,9 @@ h2 {
     font-weight: 800;
     color: #333;
   }
+  .cell-extra {
+    margin-top: 2px;
+  }
   .table td[data-label="الصنف"] {
     font-weight: 800;
   }
@@ -252,6 +297,8 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 .btn-primary {
   background: linear-gradient(180deg, #60d551, #49b628);
@@ -263,11 +310,15 @@ h2 {
   transform: translateY(-1px);
 }
 .btn-dark {
-  background: #111;
-  color: #fff;
+  background: #fff;
+  color: var(--brand);
+  border: 1px solid rgba(84, 180, 53, 0.3);
+  box-shadow: 0 10px 24px rgba(84, 180, 53, 0.15);
+  text-decoration: none;
 }
 .btn-dark:hover {
-  filter: saturate(105%);
+  background: #f4fbef;
+  color: var(--brand);
   transform: translateY(-1px);
 }
 .btn-outline {
@@ -277,6 +328,39 @@ h2 {
 }
 .btn-outline:hover {
   background: #f7f7f7;
+}
+
+.scroll-top-fab {
+  position: fixed;
+  bottom: 18px;
+  inset-inline-start: 18px;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand);
+  border: 1px solid rgba(84, 180, 53, 0.35);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease,
+    background-color 0.25s ease, color 0.25s ease;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 95;
+}
+.scroll-top-fab.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.scroll-top-fab:hover {
+  background: var(--brand);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.scroll-top-fab i {
+  font-size: 18px;
 }
 
 /* اختيارات على هيئة شرائح */
@@ -296,8 +380,29 @@ h2 {
   cursor: pointer;
   font-weight: 800;
 }
+.chip-placeholder {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px dashed #d7d7d7;
+  border-radius: 999px;
+  background: #fafafa;
+  color: #9aa0a6;
+  font-weight: 700;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.chip-placeholder.hidden {
+  display: none;
+}
 .chip input {
   transform: scale(1.1);
+}
+
+.lbl .req {
+  color: #d14343;
+  font-size: 0.85em;
+  font-weight: 800;
 }
 
 /* عناصر التحكم في الكمية (موجودة من قبل) */

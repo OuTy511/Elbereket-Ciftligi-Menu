@@ -2,7 +2,10 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <title>مزارع البركات | الصفحة الرئيسية</title>
 
     <!-- Cairo -->
@@ -21,7 +24,7 @@
 
     <link rel="stylesheet" href="style/home.css" />
   </head>
-  <body>
+  <body class="home-page">
     <!-- Header -->
     <header class="header">
       <div class="container header__inner">
@@ -87,6 +90,8 @@
       </div>
     </section>
 
+    <div class="section-break section-break--light"></div>
+
     <!-- من نحن (مع تداخل الفاصل الأبيض) -->
     <section class="about-us section-overlap" id="about">
       <div class="text">
@@ -107,6 +112,8 @@
         ></video>
       </div>
     </section>
+
+    <div class="section-break section-break--soft"></div>
 
     <!-- تواصل معنا (تصميم جديد) -->
     <section class="contact-v2" id="contact">
@@ -260,6 +267,15 @@
       </div>
     </section>
 
-    <script src="js/home.js"></script>
+    <button
+      id="backToTopHome"
+      class="scroll-top-fab"
+      type="button"
+      aria-label="العودة إلى أعلى الصفحة"
+    >
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script src="JS/home.js"></script>
   </body>
 </html>

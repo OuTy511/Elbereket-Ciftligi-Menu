@@ -2,7 +2,10 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <title>المنيو – مزارع البركات</title>
 
     <!-- Cairo -->
@@ -22,7 +25,7 @@
     <link rel="stylesheet" href="style/menu.css" />
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   </head>
-  <body>
+  <body class="menu-page">
     <!-- Header -->
     <header class="header">
       <div class="container header__inner">
@@ -65,8 +68,31 @@
     <!-- أدوات المنيو -->
     <section class="menu-tools container">
       <div class="tools-row">
-        <div id="categoryFilters" class="filters"></div>
-        <input id="searchInput" type="text" placeholder="ابحث عن منتج..." />
+        <div class="filters-wrapper">
+          <button
+            class="filters-arrow prev"
+            type="button"
+            data-filter-arrow="prev"
+            aria-label="تصنيفات سابقة"
+          >
+            <i class="fa-solid fa-angle-right"></i>
+          </button>
+          <div class="filters-scroller" id="filtersScroll">
+            <div id="categoryFilters" class="filters"></div>
+          </div>
+          <button
+            class="filters-arrow next"
+            type="button"
+            data-filter-arrow="next"
+            aria-label="تصنيفات إضافية"
+          >
+            <i class="fa-solid fa-angle-left"></i>
+          </button>
+        </div>
+        <label class="search-wrap" for="searchInput">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="searchInput" type="text" placeholder="ابحث عن منتج..." />
+        </label>
       </div>
     </section>
 
@@ -88,6 +114,15 @@
       <span class="count">0</span>
     </button>
 
+    <button
+      id="backToTopMenu"
+      class="scroll-top-fab"
+      type="button"
+      aria-label="العودة إلى أعلى الصفحة"
+    >
+      <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
     <!-- درج السلة -->
     <aside id="cartDrawer" class="cart-drawer" aria-hidden="true">
       <div class="drawer-head">
@@ -101,8 +136,13 @@
       </div>
       <div class="drawer-footer">
         <div class="total">
-          <span>الإجمالي:</span> <b class="ltr-text" id="cartTotal">0₺</b>
+          <span>الإجمالي التقريبي:</span>
+          <b class="ltr-text" id="cartTotal">0₺</b>
         </div>
+        <p class="muted total-note">
+          الإجمالي تقريبي وقد تختلف القيمة النهائية بعد الوزن الفعلي.
+          <span class="note-em">احتمال فروقات بسيطة باختلاف الوزن.</span>
+        </p>
         <button id="goConfirm" class="btn-confirm" type="button">
           <span class="ico"><i class="fa-solid fa-list-check"></i></span>
           <span>تأكيد الطلب</span>
@@ -151,7 +191,22 @@
             <button id="qtyMinus" type="button">
               <i class="fa-solid fa-minus"></i>
             </button>
-            <input id="qtyInput" type="number" min="1" step="1" value="1" />
+            <input
+              id="qtyInput"
+              class="numeric-input"
+              type="text"
+              inputmode="decimal"
+              pattern="[0-9.,٫٬،]*"
+              min="1"
+              step="1"
+              value="1"
+              lang="en"
+              dir="ltr"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
             <button id="qtyPlus" type="button">
               <i class="fa-solid fa-plus"></i>
             </button>
@@ -178,6 +233,6 @@
       <div class="backdrop"></div>
     </div>
 
-    <script src="js/menu.js"></script>
+    <script src="JS/menu.js"></script>
   </body>
 </html>

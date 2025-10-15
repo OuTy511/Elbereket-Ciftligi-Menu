@@ -19,24 +19,143 @@ if (btn && navMobile && list) {
 const CSV_PATH = "data/products.csv";
 const placeholder = "https://placehold.co/1024x1024";
 const priceFmt = (n) => `${(+n || 0).toLocaleString("tr-TR")}₺`;
+const moneyTL = (n) =>
+  `${Number(n || 0).toLocaleString("tr-TR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} TL`;
+const formatQtyValue = (qty) => {
+  const raw = typeof qty === "string" ? qty.replace(",", ".") : qty;
+  const n = Number(raw || 0);
+  if (!isFinite(n)) return "0";
+  return parseFloat(n.toFixed(2)).toString();
+};
+
+const DIGIT_MAP = {
+  "٠": "0",
+  "١": "1",
+  "٢": "2",
+  "٣": "3",
+  "٤": "4",
+  "٥": "5",
+  "٦": "6",
+  "٧": "7",
+  "٨": "8",
+  "٩": "9",
+  "۰": "0",
+  "۱": "1",
+  "۲": "2",
+  "۳": "3",
+  "۴": "4",
+  "۵": "5",
+  "۶": "6",
+  "۷": "7",
+  "۸": "8",
+  "۹": "9",
+};
+const normalizeDigits = (value = "") =>
+  String(value).replace(/[٠-٩۰-۹]/g, (d) => DIGIT_MAP[d] ?? d);
+const sanitizeNumericInput = (value = "", allowDecimal = false) => {
+  if (value == null) return "";
+  const normalized = normalizeDigits(value)
+    .replace(/[\u066C\s\u00A0]/g, "") // remove Arabic thousands separator & spaces
+    .replace(/[\u060C\u061B]/g, "") // remove Arabic comma/semicolon
+    .replace(/\u066B/g, "."); // Arabic decimal separator
+
+  if (!allowDecimal)
+    return normalized.replace(/[.,٫٬،]/g, "").replace(/[^0-9]/g, "");
+
+  const prepared = normalized
+    .replace(/[٫٬،]/g, ".")
+    .replace(/,/g, ".")
+    .replace(/[^0-9.]/g, "");
+  const [lead, ...rest] = prepared.split(".");
+  return lead + (rest.length ? "." + rest.join("") : "");
+};
 const toNum = (v, def = 0) => {
   if (v == null) return def;
-  const s = String(v)
-    .replace(",", ".")
-    .replace(/[^\d.]/g, "");
-  const n = parseFloat(s);
+  const cleaned = sanitizeNumericInput(v, true);
+  const n = parseFloat(cleaned);
   return isNaN(n) ? def : n;
+};
+const bindNumericInput = (el, opts = {}) => {
+  if (!el) return;
+  const allowDecimal = () =>
+    typeof opts.allowDecimal === "function"
+      ? opts.allowDecimal()
+      : Boolean(opts.allowDecimal);
+
+  const coerce = () => {
+    const { selectionStart, selectionEnd } = el;
+    const cleaned = sanitizeNumericInput(el.value, allowDecimal());
+    if (cleaned !== el.value) {
+      el.value = cleaned;
+      if (el.setSelectionRange) {
+        const caret = selectionStart ?? cleaned.length;
+        const endCaret = selectionEnd ?? caret;
+        requestAnimationFrame(() =>
+          el.setSelectionRange(
+            Math.min(caret, cleaned.length),
+            Math.min(endCaret, cleaned.length)
+          )
+        );
+      }
+    }
+  };
+
+  el.lang = "en";
+  el.dir = "ltr";
+  el.autocapitalize = "off";
+  el.setAttribute("autocorrect", "off");
+  if (!el.getAttribute("autocomplete")) el.setAttribute("autocomplete", "off");
+  if (typeof el.spellcheck !== "undefined") el.spellcheck = false;
+  if (!el.getAttribute("inputmode"))
+    el.setAttribute("inputmode", allowDecimal() ? "decimal" : "numeric");
+
+  el.addEventListener("beforeinput", (evt) => {
+    if (!evt.data) return;
+    const sanitized = sanitizeNumericInput(evt.data, allowDecimal());
+    if (sanitized === evt.data) return;
+    evt.preventDefault();
+    if (!sanitized) return;
+    const value = el.value || "";
+    const start = el.selectionStart ?? value.length;
+    const end = el.selectionEnd ?? value.length;
+    const nextValue = value.slice(0, start) + sanitized + value.slice(end);
+    el.value = nextValue;
+    const caret = start + sanitized.length;
+    requestAnimationFrame(() => {
+      if (el.setSelectionRange) el.setSelectionRange(caret, caret);
+      coerce();
+    });
+  });
+
+  el.addEventListener("input", coerce);
+  el.addEventListener("blur", coerce);
+  el.addEventListener("focus", () => {
+    requestAnimationFrame(() => {
+      if (document.activeElement === el && el.select) {
+        try {
+          el.select();
+        } catch (_) {}
+      }
+    });
+  });
+  coerce();
 };
 
 /* ===== عناصر الصفحة ===== */
 const els = {
   categoryFilters: document.getElementById("categoryFilters"),
+  filtersScroller: document.getElementById("filtersScroll"),
+  filterArrows: document.querySelectorAll("[data-filter-arrow]"),
   searchInput: document.getElementById("searchInput"),
   offers: document.getElementById("offers"),
   offersGrid: document.getElementById("offersGrid"),
   menuGrid: document.getElementById("menuGrid"),
 
   cartFab: document.getElementById("cartFab"),
+  scrollTop: document.getElementById("backToTopMenu"),
   cartDrawer: document.getElementById("cartDrawer"),
   drawerBackdrop: document.getElementById("drawerBackdrop"),
   drawerClose: document.querySelector(".drawer-close"),
@@ -71,6 +190,10 @@ const state = {
   cart: [],
   modalProduct: null,
 };
+
+bindNumericInput(els.qtyInput, {
+  allowDecimal: () => state.modalProduct?.sellMode === 1,
+});
 
 /* ===== تحميل CSV ===== */
 if (window.Papa) {
@@ -140,6 +263,26 @@ function buildFilters() {
       applyFilters();
     }, 200);
   });
+}
+
+function setupFilterArrows() {
+  if (!els.filtersScroller) return;
+  const isRTL = document.documentElement?.dir === "rtl";
+  const scroll = (dir) => {
+    const base = els.filtersScroller.clientWidth || window.innerWidth || 320;
+    const step = base * 0.7;
+    const delta = dir * step * (isRTL ? -1 : 1);
+    els.filtersScroller.scrollBy({ left: delta, behavior: "smooth" });
+  };
+
+  if (els.filterArrows?.forEach) {
+    els.filterArrows.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const dir = btn.dataset.filterArrow === "prev" ? -1 : 1;
+        scroll(dir);
+      });
+    });
+  }
 }
 
 function applyFilters() {
@@ -245,10 +388,12 @@ function openModal(product) {
   let helper = "";
   if (product.sellMode === 1) {
     els.qtyInput.step = "0.1";
+    els.qtyInput.inputMode = "decimal";
     els.qtyInput.setAttribute("inputmode", "decimal");
     helper = "سيتم حساب السعر حسب الكيلو.";
   } else if (product.sellMode === 2) {
     els.qtyInput.step = "1";
+    els.qtyInput.inputMode = "numeric";
     els.qtyInput.setAttribute("inputmode", "numeric");
     helper = `هذا المنتج يُباع كاملًا والسعر الظاهر هو سعر الكيلو. ${
       product.approxKg
@@ -257,6 +402,7 @@ function openModal(product) {
     }`;
   } else {
     els.qtyInput.step = "1";
+    els.qtyInput.inputMode = "numeric";
     els.qtyInput.setAttribute("inputmode", "numeric");
     helper = "الكمية تحسب بالقطعة.";
   }
@@ -348,8 +494,10 @@ const CART_KEY = "elb_cart_v1";
 function hydrateCart() {
   try {
     const raw = localStorage.getItem(CART_KEY);
-    if (raw) state.cart = JSON.parse(raw);
-  } catch {}
+    state.cart = raw ? JSON.parse(raw) : [];
+  } catch {
+    state.cart = [];
+  }
 }
 function persistCart() {
   localStorage.setItem(CART_KEY, JSON.stringify(state.cart));
@@ -407,6 +555,20 @@ function lineQtyText(it) {
 function linePriceText(it) {
   if (it.sellMode === 2) return `${priceFmt(it.price)} / كجم`;
   return priceFmt(it.price);
+}
+
+function qtyForMessage(it) {
+  if (it.sellMode === 1) return `${formatQtyValue(it.qty)} كجم`;
+  if (it.sellMode === 2) {
+    const pcs = Math.max(1, Math.floor(+it.qty || 0));
+    const approx = it.approxKg > 0 ? ` (~${it.approxKg} كجم/قطعة)` : "";
+    return `${pcs} قطعة${approx}`;
+  }
+  return `${Math.max(1, Math.floor(+it.qty || 0))} عدد`;
+}
+
+function priceLabelForMessage(it) {
+  return it.sellMode === 0 ? "سعر القطعة" : "سعر الكيلو";
 }
 
 function calcTotals() {
@@ -493,16 +655,21 @@ function updateCartUI() {
   if (els.goConfirm) els.goConfirm.disabled = false; // << ده المقصود بـ "بعد ما ترسم عناصر السلة"
 
   // ملاحظة توضيحية لو في أصناف كاملة بلا وزن تقريبي
-  let note = els.cartDrawer.querySelector(".cart-note");
-  if (!note) {
-    note = document.createElement("div");
-    note.className = "cart-note";
-    note.style.cssText = "color:#666;font-size:12px;margin-top:8px;";
-    els.cartDrawer.querySelector(".drawer-footer").appendChild(note);
+  const footer = els.cartDrawer.querySelector(".drawer-footer");
+  if (footer) {
+    let note = footer.querySelector(".cart-note");
+    if (!note) {
+      note = document.createElement("div");
+      note.className = "cart-note muted";
+      note.style.cssText = "font-size:12px;margin-top:4px;";
+      const confirmBtn = footer.querySelector("#goConfirm");
+      footer.insertBefore(note, confirmBtn || footer.firstChild);
+    }
+    note.textContent = hasUnpriced
+      ? "تنبيه: يوجد أصناف تُباع كاملة وسيتم تحديد سعرها النهائي بعد الوزن الفعلي."
+      : "";
+    note.style.display = hasUnpriced ? "block" : "none";
   }
-  note.textContent = hasUnpriced
-    ? "تنبيه: يوجد أصناف تُباع كاملة وسيُحدد سعرها النهائي بعد الوزن. الإجمالي لا يشملها."
-    : "";
 
   updateWALink();
 }
@@ -510,28 +677,38 @@ function updateCartUI() {
 /* ===== رسالة واتساب القديمة (اختياري لو الرابط لسه موجود) ===== */
 function updateWALink() {
   if (!els.waCheckout) return; // لو اتشال اللينك من الـ HTML
-  const lines = state.cart.map((x) => {
-    const qtyText = lineQtyText(x);
-    const priceText =
-      x.sellMode === 2 ? `${priceFmt(x.price)} / كجم` : `${priceFmt(x.price)}`;
-    const approxText =
-      x.sellMode === 2 && x.approxKg > 0
-        ? ` — تقديري/قطعة: ~${x.approxKg}كجم`
-        : "";
-    const noteText = x.note ? ` — ملاحظة: ${x.note}` : "";
-    return `• ${x.name} — ${
-      x.cut || "بدون"
-    } — الكمية: ${qtyText} — السعر: ${priceText}${approxText}${noteText}`;
+  const lines = state.cart.map((item) => {
+    const parts = [
+      `• ${item.name}`,
+      `      ${priceLabelForMessage(item)}: ${moneyTL(item.price)}`,
+      `      الكمية: ${qtyForMessage(item)}`,
+    ];
+    if (item.cut) parts.push(`      طريقة التقطيع: ${item.cut}`);
+    if (item.note) parts.push(`      ملاحظة: ${item.note}`);
+    return parts.join("\n");
   });
 
   const { total, hasUnpriced } = calcTotals();
-  const totalLine = `الإجمالي: ${priceFmt(total)}${
-    hasUnpriced ? " (لا يشمل أصناف كاملة بدون وزن تقريبي)" : ""
+  const header = "طلب جديد من مزارع البركات 🌾🥩";
+  const totalLine = `💰 الإجمالي التقريبي: ${moneyTL(total)}${
+    hasUnpriced ? " (قد تتغير الأصناف الكاملة بعد الوزن)" : ""
   }`;
+  const approxLine =
+    "ℹ️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
 
-  const msgRaw = `طلب جديد من موقع مزارع البركات:\n\n${lines.join(
-    "\n"
-  )}\n\n${totalLine}`;
+  const msgRaw = [
+    header,
+    "",
+    "🧾 تفاصيل الطلب:",
+    ...lines,
+    "",
+    totalLine,
+    "",
+    approxLine,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
   const encoded = encodeURIComponent(msgRaw);
   els.waCheckout.href = `https://wa.me/905524821848?text=${encoded}`;
 }
@@ -572,10 +749,6 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
 
     // جهّز عناصر للـ confirm.html
     const items = state.cart.map((x) => {
-      // ندمج التقطيع + الملاحظة (لو موجودين) مع الاسم لسهولة القراءة
-      const extras = [x.cut, x.note].filter(Boolean).join(" | ");
-      const name = extras ? `${x.name} (${extras})` : x.name;
-
       // الوحدة: بالكيلو/كامل (السعر/كجم)/قطعة
       let unit = "قطعة";
       if (x.sellMode === 1) unit = "كجم";
@@ -587,7 +760,18 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
       // السعر: رقم فقط بدون رمز
       const price = Number(x.price) || 0;
 
-      return { name, qty, unit, price };
+      return {
+        name: x.name,
+        category: x.category || "",
+        image: x.image || "",
+        qty,
+        unit,
+        price,
+        cut: x.cut || "",
+        note: x.note || "",
+        sellMode: x.sellMode,
+        approxKg: x.approxKg || 0,
+      };
     });
 
     // إجمالي تقريبي بنفس منطق السلة
@@ -610,3 +794,32 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
     window.location.href = "conformation.html";
   });
 })();
+
+function setupScrollTop() {
+  const btn = els.scrollTop;
+  if (!btn) return;
+  const toggle = () => {
+    if (window.scrollY > 240) btn.classList.add("show");
+    else btn.classList.remove("show");
+  };
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  window.addEventListener("scroll", toggle, { passive: true });
+  toggle();
+}
+
+setupFilterArrows();
+setupScrollTop();
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) return;
+  hydrateCart();
+  updateCartUI();
+});
+
+window.addEventListener("storage", (evt) => {
+  if (evt.key && evt.key !== CART_KEY) return;
+  hydrateCart();
+  updateCartUI();
+});

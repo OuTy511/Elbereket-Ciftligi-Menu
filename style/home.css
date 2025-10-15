@@ -29,6 +29,13 @@ body {
   padding: 0 20px;
 }
 
+@media (max-width: 1024px) {
+  .container {
+    max-width: none;
+    padding-inline: clamp(16px, 5vw, 32px);
+  }
+}
+
 /* ===== الهيدر ===== */
 .header {
   background: #fff;

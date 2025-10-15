@@ -163,6 +163,9 @@ body {
   align-items: center;
   gap: 10px;
   flex: 1;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 .filters-arrow {
   width: 40px;
@@ -193,6 +196,7 @@ body {
   -webkit-overflow-scrolling: touch;
   flex: 1;
   min-width: 0;
+  width: 100%;
   padding: 0 12px 4px;
   mask-image: linear-gradient(
     90deg,
@@ -308,15 +312,18 @@ body {
   }
 }
 
+@media (max-width: 1024px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .filters-wrapper {
     gap: 6px;
   }
   .search-wrap {
     width: 100%;
-  }
-  .menu-grid {
-    grid-template-columns: 1fr;
   }
 }
 .product-card {

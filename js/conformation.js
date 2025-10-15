@@ -228,12 +228,11 @@ function renderRows() {
 }
 renderRows();
 
-/* ===== Google Maps ===== */
+/* ===== خريطة OpenStreetMap (Leaflet) ===== */
 let marker = null;
 let chosenLatLng = null;
 let map = null;
 let mapReady = false;
-let mapErrorNotified = false;
 
 function updateCoordsHint(text) {
   const hint = $("#coordsHint");
@@ -241,116 +240,60 @@ function updateCoordsHint(text) {
 }
 
 function placeMarker(latLng) {
-  if (!mapReady || !map || typeof google === "undefined") return;
-  const pos =
-    latLng instanceof google.maps.LatLng
-      ? latLng
-      : new google.maps.LatLng(latLng.lat, latLng.lng);
-  if (marker) marker.setMap(null);
-  marker = new google.maps.Marker({
-    map,
-    position: pos,
-    animation: google.maps.Animation.DROP,
-  });
-  chosenLatLng = { lat: pos.lat(), lng: pos.lng() };
+  if (!mapReady || !map || typeof L === "undefined") return;
+  const pos = Array.isArray(latLng)
+    ? { lat: latLng[0], lng: latLng[1] }
+    : { lat: latLng.lat, lng: latLng.lng };
+  if (!isFinite(pos.lat) || !isFinite(pos.lng)) return;
+  if (marker) marker.remove();
+  marker = L.marker([pos.lat, pos.lng]).addTo(map);
+  chosenLatLng = { lat: pos.lat, lng: pos.lng };
   updateCoordsHint(
-    `الموقع المحدد: ${pos.lat().toFixed(6)}, ${pos.lng().toFixed(6)}`
+    `الموقع المحدد: ${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`
   );
 }
 
-window.initMap = function initMap() {
+function initLeafletMap() {
   const mapEl = document.getElementById("map");
   if (!mapEl) return;
+  if (typeof L === "undefined") {
+    updateCoordsHint(
+      "تعذّر تحميل خريطة OpenStreetMap. تأكد من الاتصال بالإنترنت ثم حدِّث الصفحة."
+    );
+    return;
+  }
 
-  const defaultCenter = { lat: 41.029, lng: 28.72 };
-  map = new google.maps.Map(mapEl, {
-    center: defaultCenter,
-    zoom: 12,
-    streetViewControl: false,
-    mapTypeControl: false,
-    fullscreenControl: false,
-  });
-  map.addListener("click", (e) => placeMarker(e.latLng));
+  const defaultCenter = [41.029, 28.72];
+  map = L.map(mapEl, { zoomControl: true }).setView(defaultCenter, 12);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+
+  map.on("click", (e) => placeMarker(e.latlng));
   mapReady = true;
   updateCoordsHint("لم يتم اختيار موقع بعد.");
-};
-
-function loadGoogleMaps() {
-  if (typeof google !== "undefined" && google.maps) {
-    mapReady = true;
-    return;
-  }
-  const existing = document.querySelector("script[data-google-maps]");
-  if (existing) return;
-
-  const apiKey = window.CONFIG?.GOOGLE_MAPS_KEY || "";
-  if (!apiKey) {
-    if (!mapErrorNotified) {
-      mapErrorNotified = true;
-      updateCoordsHint(
-        "أضف مفتاح Google Maps إلى js/config.js ثم فعّل Maps JavaScript API مع ربط الحساب البنكي وضبط قيود الدومين (localhost، Netlify، elbereketciftligi.org)."
-      );
-    }
-    return;
-  }
-
-  const params = new URLSearchParams({
-    key: apiKey,
-    callback: "initMap",
-    loading: "async",
-    libraries: "places",
-  });
-
-  const script = document.createElement("script");
-  script.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
-  script.async = true;
-  script.defer = true;
-  script.dataset.googleMaps = "true";
-  script.onerror = () => {
-    if (!mapErrorNotified) {
-      mapErrorNotified = true;
-      toast(
-        "تعذّر تحميل خريطة Google. تأكد من تفعيل API المطلوبة وربط Billing والتحقق من قيود النطاقات في Google Cloud."
-      );
-      updateCoordsHint(
-        "تعذّر تحميل الخريطة. تأكد من صحة المفتاح وتفعيل Maps JavaScript API وباقي الصلاحيات المطلوبة."
-      );
-    }
-  };
-  document.head.appendChild(script);
 }
 
-window.gm_authFailure = () => {
-  mapReady = false;
-  if (!mapErrorNotified) {
-    mapErrorNotified = true;
-    toast(
-      "خطأ في مفتاح Google Maps. تأكد من صلاحيته ومن ضبط قيود HTTP referrer في Google Cloud."
-    );
-    updateCoordsHint(
-      "تعذّر تحميل الخريطة بسبب مفتاح غير صالح أو قيود نطاق غير مضبوطة. عدّل الإعدادات ثم أعد التحديث."
-    );
-  }
-};
-
 if (document.getElementById("map")) {
-  updateCoordsHint("جاري تحميل خريطة Google...");
-  loadGoogleMaps();
+  updateCoordsHint("جاري تحميل خريطة OpenStreetMap...");
+  initLeafletMap();
 }
 
 const geoBtn = $("#geoBtn");
 if (geoBtn) {
   geoBtn.addEventListener("click", () => {
     if (!mapReady || !map) {
-      return toast("جاري تحميل خريطة Google، برجاء المحاولة بعد لحظات.");
+      return toast("جاري تحميل خريطة OpenStreetMap، برجاء المحاولة بعد لحظات.");
     }
     if (!navigator.geolocation)
       return toast("المتصفح لا يدعم تحديد الموقع.", "error");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const ll = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        map.setCenter(ll);
-        map.setZoom(16);
+        map.setView([ll.lat, ll.lng], 16);
         placeMarker(ll);
       },
       () => toast("تعذّر تحديد الموقع. اختره يدويًا من الخريطة.", "error"),
@@ -429,7 +372,7 @@ sendBtn.addEventListener("click", () => {
     locationLines = [];
   } else {
     const mapLink = chosenLatLng
-      ? `https://maps.google.com/?q=${chosenLatLng.lat},${chosenLatLng.lng}`
+      ? `https://www.openstreetmap.org/?mlat=${chosenLatLng.lat}&mlon=${chosenLatLng.lng}#map=17/${chosenLatLng.lat}/${chosenLatLng.lng}`
       : "";
     addressLine = `🏠 العنوان: ${address || "لم يُذكر"}`;
     locationLines = mapLink

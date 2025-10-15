@@ -42,7 +42,8 @@ const els = {
   drawerClose: document.querySelector(".drawer-close"),
   cartItems: document.getElementById("cartItems"),
   cartTotal: document.getElementById("cartTotal"),
-  waCheckout: document.getElementById("waCheckout"),
+  waCheckout: document.getElementById("waCheckout"), // قد لا يكون موجود بعد التعديل
+  goConfirm: document.getElementById("goConfirm"), // زر تأكيد الطلب الجديد (زر داخل الدرج)
 
   orderModal: document.getElementById("orderModal"),
   modalImg: document.getElementById("modalImg"),
@@ -352,6 +353,8 @@ function hydrateCart() {
 }
 function persistCart() {
   localStorage.setItem(CART_KEY, JSON.stringify(state.cart));
+  // عرّض السلة عالميًا لأي سكربت خارجي
+  window.cart = state.cart;
 }
 
 function addToCart(product, qty, cut, note) {
@@ -427,6 +430,9 @@ function calcTotals() {
 }
 
 function updateCartUI() {
+  // عرّض السلة عالميًا (مهم لخطوة التأكيد)
+  window.cart = state.cart;
+
   // عدّاد العناصر (يدعم الكسور في الكيلو)
   let count = 0;
   for (const x of state.cart) count += Number(x.qty) || 0;
@@ -436,13 +442,16 @@ function updateCartUI() {
   const countEl = els.cartFab?.querySelector(".count");
   if (countEl) countEl.textContent = countText;
 
+  // ✅ لو السلة فاضية: عطّل الزر
   if (!state.cart.length) {
     els.cartItems.innerHTML = `<p class="muted">السلة فارغة</p>`;
     els.cartTotal.textContent = priceFmt(0);
+    if (els.goConfirm) els.goConfirm.disabled = true; // << هنا التعطيل
     updateWALink();
     return;
   }
 
+  // رسم عناصر السلة
   els.cartItems.innerHTML = state.cart
     .map(
       (it, i) => `
@@ -465,7 +474,8 @@ function updateCartUI() {
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
-      </div>`
+      </div>
+    `
     )
     .join("");
 
@@ -475,8 +485,12 @@ function updateCartUI() {
       b.addEventListener("click", () => removeItem(+b.dataset.rm))
     );
 
+  // حساب الإجمالي
   const { total, hasUnpriced } = calcTotals();
   els.cartTotal.textContent = priceFmt(total);
+
+  // ✅ بعد ما خلّصنا الرسم والحساب: فعِّل الزر
+  if (els.goConfirm) els.goConfirm.disabled = false; // << ده المقصود بـ "بعد ما ترسم عناصر السلة"
 
   // ملاحظة توضيحية لو في أصناف كاملة بلا وزن تقريبي
   let note = els.cartDrawer.querySelector(".cart-note");
@@ -493,7 +507,9 @@ function updateCartUI() {
   updateWALink();
 }
 
+/* ===== رسالة واتساب القديمة (اختياري لو الرابط لسه موجود) ===== */
 function updateWALink() {
+  if (!els.waCheckout) return; // لو اتشال اللينك من الـ HTML
   const lines = state.cart.map((x) => {
     const qtyText = lineQtyText(x);
     const priceText =
@@ -541,3 +557,56 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
   updateCartUI();
   closeCart();
 });
+
+/* ===== زر تأكيد الطلب ➜ confirm.html ===== */
+(function setupConfirmButton() {
+  if (!els.goConfirm) return; // لو لسه ما غيرتش زرار الواتساب في HTML
+  const BRAND_NAME = "مزارع البركات";
+  const WA_NUMBER = "905524821848"; // بدون +
+
+  els.goConfirm.addEventListener("click", () => {
+    if (!state.cart.length) {
+      alert("السلة فارغة");
+      return;
+    }
+
+    // جهّز عناصر للـ confirm.html
+    const items = state.cart.map((x) => {
+      // ندمج التقطيع + الملاحظة (لو موجودين) مع الاسم لسهولة القراءة
+      const extras = [x.cut, x.note].filter(Boolean).join(" | ");
+      const name = extras ? `${x.name} (${extras})` : x.name;
+
+      // الوحدة: بالكيلو/كامل (السعر/كجم)/قطعة
+      let unit = "قطعة";
+      if (x.sellMode === 1) unit = "كجم";
+      else if (x.sellMode === 2) unit = "كجم"; // السعر/كجم لكن الكمية قطع
+
+      // الكمية تُحترم كما هي (قد تكون كسر للكيلو)
+      const qty = Number(x.qty) || 0;
+
+      // السعر: رقم فقط بدون رمز
+      const price = Number(x.price) || 0;
+
+      return { name, qty, unit, price };
+    });
+
+    // إجمالي تقريبي بنفس منطق السلة
+    const { total } = calcTotals();
+
+    const draft = {
+      items,
+      total: Number(total || 0),
+      brand: BRAND_NAME,
+      waNumber: WA_NUMBER,
+    };
+
+    try {
+      localStorage.setItem("orderDraft", JSON.stringify(draft));
+    } catch (e) {
+      console.error("orderDraft save error:", e);
+    }
+
+    // تحوّل لصفحة التأكيد
+    window.location.href = "conformation.html";
+  });
+})();

@@ -448,3 +448,8 @@ body {
     border-top-right-radius: 48px;
   }
 }
+
+.ltr-text {
+  direction: ltr;
+  unicode-bidi: plaintext;
+}

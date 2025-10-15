@@ -84,9 +84,9 @@ if (window.Papa) {
           category: (r["القسم"] || "").trim(),
           price: toNum(r["السعر"], 0),
           salePrice: toNum(r["سعر_الخصم"], 0),
-          cuts: (r["خيارات_التقطيع"] || "").trim(), // خانة واحدة فقط
+          cuts: (r["خيارات_التقطيع"] || "").trim(),
           image: (r["الصورة"] || "").trim(),
-          sellMode: Number((r["وضع_البيع"] || "0").trim()) || 0, // 0 قطعة / 1 كجم / 2 كامل+سعر/كجم
+          sellMode: Number((r["وضع_البيع"] || "0").trim()) || 0,
           approxKg: toNum(r["وزن_تقريبي_كجم"], 0),
         }))
         .filter((p) => p.name && p.category);
@@ -102,7 +102,13 @@ if (window.Papa) {
       hydrateCart();
       updateCartUI();
     },
+    error: (err) => {
+      console.error("CSV error:", err);
+      els.menuGrid.innerHTML = `<p class="muted">تعذر تحميل القائمة الآن. جرّب التحديث لاحقًا.</p>`;
+    },
   });
+} else {
+  els.menuGrid.innerHTML = `<p class="muted">تعذر تحميل القائمة (مكتبة PapaParse غير متاحة).</p>`;
 }
 
 /* ===== الفلاتر والبحث ===== */
@@ -125,9 +131,13 @@ function buildFilters() {
     els.categoryFilters.appendChild(b);
   });
 
+  let qTimer;
   els.searchInput.addEventListener("input", () => {
-    state.query = els.searchInput.value.trim();
-    applyFilters();
+    clearTimeout(qTimer);
+    qTimer = setTimeout(() => {
+      state.query = els.searchInput.value.trim();
+      applyFilters();
+    }, 200);
   });
 }
 
@@ -307,10 +317,11 @@ els.orderModal?.addEventListener("click", (e) => {
     closeModal();
 });
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeModal();
-    closeCart();
+// ===== إضافة المنتج عند الضغط على Enter =====
+els.orderModal?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    els.modalAdd?.click();
   }
 });
 
@@ -382,8 +393,7 @@ function removeItem(i) {
 }
 
 function lineQtyText(it) {
-  if (it.sellMode === 1)
-    return `${(+it.qty).toFixed(2).replace(/[^\d.]/g, "")} كجم`;
+  if (it.sellMode === 1) return `${(+it.qty).toFixed(2)} كجم`;
   if (it.sellMode === 2)
     return `${Math.floor(it.qty)} قطعة (يباع كامل • السعر/كجم${
       it.approxKg ? ` • ~${it.approxKg}كجم/قطعة` : ""
@@ -524,3 +534,10 @@ function closeCart() {
 els.cartFab?.addEventListener("click", openCart);
 els.drawerBackdrop?.addEventListener("click", closeCart);
 els.drawerClose?.addEventListener("click", closeCart);
+
+document.getElementById("cartClear")?.addEventListener("click", () => {
+  state.cart = [];
+  persistCart();
+  updateCartUI();
+  closeCart();
+});

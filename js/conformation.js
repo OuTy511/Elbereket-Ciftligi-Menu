@@ -233,10 +233,37 @@ let marker = null;
 let chosenLatLng = null;
 let map = null;
 let mapReady = false;
+let leafletLoaded = false;
+let leafletSourceIndex = 0;
+
+const LEAFLET_CSS_URLS = [
+  "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css",
+  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+];
+
+const LEAFLET_JS_URLS = [
+  "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
+  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+];
 
 function updateCoordsHint(text) {
   const hint = $("#coordsHint");
   if (hint) hint.textContent = text;
+}
+
+function ensureLeafletCSS() {
+  const head = document.head || document.getElementsByTagName("head")[0];
+  if (!head) return;
+  const alreadyLoaded = Array.from(
+    document.querySelectorAll('link[rel="stylesheet"]')
+  ).some((link) =>
+    LEAFLET_CSS_URLS.some((url) => link.href && link.href.includes(url))
+  );
+  if (alreadyLoaded) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = LEAFLET_CSS_URLS[0];
+  head.appendChild(link);
 }
 
 function placeMarker(latLng) {
@@ -256,6 +283,10 @@ function placeMarker(latLng) {
 function initLeafletMap() {
   const mapEl = document.getElementById("map");
   if (!mapEl) return;
+  if (mapReady && map) {
+    setTimeout(() => map.invalidateSize(), 50);
+    return;
+  }
   if (typeof L === "undefined") {
     updateCoordsHint(
       "تعذّر تحميل خريطة OpenStreetMap. تأكد من الاتصال بالإنترنت ثم حدِّث الصفحة."
@@ -274,12 +305,45 @@ function initLeafletMap() {
 
   map.on("click", (e) => placeMarker(e.latlng));
   mapReady = true;
+  leafletLoaded = true;
   updateCoordsHint("لم يتم اختيار موقع بعد.");
+  setTimeout(() => map.invalidateSize(), 100);
+}
+
+function loadLeafletLibrary() {
+  if (leafletLoaded || typeof L !== "undefined") {
+    initLeafletMap();
+    return;
+  }
+  if (leafletSourceIndex >= LEAFLET_JS_URLS.length) {
+    updateCoordsHint(
+      "تعذّر تحميل خريطة OpenStreetMap. تأكد من الاتصال بالإنترنت ثم حدِّث الصفحة."
+    );
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.src = LEAFLET_JS_URLS[leafletSourceIndex++];
+  script.async = true;
+  script.onload = () => {
+    if (typeof L !== "undefined") {
+      initLeafletMap();
+    } else {
+      loadLeafletLibrary();
+    }
+  };
+  script.onerror = () => {
+    loadLeafletLibrary();
+  };
+  (document.head || document.body || document.documentElement).appendChild(
+    script
+  );
 }
 
 if (document.getElementById("map")) {
   updateCoordsHint("جاري تحميل خريطة OpenStreetMap...");
-  initLeafletMap();
+  ensureLeafletCSS();
+  loadLeafletLibrary();
 }
 
 const geoBtn = $("#geoBtn");

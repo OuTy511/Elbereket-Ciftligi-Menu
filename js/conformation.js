@@ -1,10 +1,19 @@
-const i18nApi = window.i18n || {
+const fallbackI18n = {
   t: (key) => key,
   onChange: () => () => {},
 };
 
-const t = (key, params) =>
-  typeof i18nApi.t === "function" ? i18nApi.t(key, params) : key;
+const getI18n = () => window.i18n || fallbackI18n;
+
+const t = (key, params) => {
+  const api = getI18n();
+  return typeof api.t === "function" ? api.t(key, params) : key;
+};
+
+const onLangChange = (handler) => {
+  const api = getI18n();
+  return typeof api.onChange === "function" ? api.onChange(handler) : () => {};
+};
 
 /* ===== منيو الموبايل (نفس menu.js لعمل التوجل هنا) ===== */
 const btn = document.querySelector(".menu-toggle");
@@ -668,14 +677,12 @@ payInputs.forEach((input) =>
 );
 updatePayPlaceholder();
 
-if (typeof i18nApi.onChange === "function") {
-  i18nApi.onChange(() => {
-    renderRows();
-    toggleDeliveryUI();
-    applyMapHint();
-    updatePayPlaceholder();
-  });
-}
+onLangChange(() => {
+  renderRows();
+  toggleDeliveryUI();
+  applyMapHint();
+  updatePayPlaceholder();
+});
 
 /* ===== إرسال واتساب ===== */
 sendBtn.addEventListener("click", () => {

@@ -1,9 +1,19 @@
-const i18nApi = window.i18n || {
+const fallbackI18n = {
   t: (key) => key,
   onChange: () => () => {},
 };
 
-const translate = (key) => (typeof i18nApi.t === "function" ? i18nApi.t(key) : key);
+const getI18n = () => window.i18n || fallbackI18n;
+
+const translate = (key) => {
+  const api = getI18n();
+  return typeof api.t === "function" ? api.t(key) : key;
+};
+
+const onLangChange = (handler) => {
+  const api = getI18n();
+  return typeof api.onChange === "function" ? api.onChange(handler) : () => {};
+};
 
 /* ===== منيو الموبايل ===== */
 const hb = document.querySelector(".menu-toggle");
@@ -58,7 +68,7 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
     });
   });
 
-  i18nApi.onChange(() => {
+  onLangChange(() => {
     if (toast && toast.classList.contains("show")) {
       toast.textContent = translate("toast.copy.success");
     }

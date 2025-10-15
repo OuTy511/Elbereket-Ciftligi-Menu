@@ -1,10 +1,19 @@
-const i18nApi = window.i18n || {
+const fallbackI18n = {
   t: (key) => key,
   onChange: () => () => {},
 };
 
-const t = (key, params) =>
-  typeof i18nApi.t === "function" ? i18nApi.t(key, params) : key;
+const getI18n = () => window.i18n || fallbackI18n;
+
+const t = (key, params) => {
+  const api = getI18n();
+  return typeof api.t === "function" ? api.t(key, params) : key;
+};
+
+const onLangChange = (handler) => {
+  const api = getI18n();
+  return typeof api.onChange === "function" ? api.onChange(handler) : () => {};
+};
 
 const ALL_CATEGORY = "__ALL__";
 
@@ -893,7 +902,7 @@ function setupScrollTop() {
 setupFilterArrows();
 setupScrollTop();
 
-i18nApi.onChange(() => {
+onLangChange(() => {
   buildFilters();
   applyFilters();
   updateCartUI();

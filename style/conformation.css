@@ -380,8 +380,29 @@ h2 {
   cursor: pointer;
   font-weight: 800;
 }
+.chip-placeholder {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px dashed #d7d7d7;
+  border-radius: 999px;
+  background: #fafafa;
+  color: #9aa0a6;
+  font-weight: 700;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.chip-placeholder.hidden {
+  display: none;
+}
 .chip input {
   transform: scale(1.1);
+}
+
+.lbl .req {
+  color: #d14343;
+  font-size: 0.85em;
+  font-weight: 800;
 }
 
 /* عناصر التحكم في الكمية (موجودة من قبل) */

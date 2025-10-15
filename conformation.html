@@ -163,24 +163,27 @@
 
         <div class="grid">
           <div id="addressGroup">
-            <label class="lbl">العنوان التفصيلي (اختياري)</label>
+            <label class="lbl">العنوان التفصيلي <span class="req">(مطلوب)</span></label>
             <textarea
               id="custAddress"
               class="inp"
               rows="3"
               placeholder="مثال: باشاك شهير - الحي - الشارع - المبنى/الدور/الشقة"
+              required
             ></textarea>
             <p class="muted">
-              يمكنك الاكتفاء بتحديد الموقع من الخريطة بالأسفل.
+              اكتب العنوان بالتفصيل حتى مع تحديد الموقع من الخريطة.
             </p>
           </div>
 
           <div id="payGroup">
             <label class="lbl">طريقة الدفع</label>
             <div class="pill-row">
+              <span class="chip chip-placeholder" aria-hidden="true">
+                اختر طريقة الدفع
+              </span>
               <label class="chip"
-                ><input type="radio" name="pay" value="نقدًا" checked />
-                نقدًا</label
+                ><input type="radio" name="pay" value="نقدًا" /> نقدًا</label
               >
               <label class="chip"
                 ><input type="radio" name="pay" value="كريدي كارت (POS)" />

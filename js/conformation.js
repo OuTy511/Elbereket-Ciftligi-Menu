@@ -175,6 +175,10 @@ if (order?.waNumber) WA_NUMBER = order.waNumber;
 
 const addressGroup = $("#addressGroup");
 const payGroup = $("#payGroup");
+const payPlaceholder = document.querySelector(".chip-placeholder");
+const payInputs = Array.from(
+  document.querySelectorAll('input[name="pay"]')
+);
 const mapCard = $("#mapCard");
 const sendBtn = $("#sendBtn");
 const phoneInput = $("#custPhone");
@@ -570,9 +574,9 @@ function toggleDeliveryUI() {
       .value || "delivery";
   const isPickup = mode === "pickup";
 
-  addressGroup.style.display = isPickup ? "none" : "";
-  payGroup.style.display = isPickup ? "none" : "";
-  mapCard.style.display = isPickup ? "none" : "";
+  if (addressGroup) addressGroup.style.display = isPickup ? "none" : "";
+  if (payGroup) payGroup.style.display = "";
+  if (mapCard) mapCard.style.display = isPickup ? "none" : "";
 
   sendBtn.innerHTML = isPickup
     ? '<i class="fa-brands fa-whatsapp"></i> تأكيد الطلب (استلام من المحل)'
@@ -583,6 +587,19 @@ document
   .forEach((r) => r.addEventListener("change", toggleDeliveryUI));
 toggleDeliveryUI();
 
+function updatePayPlaceholder() {
+  if (!payPlaceholder) return;
+  const selected = document.querySelector('input[name="pay"]:checked');
+  payPlaceholder.classList.toggle("hidden", Boolean(selected));
+}
+
+payInputs.forEach((input) =>
+  input.addEventListener("change", () => {
+    updatePayPlaceholder();
+  })
+);
+updatePayPlaceholder();
+
 /* ===== إرسال واتساب ===== */
 sendBtn.addEventListener("click", () => {
   const name = $("#custName").value.trim();
@@ -590,8 +607,8 @@ sendBtn.addEventListener("click", () => {
   const phone = sanitizeNumericInput(phoneField ? phoneField.value.trim() : "", false);
   if (phoneField) phoneField.value = phone;
   const address = $("#custAddress") ? $("#custAddress").value.trim() : "";
-  const pay =
-    (document.querySelector('input[name="pay"]:checked') || {}).value || "نقدًا";
+  const payInput = document.querySelector('input[name="pay"]:checked');
+  const pay = payInput ? payInput.value : "";
   const deliveryType =
     (document.querySelector('input[name="deliveryType"]:checked') || {})
       .value || "delivery";
@@ -600,13 +617,10 @@ sendBtn.addEventListener("click", () => {
   if (!name) return toast("من فضلك أدخل الاسم.", "error");
   if (!phone) return toast("من فضلك أدخل رقم الهاتف.", "error");
 
-  if (deliveryType === "delivery") {
-    if (!address && !chosenLatLng)
-      return toast(
-        "من فضلك أدخل العنوان أو حدِّد موقع التسليم على الخريطة.",
-        "error"
-      );
-  }
+  if (deliveryType === "delivery" && !address)
+    return toast("من فضلك اكتب العنوان التفصيلي.", "error");
+
+  if (!pay) return toast("من فضلك اختر طريقة الدفع المناسبة.", "error");
 
   const lines = order.items.map((it) => {
     const parts = [
@@ -628,14 +642,14 @@ sendBtn.addEventListener("click", () => {
 
   let addressLine = "";
   let locationLines = [];
-  let payLine = `💳 طريقة الدفع: ${pay}`;
+  let payLine = pay ? `💳 طريقة الدفع: ${pay}` : "";
 
   if (deliveryType === "pickup") {
     addressLine = "🏪 طريقة الاستلام: استلام من المحل";
     locationLines = [];
   } else {
     const mapLink = chosenLatLng
-      ? `https://www.openstreetmap.org/?mlat=${chosenLatLng.lat}&mlon=${chosenLatLng.lng}#map=17/${chosenLatLng.lat}/${chosenLatLng.lng}`
+      ? `https://maps.google.com/?q=${chosenLatLng.lat},${chosenLatLng.lng}`
       : "";
     addressLine = `🏠 العنوان: ${address || "لم يُذكر"}`;
     locationLines = mapLink

@@ -642,7 +642,7 @@ sendBtn.addEventListener("click", () => {
 
   let addressLine = "";
   let locationLines = [];
-  let payLine = pay ? `💳 طريقة الدفع: ${pay}` : "";
+  const payLine = pay ? `💳 طريقة الدفع: ${pay}` : "";
 
   if (deliveryType === "pickup") {
     addressLine = "🏪 طريقة الاستلام: استلام من المحل";
@@ -652,15 +652,10 @@ sendBtn.addEventListener("click", () => {
       ? `https://maps.google.com/?q=${chosenLatLng.lat},${chosenLatLng.lng}`
       : "";
     addressLine = `🏠 العنوان: ${address || "لم يُذكر"}`;
-    locationLines = mapLink
-      ? [
-          `📍 الموقع على الخريطة: ${mapLink}`,
-          `🧭 اللوكيشن: ${mapLink}`,
-        ]
-      : [];
+    locationLines = mapLink ? [`🧭 اللوكيشن: ${mapLink}`] : [];
   }
 
-  const msg = [
+  const msgParts = [
     header,
     "",
     "🧾 تفاصيل الطلب:",
@@ -669,12 +664,22 @@ sendBtn.addEventListener("click", () => {
     totalLine,
     "",
     ...customerBlock,
+    "",
     addressLine,
-    ...locationLines,
-    payLine,
-    approxNote,
-  ]
-    .filter(Boolean)
+  ];
+
+  if (locationLines.length) {
+    msgParts.push("", ...locationLines);
+  }
+
+  if (payLine) {
+    msgParts.push("", payLine);
+  }
+
+  msgParts.push("", approxNote);
+
+  const msg = msgParts
+    .filter((line) => line !== null && line !== undefined && line !== false)
     .join("\n");
 
   const waURL = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;

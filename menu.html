@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="style/menu.css" />
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   </head>
-  <body>
+  <body class="menu-page">
     <!-- Header -->
     <header class="header">
       <div class="container header__inner">
@@ -65,10 +65,31 @@
     <!-- أدوات المنيو -->
     <section class="menu-tools container">
       <div class="tools-row">
-        <div class="filters-scroller">
-          <div id="categoryFilters" class="filters"></div>
+        <div class="filters-wrapper">
+          <button
+            class="filters-arrow prev"
+            type="button"
+            data-filter-arrow="prev"
+            aria-label="تصنيفات سابقة"
+          >
+            <i class="fa-solid fa-angle-right"></i>
+          </button>
+          <div class="filters-scroller" id="filtersScroll">
+            <div id="categoryFilters" class="filters"></div>
+          </div>
+          <button
+            class="filters-arrow next"
+            type="button"
+            data-filter-arrow="next"
+            aria-label="تصنيفات إضافية"
+          >
+            <i class="fa-solid fa-angle-left"></i>
+          </button>
         </div>
-        <input id="searchInput" type="text" placeholder="ابحث عن منتج..." />
+        <label class="search-wrap" for="searchInput">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="searchInput" type="text" placeholder="ابحث عن منتج..." />
+        </label>
       </div>
     </section>
 
@@ -88,6 +109,15 @@
     <button id="cartFab" class="cart-fab" aria-label="فتح السلة">
       <i class="fa-solid fa-basket-shopping"></i>
       <span class="count">0</span>
+    </button>
+
+    <button
+      id="backToTopMenu"
+      class="scroll-top-fab"
+      type="button"
+      aria-label="العودة إلى أعلى الصفحة"
+    >
+      <i class="fa-solid fa-arrow-up"></i>
     </button>
 
     <!-- درج السلة -->

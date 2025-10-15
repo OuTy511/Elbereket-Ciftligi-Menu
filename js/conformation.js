@@ -47,17 +47,64 @@ const toNum = (v, def = 0) => {
   return isNaN(n) ? def : n;
 };
 const money = (n) => Number(n || 0).toFixed(2);
+const moneyTL = (n) => `${money(n)} TL`;
+const formatQtyValue = (qty) => {
+  const raw = typeof qty === "string" ? qty.replace(",", ".") : qty;
+  const n = Number(raw || 0);
+  if (!isFinite(n)) return "0";
+  return parseFloat(n.toFixed(2)).toString();
+};
+
+function resolveMode(it) {
+  if (typeof it.sellMode === "number") return it.sellMode;
+  if (it.unit === "كجم") return 1;
+  return 0;
+}
+
+function qtyForMessage(it) {
+  const mode = resolveMode(it);
+  if (mode === 1) return `${formatQtyValue(it.qty)} كجم`;
+  if (mode === 2) {
+    const pieces = Math.max(1, Math.floor(Number(it.qty) || 0));
+    const approx = it.approxKg > 0 ? ` (~${it.approxKg} كجم/قطعة)` : "";
+    return `${pieces} قطعة${approx}`;
+  }
+  if (String(it.unit || "").includes("كجم"))
+    return `${formatQtyValue(it.qty)} ${it.unit}`.trim();
+  const pieces = Math.max(1, Math.floor(Number(it.qty) || 0));
+  return `${pieces} ${it.unit && it.unit !== "قطعة" ? it.unit : "عدد"}`.trim();
+}
+
+function priceLabelForMessage(it) {
+  const mode = resolveMode(it);
+  if (mode === 0 && it.unit && !it.unit.includes("كجم")) return "سعر القطعة";
+  return "سعر الكيلو";
+}
 
 function saveDraft() {
   try {
     localStorage.setItem("orderDraft", JSON.stringify(order));
   } catch {}
 }
+function lineTotal(it) {
+  const price = toNum(it.price, 0);
+  const qty = toNum(it.qty, 0);
+  const mode = resolveMode(it);
+  if (mode === 2) {
+    const approx = toNum(it.approxKg, 0);
+    if (approx > 0) {
+      return price * approx * Math.max(1, Math.floor(qty || 0));
+    }
+    return 0;
+  }
+  if (mode === 1) {
+    return price * qty;
+  }
+  return price * Math.max(1, Math.floor(qty || 0));
+}
+
 function calcTotal() {
-  return order.items.reduce(
-    (s, it) => s + toNum(it.qty, 0) * toNum(it.price, 0),
-    0
-  );
+  return order.items.reduce((sum, it) => sum + lineTotal(it), 0);
 }
 
 /* ===== Toast رسائل أنيقة بدل alert ===== */
@@ -81,7 +128,23 @@ function renderRows() {
 
     const tdName = document.createElement("td");
     tdName.dataset.label = "الصنف";
-    tdName.textContent = it.name || "-";
+    const nameWrap = document.createElement("div");
+    nameWrap.className = "cell-title";
+    nameWrap.textContent = it.name || "-";
+    tdName.appendChild(nameWrap);
+    const extras = [];
+    if (it.cut) extras.push(`تقطيع: ${it.cut}`);
+    if (it.note) extras.push(`ملاحظة: ${it.note}`);
+    if (!extras.length && /\((.+)\)/.test(it.name || "")) {
+      const match = (it.name || "").match(/\((.+)\)/);
+      if (match && match[1]) extras.push(match[1]);
+    }
+    if (extras.length) {
+      const extraEl = document.createElement("div");
+      extraEl.className = "cell-extra";
+      extraEl.textContent = extras.join(" • ");
+      tdName.appendChild(extraEl);
+    }
 
     const tdQty = document.createElement("td");
     tdQty.dataset.label = "الكمية";
@@ -115,7 +178,7 @@ function renderRows() {
       const n = clamp(v);
       it.qty = n;
       input.value = String(n);
-      tdLine.textContent = `${money(n * toNum(it.price, 0))} TL`;
+      tdLine.textContent = moneyTL(lineTotal(it));
       totalEl.textContent = money(calcTotal());
       saveDraft();
     }
@@ -138,7 +201,7 @@ function renderRows() {
     const tdLine = document.createElement("td");
     tdLine.dataset.label = "الإجمالي التقريبي";
     tdLine.className = "ltr-text";
-    tdLine.textContent = `${money(toNum(it.qty, 1) * toNum(it.price, 0))} TL`;
+    tdLine.textContent = moneyTL(lineTotal(it));
 
     const tdDel = document.createElement("td");
     tdDel.dataset.label = "حذف";
@@ -220,26 +283,38 @@ function loadGoogleMaps() {
   const existing = document.querySelector("script[data-google-maps]");
   if (existing) return;
 
-  const apiKey = window.APP_CONFIG?.googleMapsApiKey || "";
-  if (!apiKey && !mapErrorNotified) {
-    mapErrorNotified = true;
-    updateCoordsHint(
-      "يرجى إضافة مفتاح Google Maps في ملف config.js لعرض الخريطة والتحديد."
-    );
+  const apiKey = window.CONFIG?.GOOGLE_MAPS_KEY || "";
+  if (!apiKey) {
+    if (!mapErrorNotified) {
+      mapErrorNotified = true;
+      updateCoordsHint(
+        "أضف مفتاح Google Maps إلى js/config.js ثم فعّل Maps JavaScript API مع ربط الحساب البنكي وضبط قيود الدومين (localhost، Netlify، elbereketciftligi.org)."
+      );
+    }
+    return;
   }
 
+  const params = new URLSearchParams({
+    key: apiKey,
+    callback: "initMap",
+    loading: "async",
+    libraries: "places",
+  });
+
   const script = document.createElement("script");
-  script.src =
-    "https://maps.googleapis.com/maps/api/js?callback=initMap&loading=async" +
-    (apiKey ? `&key=${encodeURIComponent(apiKey)}` : "");
+  script.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
   script.async = true;
   script.defer = true;
   script.dataset.googleMaps = "true";
   script.onerror = () => {
     if (!mapErrorNotified) {
       mapErrorNotified = true;
-      toast("تعذّر تحميل خريطة Google. تأكد من إعداد مفتاح API الصحيح.");
-      updateCoordsHint("تعذّر تحميل الخريطة. حاول مرة أخرى لاحقًا.");
+      toast(
+        "تعذّر تحميل خريطة Google. تأكد من تفعيل API المطلوبة وربط Billing والتحقق من قيود النطاقات في Google Cloud."
+      );
+      updateCoordsHint(
+        "تعذّر تحميل الخريطة. تأكد من صحة المفتاح وتفعيل Maps JavaScript API وباقي الصلاحيات المطلوبة."
+      );
     }
   };
   document.head.appendChild(script);
@@ -249,8 +324,12 @@ window.gm_authFailure = () => {
   mapReady = false;
   if (!mapErrorNotified) {
     mapErrorNotified = true;
-    toast("خطأ في مفتاح Google Maps. تأكد من صلاحيته.");
-    updateCoordsHint("تعذّر تحميل الخريطة بسبب مفتاح غير صالح.");
+    toast(
+      "خطأ في مفتاح Google Maps. تأكد من صلاحيته ومن ضبط قيود HTTP referrer في Google Cloud."
+    );
+    updateCoordsHint(
+      "تعذّر تحميل الخريطة بسبب مفتاح غير صالح أو قيود نطاق غير مضبوطة. عدّل الإعدادات ثم أعد التحديث."
+    );
   }
 };
 
@@ -324,48 +403,54 @@ sendBtn.addEventListener("click", () => {
   }
 
   const lines = order.items.map((it) => {
-    const qty = `${it.qty ?? 1}${it.unit ? " " + it.unit : ""}`;
-    const price = `${money(it.price)} TL/${it.unit || ""}`.trim();
-    const lineTotal = money(toNum(it.qty, 1) * toNum(it.price, 0));
-    return `• ${it.name} — ${qty} — ${price} — الإجمالي التقريبي: ${lineTotal} TL`;
+    const parts = [
+      `• ${it.name}`,
+      `      ${priceLabelForMessage(it)}: ${moneyTL(it.price)}`,
+      `      الكمية: ${qtyForMessage(it)}`,
+    ];
+    if (it.cut) parts.push(`      طريقة التقطيع: ${it.cut}`);
+    if (it.note) parts.push(`      ملاحظة: ${it.note}`);
+    return parts.join("\n");
   });
 
-  const totalLine = `الإجمالي التقريبي: ${money(calcTotal())} TL`;
+  const totalLine = `💰 الإجمالي التقريبي: ${moneyTL(calcTotal())}`;
   const approxNote =
-    "⚠️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
-  const header = `طلب جديد من ${order.brand || "المتجر"} 🐄🥩`;
-  const customer = `👤 الاسم: ${name}\n📞 الهاتف: ${phone}`;
+    "ℹ️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
+  const header = `طلب جديد من ${order.brand || "مزارع البركات"} 🌿🐄`;
 
-  let addressBlock = "";
-  let payLine = "";
-  let pinLine = "";
+  const customerBlock = [`👤 الاسم: ${name}`, `📞 الهاتف: ${phone}`];
+
+  let addressLine = "";
+  let locationLines = [];
+  let payLine = `💳 طريقة الدفع: ${pay}`;
 
   if (deliveryType === "pickup") {
-    addressBlock = "🏪 طريقة الاستلام: استلام من المحل (العميل سيحضر للموقع)";
+    addressLine = "🏪 طريقة الاستلام: استلام من المحل";
+    locationLines = [];
   } else {
     const mapLink = chosenLatLng
       ? `https://maps.google.com/?q=${chosenLatLng.lat},${chosenLatLng.lng}`
       : "";
-    addressBlock = address
-      ? `📍 العنوان: ${address}`
-      : chosenLatLng
-      ? `📍 الموقع على الخريطة: ${mapLink}`
-      : "";
-    pinLine = chosenLatLng ? `📌 اللوكيشن: ${mapLink}` : "";
-    payLine = `💳 طريقة الدفع: ${pay}`;
+    addressLine = `🏠 العنوان: ${address || "لم يُذكر"}`;
+    locationLines = mapLink
+      ? [
+          `📍 الموقع على الخريطة: ${mapLink}`,
+          `🧭 اللوكيشن: ${mapLink}`,
+        ]
+      : [];
   }
 
   const msg = [
     header,
     "",
-    "تفاصيل الطلب:",
+    "🧾 تفاصيل الطلب:",
     ...lines,
     "",
     totalLine,
     "",
-    customer,
-    addressBlock,
-    pinLine,
+    ...customerBlock,
+    addressLine,
+    ...locationLines,
     payLine,
     approxNote,
   ]
@@ -375,3 +460,17 @@ sendBtn.addEventListener("click", () => {
   const waURL = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
   window.location.href = waURL;
 });
+
+(() => {
+  const btn = document.getElementById("backToTopConfirm");
+  if (!btn) return;
+  const toggle = () => {
+    if (window.scrollY > 240) btn.classList.add("show");
+    else btn.classList.remove("show");
+  };
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  window.addEventListener("scroll", toggle, { passive: true });
+  toggle();
+})();

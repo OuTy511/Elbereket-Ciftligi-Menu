@@ -19,6 +19,17 @@ if (btn && navMobile && list) {
 const CSV_PATH = "data/products.csv";
 const placeholder = "https://placehold.co/1024x1024";
 const priceFmt = (n) => `${(+n || 0).toLocaleString("tr-TR")}₺`;
+const moneyTL = (n) =>
+  `${Number(n || 0).toLocaleString("tr-TR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} TL`;
+const formatQtyValue = (qty) => {
+  const raw = typeof qty === "string" ? qty.replace(",", ".") : qty;
+  const n = Number(raw || 0);
+  if (!isFinite(n)) return "0";
+  return parseFloat(n.toFixed(2)).toString();
+};
 const toNum = (v, def = 0) => {
   if (v == null) return def;
   const s = String(v)
@@ -31,12 +42,15 @@ const toNum = (v, def = 0) => {
 /* ===== عناصر الصفحة ===== */
 const els = {
   categoryFilters: document.getElementById("categoryFilters"),
+  filtersScroller: document.getElementById("filtersScroll"),
+  filterArrows: document.querySelectorAll("[data-filter-arrow]"),
   searchInput: document.getElementById("searchInput"),
   offers: document.getElementById("offers"),
   offersGrid: document.getElementById("offersGrid"),
   menuGrid: document.getElementById("menuGrid"),
 
   cartFab: document.getElementById("cartFab"),
+  scrollTop: document.getElementById("backToTopMenu"),
   cartDrawer: document.getElementById("cartDrawer"),
   drawerBackdrop: document.getElementById("drawerBackdrop"),
   drawerClose: document.querySelector(".drawer-close"),
@@ -140,6 +154,26 @@ function buildFilters() {
       applyFilters();
     }, 200);
   });
+}
+
+function setupFilterArrows() {
+  if (!els.filtersScroller) return;
+  const isRTL = document.documentElement?.dir === "rtl";
+  const scroll = (dir) => {
+    const base = els.filtersScroller.clientWidth || window.innerWidth || 320;
+    const step = base * 0.7;
+    const delta = dir * step * (isRTL ? -1 : 1);
+    els.filtersScroller.scrollBy({ left: delta, behavior: "smooth" });
+  };
+
+  if (els.filterArrows?.forEach) {
+    els.filterArrows.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const dir = btn.dataset.filterArrow === "prev" ? -1 : 1;
+        scroll(dir);
+      });
+    });
+  }
 }
 
 function applyFilters() {
@@ -409,6 +443,20 @@ function linePriceText(it) {
   return priceFmt(it.price);
 }
 
+function qtyForMessage(it) {
+  if (it.sellMode === 1) return `${formatQtyValue(it.qty)} كجم`;
+  if (it.sellMode === 2) {
+    const pcs = Math.max(1, Math.floor(+it.qty || 0));
+    const approx = it.approxKg > 0 ? ` (~${it.approxKg} كجم/قطعة)` : "";
+    return `${pcs} قطعة${approx}`;
+  }
+  return `${Math.max(1, Math.floor(+it.qty || 0))} عدد`;
+}
+
+function priceLabelForMessage(it) {
+  return it.sellMode === 0 ? "سعر القطعة" : "سعر الكيلو";
+}
+
 function calcTotals() {
   let total = 0;
   let hasUnpriced = false;
@@ -515,30 +563,38 @@ function updateCartUI() {
 /* ===== رسالة واتساب القديمة (اختياري لو الرابط لسه موجود) ===== */
 function updateWALink() {
   if (!els.waCheckout) return; // لو اتشال اللينك من الـ HTML
-  const lines = state.cart.map((x) => {
-    const qtyText = lineQtyText(x);
-    const priceText =
-      x.sellMode === 2 ? `${priceFmt(x.price)} / كجم` : `${priceFmt(x.price)}`;
-    const approxText =
-      x.sellMode === 2 && x.approxKg > 0
-        ? ` — تقديري/قطعة: ~${x.approxKg}كجم`
-        : "";
-    const noteText = x.note ? ` — ملاحظة: ${x.note}` : "";
-    return `• ${x.name} — ${
-      x.cut || "بدون"
-    } — الكمية: ${qtyText} — السعر: ${priceText}${approxText}${noteText}`;
+  const lines = state.cart.map((item) => {
+    const parts = [
+      `• ${item.name}`,
+      `      ${priceLabelForMessage(item)}: ${moneyTL(item.price)}`,
+      `      الكمية: ${qtyForMessage(item)}`,
+    ];
+    if (item.cut) parts.push(`      طريقة التقطيع: ${item.cut}`);
+    if (item.note) parts.push(`      ملاحظة: ${item.note}`);
+    return parts.join("\n");
   });
 
   const { total, hasUnpriced } = calcTotals();
-  const totalLine = `الإجمالي التقريبي: ${priceFmt(total)}${
-    hasUnpriced ? " (لا يشمل أصناف كاملة بدون وزن تقريبي)" : ""
+  const header = "طلب جديد من مزارع البركات 🌾🥩";
+  const totalLine = `💰 الإجمالي التقريبي: ${moneyTL(total)}${
+    hasUnpriced ? " (قد تتغير الأصناف الكاملة بعد الوزن)" : ""
   }`;
   const approxLine =
-    "⚠️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
+    "ℹ️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
 
-  const msgRaw = `طلب جديد من موقع مزارع البركات:\n\n${lines.join(
-    "\n"
-  )}\n\n${totalLine}\n${approxLine}`;
+  const msgRaw = [
+    header,
+    "",
+    "🧾 تفاصيل الطلب:",
+    ...lines,
+    "",
+    totalLine,
+    "",
+    approxLine,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
   const encoded = encodeURIComponent(msgRaw);
   els.waCheckout.href = `https://wa.me/905524821848?text=${encoded}`;
 }
@@ -579,10 +635,6 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
 
     // جهّز عناصر للـ confirm.html
     const items = state.cart.map((x) => {
-      // ندمج التقطيع + الملاحظة (لو موجودين) مع الاسم لسهولة القراءة
-      const extras = [x.cut, x.note].filter(Boolean).join(" | ");
-      const name = extras ? `${x.name} (${extras})` : x.name;
-
       // الوحدة: بالكيلو/كامل (السعر/كجم)/قطعة
       let unit = "قطعة";
       if (x.sellMode === 1) unit = "كجم";
@@ -594,7 +646,16 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
       // السعر: رقم فقط بدون رمز
       const price = Number(x.price) || 0;
 
-      return { name, qty, unit, price };
+      return {
+        name: x.name,
+        qty,
+        unit,
+        price,
+        cut: x.cut || "",
+        note: x.note || "",
+        sellMode: x.sellMode,
+        approxKg: x.approxKg || 0,
+      };
     });
 
     // إجمالي تقريبي بنفس منطق السلة
@@ -617,3 +678,20 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
     window.location.href = "conformation.html";
   });
 })();
+
+function setupScrollTop() {
+  const btn = els.scrollTop;
+  if (!btn) return;
+  const toggle = () => {
+    if (window.scrollY > 240) btn.classList.add("show");
+    else btn.classList.remove("show");
+  };
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  window.addEventListener("scroll", toggle, { passive: true });
+  toggle();
+}
+
+setupFilterArrows();
+setupScrollTop();

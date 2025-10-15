@@ -24,6 +24,16 @@ body {
   padding: 0 16px;
 }
 
+@media (max-width: 1024px) {
+  .confirm-container {
+    max-width: none;
+    padding-inline: clamp(16px, 4vw, 24px);
+  }
+  .card {
+    border-radius: 18px;
+  }
+}
+
 /* Cards */
 .card {
   background: #fff;
@@ -74,6 +84,14 @@ h2 {
 }
 .table th {
   background: #fafafa;
+}
+.cell-title {
+  font-weight: 800;
+}
+.cell-extra {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
 }
 .total {
   display: flex;
@@ -228,6 +246,9 @@ h2 {
     font-weight: 800;
     color: #333;
   }
+  .cell-extra {
+    margin-top: 2px;
+  }
   .table td[data-label="الصنف"] {
     font-weight: 800;
   }
@@ -279,6 +300,7 @@ h2 {
   color: var(--brand);
   border: 1px solid rgba(84, 180, 53, 0.3);
   box-shadow: 0 10px 24px rgba(84, 180, 53, 0.15);
+  text-decoration: none;
 }
 .btn-dark:hover {
   background: #f4fbef;
@@ -292,6 +314,39 @@ h2 {
 }
 .btn-outline:hover {
   background: #f7f7f7;
+}
+
+.scroll-top-fab {
+  position: fixed;
+  bottom: 18px;
+  inset-inline-start: 18px;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand);
+  border: 1px solid rgba(84, 180, 53, 0.35);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease,
+    background-color 0.25s ease, color 0.25s ease;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 95;
+}
+.scroll-top-fab.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.scroll-top-fab:hover {
+  background: var(--brand);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.scroll-top-fab i {
+  font-size: 18px;
 }
 
 /* اختيارات على هيئة شرائح */

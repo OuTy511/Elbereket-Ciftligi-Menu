@@ -222,13 +222,49 @@ body {
 /* ===== الفاصل المتداخل ===== */
 .section-overlap {
   position: relative;
-  margin-top: -100px;
+  margin-top: -90px;
   border-top-left-radius: 80px;
   border-top-right-radius: 80px;
   background: #fff;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
   padding-top: 140px;
   z-index: 2;
+}
+
+/* فواصل لينة بين الأقسام */
+.section-break {
+  position: relative;
+  height: 70px;
+  overflow: hidden;
+}
+.section-break--light {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #ffffff 75%);
+}
+.section-break--soft {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 85%);
+}
+.section-break::after,
+.section-break::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(220px, 42vw, 420px);
+  height: 120px;
+  border-radius: 50%;
+  opacity: 0;
+}
+.section-break--light::after {
+  top: -90px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  opacity: 1;
+}
+.section-break--soft::before {
+  bottom: -90px;
+  background: #f7f7f7;
+  box-shadow: 0 -16px 38px rgba(0, 0, 0, 0.07);
+  opacity: 1;
 }
 
 /* ===== من نحن ===== */
@@ -318,6 +354,40 @@ body {
   color: var(--brand);
   font-size: 18px;
   font-weight: 900;
+}
+
+/* زر العودة إلى الأعلى */
+.scroll-top-fab {
+  position: fixed;
+  bottom: 18px;
+  inset-inline-start: 18px;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand);
+  border: 1px solid rgba(84, 180, 53, 0.35);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease,
+    background-color 0.25s ease, color 0.25s ease;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 90;
+}
+.scroll-top-fab.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.scroll-top-fab:hover {
+  background: var(--brand);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.scroll-top-fab i {
+  font-size: 18px;
 }
 .c-card h3 {
   margin: 6px 0 0;

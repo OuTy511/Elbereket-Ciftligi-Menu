@@ -241,12 +241,12 @@ sendBtn.addEventListener("click", () => {
 
   const lines = order.items.map((it) => {
     const qty = `${it.qty ?? 1}${it.unit ? " " + it.unit : ""}`;
-    const price = `${money(it.price)} TL/${it.unit || ""}`.trim();
+    const price = `${money(it.price)}₺/${it.unit || ""}`.trim();
     const lineTotal = money(toNum(it.qty, 1) * toNum(it.price, 0));
-    return `• ${it.name} — ${qty} — ${price} — الإجمالي: ${lineTotal} TL`;
+    return `• ${it.name} — ${qty} — ${price} — الإجمالي: ${lineTotal}₺`;
   });
 
-  const totalLine = `الإجمالي: ${money(calcTotal())} TL`;
+  const totalLine = `الإجمالي: ${money(calcTotal())}₺`;
   const header = `طلب جديد من ${order.brand || "المتجر"} 🐄🥩`;
   const customer = `👤 الاسم: ${name}\n📞 الهاتف: ${phone}`;
 

@@ -1,3 +1,11 @@
+const i18nApi = window.i18n || {
+  t: (key) => key,
+  onChange: () => () => {},
+};
+
+const t = (key, params) =>
+  typeof i18nApi.t === "function" ? i18nApi.t(key, params) : key;
+
 /* ===== منيو الموبايل (نفس menu.js لعمل التوجل هنا) ===== */
 const btn = document.querySelector(".menu-toggle");
 const navMobile = document.querySelector(".nav-mobile");
@@ -133,7 +141,7 @@ try {
   order = JSON.parse(localStorage.getItem("orderDraft") || "null");
 } catch {}
 if (!order || !order.items || !order.items.length) {
-  toast("لا يوجد طلب قيد التأكيد. سيتم الرجوع للمنيو.", "error");
+  toast(t("confirm.toast.noDraft"), "error");
   window.location.href = "menu.html";
 }
 
@@ -161,7 +169,7 @@ if (order && Array.isArray(order.items) && cartSnapshot.length) {
         it.approxKg = src.approxKg;
     }
     if (typeof it.sellMode === "undefined") {
-      if (it.unit === "كجم") it.sellMode = 1;
+      if (it.unit === "كجم" || it.unit === "kg") it.sellMode = 1;
       else it.sellMode = 0;
     }
   });
@@ -170,7 +178,10 @@ if (order && Array.isArray(order.items) && cartSnapshot.length) {
 /* ===== عناصر الصفحة ===== */
 const tbody = $("#itemsBody");
 const totalEl = $("#totalAmount");
-$("#brandName").textContent = order?.brand ? `المتجر: ${order.brand}` : "";
+const brandDisplay = order?.brand
+  ? t("confirm.summary.store", { brand: order.brand })
+  : "";
+$("#brandName").textContent = brandDisplay;
 if (order?.waNumber) WA_NUMBER = order.waNumber;
 
 const addressGroup = $("#addressGroup");
@@ -206,30 +217,72 @@ const formatQtyValue = (qty) => {
   return parseFloat(n.toFixed(2)).toString();
 };
 
+const translatePayMethod = (value = "") => {
+  const v = value.trim();
+  if (!v) return "";
+  const lower = v.toLowerCase();
+  if (
+    v === "نقدًا" ||
+    lower.includes("nakit") ||
+    lower.includes("cash") ||
+    lower.includes("نقد") ||
+    lower.includes("كاش")
+  )
+    return t("confirm.form.payment.cash");
+  if (
+    v.includes("POS") ||
+    lower.includes("pos") ||
+    lower.includes("kredi") ||
+    lower.includes("card") ||
+    lower.includes("kart")
+  )
+    return t("confirm.form.payment.pos");
+  return v;
+};
+
 function resolveMode(it) {
   if (typeof it.sellMode === "number") return it.sellMode;
-  if (it.unit === "كجم") return 1;
+  const unit = (it.unit || "").toLowerCase();
+  if (unit.includes("كجم") || unit.includes("kg")) return 1;
   return 0;
+}
+
+function unitLabel(it) {
+  const unitRaw = (it.unit || "").trim();
+  const unitLower = unitRaw.toLowerCase();
+  const mode = resolveMode(it);
+  if (mode === 1) return t("menu.units.kg");
+  if (mode === 2) return t("menu.units.piecePlural");
+  if (!unitRaw) return t("menu.units.count");
+  if (unitLower === "piece" || unitRaw === "قطعة") return t("menu.units.piece");
+  if (unitLower === "عدد") return t("menu.units.count");
+  if (unitLower.includes("kg") || unitLower.includes("كجم"))
+    return t("menu.units.kg");
+  return unitRaw;
 }
 
 function qtyForMessage(it) {
   const mode = resolveMode(it);
-  if (mode === 1) return `${formatQtyValue(it.qty)} كجم`;
+  if (mode === 1) return `${formatQtyValue(it.qty)} ${t("menu.units.kg")}`;
   if (mode === 2) {
     const pieces = Math.max(1, Math.floor(Number(it.qty) || 0));
-    const approx = it.approxKg > 0 ? ` (~${it.approxKg} كجم/قطعة)` : "";
-    return `${pieces} قطعة${approx}`;
+    const approx =
+      it.approxKg > 0
+        ? t("menu.units.approxPieceKg", { kg: formatQtyValue(it.approxKg) })
+        : "";
+    return `${pieces} ${t("menu.units.piecePlural")}${approx}`;
   }
-  if (String(it.unit || "").includes("كجم"))
-    return `${formatQtyValue(it.qty)} ${it.unit}`.trim();
+  if ((it.unit || "").toLowerCase().includes("kg") || (it.unit || "").includes("كجم"))
+    return `${formatQtyValue(it.qty)} ${t("menu.units.kg")}`;
   const pieces = Math.max(1, Math.floor(Number(it.qty) || 0));
-  return `${pieces} ${it.unit && it.unit !== "قطعة" ? it.unit : "عدد"}`.trim();
+  return `${pieces} ${unitLabel(it)}`;
 }
 
 function priceLabelForMessage(it) {
   const mode = resolveMode(it);
-  if (mode === 0 && it.unit && !it.unit.includes("كجم")) return "سعر القطعة";
-  return "سعر الكيلو";
+  if (mode === 0 && !(it.unit || "").toLowerCase().includes("kg"))
+    return t("menu.price.unitPiece");
+  return t("menu.price.unitKg");
 }
 
 function buildCartSnapshot() {
@@ -314,16 +367,17 @@ function renderRows() {
   tbody.innerHTML = "";
   order.items.forEach((it, idx) => {
     const tr = document.createElement("tr");
+    const mode = resolveMode(it);
 
     const tdName = document.createElement("td");
-    tdName.dataset.label = "الصنف";
+    tdName.dataset.label = t("confirm.summary.table.item");
     const nameWrap = document.createElement("div");
     nameWrap.className = "cell-title";
     nameWrap.textContent = it.name || "-";
     tdName.appendChild(nameWrap);
     const extras = [];
-    if (it.cut) extras.push(`تقطيع: ${it.cut}`);
-    if (it.note) extras.push(`ملاحظة: ${it.note}`);
+    if (it.cut) extras.push(`${t("menu.cart.meta.cut")}: ${it.cut}`);
+    if (it.note) extras.push(`${t("menu.cart.meta.note")}: ${it.note}`);
     if (!extras.length && /\((.+)\)/.test(it.name || "")) {
       const match = (it.name || "").match(/\((.+)\)/);
       if (match && match[1]) extras.push(match[1]);
@@ -336,8 +390,8 @@ function renderRows() {
     }
 
     const tdQty = document.createElement("td");
-    tdQty.dataset.label = "الكمية";
-    const isDecimal = it.unit === "كجم" || String(it.qty).includes(".");
+    tdQty.dataset.label = t("confirm.summary.table.qty");
+    const isDecimal = mode === 1;
     const step = isDecimal ? 0.1 : 1;
 
     const box = document.createElement("div");
@@ -364,7 +418,7 @@ function renderRows() {
     plus.textContent = "+";
     const unit = document.createElement("span");
     unit.style.marginInlineStart = "6px";
-    unit.textContent = it.unit || "";
+    unit.textContent = unitLabel(it);
 
     function clamp(val) {
       let n = toNum(val, isDecimal ? 0.1 : 1);
@@ -392,25 +446,26 @@ function renderRows() {
     tdQty.append(box, unit);
 
     const tdPrice = document.createElement("td");
-    tdPrice.dataset.label = "السعر/وحدة";
+    tdPrice.dataset.label = t("confirm.summary.table.price");
     tdPrice.className = "ltr-text";
     tdPrice.textContent = `${money(it.price)} TL`;
 
     const tdLine = document.createElement("td");
-    tdLine.dataset.label = "الإجمالي التقريبي";
+    tdLine.dataset.label = t("confirm.summary.table.total");
     tdLine.className = "ltr-text";
     tdLine.textContent = moneyTL(lineTotal(it));
 
     const tdDel = document.createElement("td");
-    tdDel.dataset.label = "حذف";
+    tdDel.dataset.label = t("confirm.summary.table.delete");
     const del = document.createElement("button");
     del.className = "del-btn";
+    del.setAttribute("aria-label", t("confirm.summary.table.delete"));
     del.innerHTML = '<i class="fa-solid fa-trash"></i>';
     del.addEventListener("click", () => {
       order.items.splice(idx, 1);
       if (!order.items.length) {
         saveDraft();
-        toast("تم حذف جميع الأصناف.", "success");
+        toast(t("confirm.toast.allRemoved"), "success");
         return (window.location.href = "menu.html");
       }
       totalEl.textContent = money(calcTotal());
@@ -425,6 +480,10 @@ function renderRows() {
   const total = calcTotal();
   totalEl.textContent = money(total);
   if (order) order.total = total;
+  const brandText = order?.brand
+    ? t("confirm.summary.store", { brand: order.brand })
+    : "";
+  $("#brandName").textContent = brandText;
 }
 renderRows();
 syncCartStorage();
@@ -447,9 +506,18 @@ const LEAFLET_JS_URLS = [
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
 ];
 
-function updateCoordsHint(text) {
+let mapHintState = { key: "confirm.map.hint.empty", params: null };
+
+function applyMapHint() {
   const hint = $("#coordsHint");
-  if (hint) hint.textContent = text;
+  if (!hint) return;
+  const { key, params } = mapHintState || {};
+  hint.textContent = t(key || "confirm.map.hint.empty", params);
+}
+
+function setMapHint(key, params) {
+  mapHintState = { key, params };
+  applyMapHint();
 }
 
 function ensureLeafletCSS() {
@@ -476,9 +544,10 @@ function placeMarker(latLng) {
   if (marker) marker.remove();
   marker = L.marker([pos.lat, pos.lng]).addTo(map);
   chosenLatLng = { lat: pos.lat, lng: pos.lng };
-  updateCoordsHint(
-    `الموقع المحدد: ${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`
-  );
+  setMapHint("confirm.map.hint.selected", {
+    lat: pos.lat.toFixed(6),
+    lng: pos.lng.toFixed(6),
+  });
 }
 
 function initLeafletMap() {
@@ -489,9 +558,7 @@ function initLeafletMap() {
     return;
   }
   if (typeof L === "undefined") {
-    updateCoordsHint(
-      "تعذّر تحميل خريطة OpenStreetMap. تأكد من الاتصال بالإنترنت ثم حدِّث الصفحة."
-    );
+    setMapHint("confirm.toast.mapLoadError");
     return;
   }
 
@@ -507,7 +574,7 @@ function initLeafletMap() {
   map.on("click", (e) => placeMarker(e.latlng));
   mapReady = true;
   leafletLoaded = true;
-  updateCoordsHint("لم يتم اختيار موقع بعد.");
+  setMapHint("confirm.map.hint.empty");
   setTimeout(() => map.invalidateSize(), 100);
 }
 
@@ -517,9 +584,7 @@ function loadLeafletLibrary() {
     return;
   }
   if (leafletSourceIndex >= LEAFLET_JS_URLS.length) {
-    updateCoordsHint(
-      "تعذّر تحميل خريطة OpenStreetMap. تأكد من الاتصال بالإنترنت ثم حدِّث الصفحة."
-    );
+    setMapHint("confirm.toast.mapLoadError");
     return;
   }
 
@@ -542,7 +607,7 @@ function loadLeafletLibrary() {
 }
 
 if (document.getElementById("map")) {
-  updateCoordsHint("جاري تحميل خريطة OpenStreetMap...");
+  setMapHint("confirm.map.hint.loading");
   ensureLeafletCSS();
   loadLeafletLibrary();
 }
@@ -551,17 +616,17 @@ const geoBtn = $("#geoBtn");
 if (geoBtn) {
   geoBtn.addEventListener("click", () => {
     if (!mapReady || !map) {
-      return toast("جاري تحميل خريطة OpenStreetMap، برجاء المحاولة بعد لحظات.");
+      return toast(t("confirm.toast.mapLoading"));
     }
     if (!navigator.geolocation)
-      return toast("المتصفح لا يدعم تحديد الموقع.", "error");
+      return toast(t("confirm.toast.geoUnsupported"), "error");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const ll = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         map.setView([ll.lat, ll.lng], 16);
         placeMarker(ll);
       },
-      () => toast("تعذّر تحديد الموقع. اختره يدويًا من الخريطة.", "error"),
+      () => toast(t("confirm.toast.geoFailed"), "error"),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   });
@@ -578,9 +643,12 @@ function toggleDeliveryUI() {
   if (payGroup) payGroup.style.display = "";
   if (mapCard) mapCard.style.display = isPickup ? "none" : "";
 
-  sendBtn.innerHTML = isPickup
-    ? '<i class="fa-brands fa-whatsapp"></i> تأكيد الطلب (استلام من المحل)'
-    : '<i class="fa-brands fa-whatsapp"></i> تأكيد وإرسال على واتساب';
+  if (sendBtn) {
+    const label = isPickup
+      ? t("confirm.actions.sendPickup")
+      : t("common.actions.sendWhatsApp");
+    sendBtn.innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${label}`;
+  }
 }
 document
   .querySelectorAll('input[name="deliveryType"]')
@@ -600,6 +668,15 @@ payInputs.forEach((input) =>
 );
 updatePayPlaceholder();
 
+if (typeof i18nApi.onChange === "function") {
+  i18nApi.onChange(() => {
+    renderRows();
+    toggleDeliveryUI();
+    applyMapHint();
+    updatePayPlaceholder();
+  });
+}
+
 /* ===== إرسال واتساب ===== */
 sendBtn.addEventListener("click", () => {
   const name = $("#custName").value.trim();
@@ -609,56 +686,75 @@ sendBtn.addEventListener("click", () => {
   const address = $("#custAddress") ? $("#custAddress").value.trim() : "";
   const payInput = document.querySelector('input[name="pay"]:checked');
   const pay = payInput ? payInput.value : "";
+  const payLabelKey = payInput
+    ? payInput
+        .closest("label")
+        ?.querySelector("[data-i18n]")
+        ?.getAttribute("data-i18n")
+    : null;
   const deliveryType =
     (document.querySelector('input[name="deliveryType"]:checked') || {})
       .value || "delivery";
 
   // تحقق جميل
-  if (!name) return toast("من فضلك أدخل الاسم.", "error");
-  if (!phone) return toast("من فضلك أدخل رقم الهاتف.", "error");
+  if (!name) return toast(t("confirm.toast.needName"), "error");
+  if (!phone) return toast(t("confirm.toast.needPhone"), "error");
 
   if (deliveryType === "delivery" && !address)
-    return toast("من فضلك اكتب العنوان التفصيلي.", "error");
+    return toast(t("confirm.toast.needAddress"), "error");
 
-  if (!pay) return toast("من فضلك اختر طريقة الدفع المناسبة.", "error");
+  if (!pay) return toast(t("confirm.toast.needPayment"), "error");
 
   const lines = order.items.map((it) => {
     const parts = [
       `• ${it.name}`,
       `      ${priceLabelForMessage(it)}: ${moneyTL(it.price)}`,
-      `      الكمية: ${qtyForMessage(it)}`,
+      `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(it)}`,
     ];
-    if (it.cut) parts.push(`      طريقة التقطيع: ${it.cut}`);
-    if (it.note) parts.push(`      ملاحظة: ${it.note}`);
+    if (it.cut) parts.push(`      ${t("confirm.whatsapp.cut")}: ${it.cut}`);
+    if (it.note) parts.push(`      ${t("confirm.whatsapp.note")}: ${it.note}`);
     return parts.join("\n");
   });
 
-  const totalLine = `💰 الإجمالي التقريبي: ${moneyTL(calcTotal())}`;
-  const approxNote =
-    "ℹ️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
-  const header = `طلب جديد من ${order.brand || "مزارع البركات"} 🌿🐄`;
+  const totalLine = t("confirm.whatsapp.total", {
+    total: moneyTL(calcTotal()),
+  });
+  const approxNote = t("confirm.whatsapp.noteLine");
+  const header = t("confirm.whatsapp.header", {
+    brand: order.brand || t("common.brandName"),
+  });
 
-  const customerBlock = [`👤 الاسم: ${name}`, `📞 الهاتف: ${phone}`];
+  const customerBlock = [
+    t("confirm.whatsapp.customer", { name }),
+    t("confirm.whatsapp.phone", { phone }),
+  ];
 
   let addressLine = "";
   let locationLines = [];
-  const payLine = pay ? `💳 طريقة الدفع: ${pay}` : "";
+  const payTranslated = payLabelKey ? t(payLabelKey) : translatePayMethod(pay);
+  const payLine = payTranslated
+    ? t("confirm.whatsapp.payment", { method: payTranslated })
+    : "";
 
   if (deliveryType === "pickup") {
-    addressLine = "🏪 طريقة الاستلام: استلام من المحل";
+    addressLine = t("confirm.whatsapp.pickup");
     locationLines = [];
   } else {
     const mapLink = chosenLatLng
       ? `https://maps.google.com/?q=${chosenLatLng.lat},${chosenLatLng.lng}`
       : "";
-    addressLine = `🏠 العنوان: ${address || "لم يُذكر"}`;
-    locationLines = mapLink ? [`🧭 اللوكيشن: ${mapLink}`] : [];
+    addressLine = t("confirm.whatsapp.address", {
+      address: address || t("confirm.whatsapp.addressFallback"),
+    });
+    locationLines = mapLink
+      ? [t("confirm.whatsapp.location", { link: mapLink })]
+      : [];
   }
 
   const msgParts = [
     header,
     "",
-    "🧾 تفاصيل الطلب:",
+    t("confirm.whatsapp.details"),
     ...lines,
     "",
     totalLine,

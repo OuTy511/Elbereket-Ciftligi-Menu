@@ -1,3 +1,10 @@
+const i18nApi = window.i18n || {
+  t: (key) => key,
+  onChange: () => () => {},
+};
+
+const translate = (key) => (typeof i18nApi.t === "function" ? i18nApi.t(key) : key);
+
 /* ===== منيو الموبايل ===== */
 const hb = document.querySelector(".menu-toggle");
 const navMob = document.querySelector(".nav-mobile");
@@ -32,9 +39,9 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
 // نسخ سريع + توست
 (() => {
   const toast = document.getElementById("copyToast");
-  const showToast = (msg = "تم النسخ ✅") => {
+  const showToast = (key = "toast.copy.success") => {
     if (!toast) return;
-    toast.textContent = msg;
+    toast.textContent = translate(key);
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 1500);
   };
@@ -44,11 +51,17 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
       const value = btn.getAttribute("data-copy") || "";
       try {
         await navigator.clipboard.writeText(value);
-        showToast();
+        showToast("toast.copy.success");
       } catch {
-        showToast("لم يتم النسخ، انسخ يدويًا");
+        showToast("toast.copy.error");
       }
     });
+  });
+
+  i18nApi.onChange(() => {
+    if (toast && toast.classList.contains("show")) {
+      toast.textContent = translate("toast.copy.success");
+    }
   });
 })();
 

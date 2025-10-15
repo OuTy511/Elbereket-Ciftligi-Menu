@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <title>تأكيد الطلب – مزارع البركات</title>
+    <title data-i18n="confirm.meta.title">تأكيد الطلب – مزارع البركات</title>
 
     <!-- Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -32,6 +32,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
     />
+    <script src="js/i18n.js" defer></script>
   </head>
   <body class="confirm-page">
     <!-- نفس هيدر menu.html حرفياً -->
@@ -41,33 +42,69 @@
           <img src="img/logos/logo-3.png" alt="مزارع البركات" />
         </a>
 
-        <nav class="nav-desktop" aria-label="القائمة الرئيسية">
+        <nav
+          class="nav-desktop"
+          aria-label="القائمة الرئيسية"
+          data-i18n-attr='{"aria-label":"nav.aria.main"}'
+        >
           <ul class="nav-list">
-            <li><a href="index.html">الصفحة الرئيسية</a></li>
-            <li><a class="active" href="menu.html">المنيو</a></li>
-            <li><a href="index.html#about">من نحن</a></li>
-            <li><a href="index.html#contact">تواصل معنا</a></li>
+            <li><a href="index.html" data-i18n="nav.home">الصفحة الرئيسية</a></li>
+            <li><a class="active" href="menu.html" data-i18n="nav.menu">المنيو</a></li>
+            <li><a href="index.html#about" data-i18n="nav.about">من نحن</a></li>
+            <li><a href="index.html#contact" data-i18n="nav.contact">تواصل معنا</a></li>
           </ul>
         </nav>
 
+        <div
+          class="lang-switch lang-switch--desktop"
+          role="group"
+          data-i18n-attr='{"aria-label":"common.langSwitch.label"}'
+        >
+          <button type="button" data-lang="ar" data-i18n="common.lang.ar">
+            عربي
+          </button>
+          <button type="button" data-lang="tr" data-i18n="common.lang.tr">
+            تركي
+          </button>
+        </div>
+
         <!-- موبايل -->
         <div class="mobile-actions">
-          <a class="nav-home" href="index.html">الصفحة الرئيسية</a>
+          <a class="nav-home" href="index.html" data-i18n="nav.home"
+            >الصفحة الرئيسية</a
+          >
+          <div
+            class="lang-switch"
+            role="group"
+            data-i18n-attr='{"aria-label":"common.langSwitch.label"}'
+          >
+            <button type="button" data-lang="ar" data-i18n="common.lang.ar">
+              عربي
+            </button>
+            <button type="button" data-lang="tr" data-i18n="common.lang.tr">
+              تركي
+            </button>
+          </div>
           <button
             class="menu-toggle"
             aria-label="فتح القائمة"
             aria-expanded="false"
+            data-i18n-attr='{"aria-label":"common.aria.openMenu"}'
           >
             <span class="bar"></span><span class="bar"></span
             ><span class="bar"></span>
           </button>
         </div>
 
-        <nav class="nav-mobile" aria-label="قائمة الموبايل">
+        <nav
+          class="nav-mobile"
+          aria-label="قائمة الموبايل"
+          data-i18n-attr='{"aria-label":"nav.aria.mobile"}'
+        >
           <ul class="navm-list">
-            <li><a href="menu.html">المنيو</a></li>
-            <li><a href="index.html#about">من نحن</a></li>
-            <li><a href="index.html#contact">تواصل معنا</a></li>
+            <li><a href="menu.html" data-i18n="nav.menu">المنيو</a></li>
+            <li><a href="index.html#about" data-i18n="nav.about">من نحن</a></li>
+            <li><a href="index.html#contact" data-i18n="nav.contact">تواصل معنا</a></li>
           </ul>
         </nav>
       </div>
@@ -76,8 +113,11 @@
     <!-- المحتوى -->
     <main class="confirm-container">
       <section class="card">
-        <h1>تأكيد الطلب <span class="badge">خطوة أخيرة</span></h1>
-        <p class="muted">
+        <h1>
+          <span data-i18n="confirm.heading.title">تأكيد الطلب</span>
+          <span class="badge" data-i18n="confirm.heading.badge">خطوة أخيرة</span>
+        </h1>
+        <p class="muted" data-i18n="confirm.heading.body">
           راجِع الأصناف ثم أدخل بيانات الاستلام واختر طريقة الدفع وحدِّد موقع
           التسليم على الخريطة.
         </p>
@@ -85,43 +125,50 @@
 
       <section class="card" id="summaryCard">
         <div class="sec-head">
-          <h2>ملخص الطلب</h2>
+          <h2 data-i18n="confirm.summary.title">ملخص الطلب</h2>
           <div id="brandName" class="muted"></div>
         </div>
         <div class="table-wrap">
           <table class="table">
             <thead>
               <tr>
-                <th>الصنف</th>
-                <th>الكمية</th>
-                <th>السعر/وحدة</th>
-                <th>الإجمالي التقريبي</th>
-                <th>حذف</th>
+                <th data-i18n="confirm.summary.table.item">الصنف</th>
+                <th data-i18n="confirm.summary.table.qty">الكمية</th>
+                <th data-i18n="confirm.summary.table.price">السعر/وحدة</th>
+                <th data-i18n="confirm.summary.table.total">الإجمالي التقريبي</th>
+                <th data-i18n="confirm.summary.table.delete">حذف</th>
               </tr>
             </thead>
             <tbody id="itemsBody"></tbody>
           </table>
         </div>
         <div class="total">
-          <div>الإجمالي التقريبي</div>
+          <div data-i18n="confirm.summary.totalLabel">الإجمالي التقريبي</div>
           <div class="ltr-text"><span id="totalAmount">0</span> TL</div>
         </div>
-        <p class="muted total-note">
-          الإجمالي تقريبي وقد تختلف القيمة النهائية بعد الوزن الفعلي.
-          <span class="note-em">احتمال فروقات بسيطة باختلاف الوزن.</span>
+        <p class="muted total-note" data-i18n="confirm.summary.totalNote">
+          الإجمالي تقريبي وقد تختلف القيمة النهائية عد الوزن الفعلي.
+        </p>
+        <p class="muted total-note note-em" data-i18n="confirm.summary.totalNoteEm">
+          احتمال فروقات بسيطة باختلاف الوزن.
         </p>
       </section>
 
       <section class="card">
-        <h2>بيانات الاستلام والدفع</h2>
+        <h2 data-i18n="confirm.form.title">بيانات الاستلام والدفع</h2>
 
         <div class="grid">
           <div>
-            <label class="lbl">الاسم</label>
-            <input id="custName" class="inp" placeholder="اسم المستلم" />
+            <label class="lbl" data-i18n="confirm.form.name">الاسم</label>
+            <input
+              id="custName"
+              class="inp"
+              placeholder="اسم المستلم"
+              data-i18n-placeholder="confirm.form.namePlaceholder"
+            />
           </div>
           <div>
-            <label class="lbl">رقم الهاتف</label>
+            <label class="lbl" data-i18n="confirm.form.phone">رقم الهاتف</label>
             <input
               id="custPhone"
               class="inp numeric-input"
@@ -142,7 +189,9 @@
         <!-- طريقة الاستلام -->
         <div class="grid">
           <div>
-            <label class="lbl">طريقة الاستلام</label>
+            <label class="lbl" data-i18n="confirm.form.delivery"
+              >طريقة الاستلام</label
+            >
             <div class="pill-row">
               <label class="chip"
                 ><input
@@ -151,43 +200,56 @@
                   value="delivery"
                   checked
                 />
-                توصيل للمنزل</label
+                <span data-i18n="confirm.form.delivery.delivery"
+                  >توصيل للمنزل</span
+                ></label
               >
               <label class="chip"
                 ><input type="radio" name="deliveryType" value="pickup" />
-                استلام من المحل</label
+                <span data-i18n="confirm.form.delivery.pickup"
+                  >استلام من المحل</span
+                ></label
               >
             </div>
           </div>
-        </div>
 
-        <div class="grid">
           <div id="addressGroup">
-            <label class="lbl">العنوان التفصيلي <span class="req">(مطلوب)</span></label>
+            <label class="lbl">
+              <span data-i18n="confirm.form.address">العنوان التفصيلي</span>
+              <span class="req" data-i18n="confirm.form.addressRequired"
+                >(مطلوب)</span
+              >
+            </label>
             <textarea
               id="custAddress"
               class="inp"
               rows="3"
               placeholder="مثال: باشاك شهير - الحي - الشارع - المبنى/الدور/الشقة"
               required
+              data-i18n-placeholder="confirm.form.addressPlaceholder"
             ></textarea>
-            <p class="muted">
+            <p class="muted" data-i18n="confirm.form.addressHint">
               اكتب العنوان بالتفصيل حتى مع تحديد الموقع من الخريطة.
             </p>
           </div>
 
           <div id="payGroup">
-            <label class="lbl">طريقة الدفع</label>
+            <label class="lbl" data-i18n="confirm.form.payment"
+              >طريقة الدفع</label
+            >
             <div class="pill-row">
-              <span class="chip chip-placeholder" aria-hidden="true">
+              <span class="chip chip-placeholder" aria-hidden="true" data-i18n="confirm.form.payment.placeholder">
                 اختر طريقة الدفع
               </span>
               <label class="chip"
-                ><input type="radio" name="pay" value="نقدًا" /> نقدًا</label
+                ><input type="radio" name="pay" value="نقدًا" />
+                <span data-i18n="confirm.form.payment.cash">نقدًا</span></label
               >
               <label class="chip"
                 ><input type="radio" name="pay" value="كريدي كارت (POS)" />
-                كريدي كارت (POS)</label
+                <span data-i18n="confirm.form.payment.pos"
+                  >كريدي كارت (POS)</span
+                ></label
               >
             </div>
           </div>
@@ -195,24 +257,35 @@
       </section>
 
       <section class="card" id="mapCard">
-        <h2>موقع التسليم على الخريطة</h2>
+        <h2 data-i18n="confirm.map.title">موقع التسليم على الخريطة</h2>
         <div id="map"></div>
         <div class="actions">
           <button id="geoBtn" class="btn btn-outline">
-            <i class="fa-solid fa-location-crosshairs"></i> تحديد موقعي الحالي
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <span data-i18n="common.actions.detectLocation"
+              >تحديد موقعي الحالي</span
+            >
           </button>
-          <span class="muted">أو اضغط على الخريطة لاختيار نقطة التسليم.</span>
+          <span class="muted" data-i18n="confirm.map.instructions"
+            >أو اضغط على الخريطة لاختيار نقطة التسليم.</span
+          >
         </div>
-        <p class="muted" id="coordsHint">لم يتم اختيار موقع بعد.</p>
+        <p class="muted" id="coordsHint" data-i18n="confirm.map.hint.empty">
+          لم يتم اختيار موقع بعد.
+        </p>
       </section>
 
       <section class="card">
         <div class="actions end">
-          <a href="menu.html" class="btn btn-dark"
-            ><i class="fa-solid fa-arrow-right"></i> الرجوع إلى المنيو</a
-          >
+          <a href="menu.html" class="btn btn-dark">
+            <i class="fa-solid fa-arrow-right"></i>
+            <span data-i18n="common.actions.viewMenu">الرجوع إلى المنيو</span>
+          </a>
           <button id="sendBtn" class="btn btn-primary">
-            <i class="fa-brands fa-whatsapp"></i> تأكيد وإرسال على واتساب
+            <i class="fa-brands fa-whatsapp"></i>
+            <span data-i18n="common.actions.sendWhatsApp"
+              >تأكيد وإرسال على واتساب</span
+            >
           </button>
         </div>
       </section>
@@ -223,6 +296,7 @@
       class="scroll-top-fab"
       type="button"
       aria-label="العودة إلى أعلى الصفحة"
+      data-i18n-attr='{"aria-label":"common.aria.backToTop"}'
     >
       <i class="fa-solid fa-arrow-up"></i>
     </button>

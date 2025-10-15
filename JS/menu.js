@@ -1,3 +1,13 @@
+const i18nApi = window.i18n || {
+  t: (key) => key,
+  onChange: () => () => {},
+};
+
+const t = (key, params) =>
+  typeof i18nApi.t === "function" ? i18nApi.t(key, params) : key;
+
+const ALL_CATEGORY = "__ALL__";
+
 /* ===== منيو الموبايل ===== */
 const btn = document.querySelector(".menu-toggle");
 const navMobile = document.querySelector(".nav-mobile");
@@ -185,7 +195,7 @@ const state = {
   products: [],
   filtered: [],
   categories: [],
-  activeCategory: "الكل",
+  activeCategory: ALL_CATEGORY,
   query: "",
   cart: [],
   modalProduct: null,
@@ -216,7 +226,7 @@ if (window.Papa) {
         .filter((p) => p.name && p.category);
 
       state.categories = [
-        "الكل",
+        ALL_CATEGORY,
         ...new Set(state.products.map((p) => p.category)),
       ];
       buildFilters();
@@ -228,12 +238,23 @@ if (window.Papa) {
     },
     error: (err) => {
       console.error("CSV error:", err);
-      els.menuGrid.innerHTML = `<p class="muted">تعذر تحميل القائمة الآن. جرّب التحديث لاحقًا.</p>`;
+      els.menuGrid.innerHTML = `<p class="muted">${t(
+        "menu.alert.loadFail"
+      )}</p>`;
     },
   });
 } else {
-  els.menuGrid.innerHTML = `<p class="muted">تعذر تحميل القائمة (مكتبة PapaParse غير متاحة).</p>`;
+  els.menuGrid.innerHTML = `<p class="muted">${t(
+    "menu.alert.noPapa"
+  )}</p>`;
 }
+
+const getCategoryLabel = (category) => {
+  if (category === ALL_CATEGORY) return t("menu.filters.all");
+  const key = `menu.categories.${category}`;
+  const label = t(key);
+  return label === key ? category : label;
+};
 
 /* ===== الفلاتر والبحث ===== */
 function buildFilters() {
@@ -243,7 +264,7 @@ function buildFilters() {
     b.className =
       "filter-btn" + (cat === state.activeCategory ? " active" : "");
     b.type = "button";
-    b.textContent = cat;
+    b.textContent = getCategoryLabel(cat);
     b.addEventListener("click", () => {
       state.activeCategory = cat;
       document
@@ -255,14 +276,17 @@ function buildFilters() {
     els.categoryFilters.appendChild(b);
   });
 
-  let qTimer;
-  els.searchInput.addEventListener("input", () => {
-    clearTimeout(qTimer);
-    qTimer = setTimeout(() => {
-      state.query = els.searchInput.value.trim();
-      applyFilters();
-    }, 200);
-  });
+  if (els.searchInput && !els.searchInput.dataset.bound) {
+    let qTimer;
+    els.searchInput.addEventListener("input", () => {
+      clearTimeout(qTimer);
+      qTimer = setTimeout(() => {
+        state.query = els.searchInput.value.trim();
+        applyFilters();
+      }, 200);
+    });
+    els.searchInput.dataset.bound = "1";
+  }
 }
 
 function setupFilterArrows() {
@@ -289,7 +313,7 @@ function applyFilters() {
   const q = state.query.toLowerCase();
   state.filtered = state.products.filter((p) => {
     const byCat =
-      state.activeCategory === "الكل" || p.category === state.activeCategory;
+      state.activeCategory === ALL_CATEGORY || p.category === state.activeCategory;
     const byQuery = !q || p.name.toLowerCase().includes(q);
     return byCat && byQuery;
   });
@@ -316,35 +340,44 @@ function renderProducts(list, mount) {
         )}</span> <span class="new ltr-text">${priceFmt(p.salePrice)}</span>`
       : showPrice
       ? `<span class="ltr-text">${priceFmt(p.price)}</span>`
-      : `<span class="coming-soon">اتصل للتسعير</span>`;
+      : `<span class="coming-soon">${t("menu.product.callForPrice")}</span>`;
 
     const flags = (() => {
       if (p.sellMode === 1)
-        return `<span class="flag"><i class="fa-solid fa-scale-balanced"></i> يباع بالكيلو</span>`;
-      if (p.sellMode === 2)
-        return `<span class="flag warn"><i class="fa-solid fa-drumstick-bite"></i> يباع كامل • السعر/كجم${
-          p.approxKg ? ` • ~${p.approxKg}كجم/قطعة` : ""
-        }</span>`;
+        return `<span class="flag"><i class="fa-solid fa-scale-balanced"></i> ${t(
+          "menu.flags.sellByKg"
+        )}</span>`;
+      if (p.sellMode === 2) {
+        const approx = p.approxKg
+          ? t("menu.flags.sellWholeApprox", { kg: formatQtyValue(p.approxKg) })
+          : "";
+        return `<span class="flag warn"><i class="fa-solid fa-drumstick-bite"></i> ${t(
+          "menu.flags.sellWhole"
+        )}${approx}</span>`;
+      }
       return "";
     })();
 
     const canAdd = showPrice;
+    const addLabel = t("common.actions.addToCart");
+    const unavailableLabel = t("menu.product.unavailable");
+    const categoryLabel = getCategoryLabel(p.category);
 
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
       <div class="image-wrap">
-        ${hasOffer ? '<span class="badge-offer">عرض</span>' : ""}
+        ${hasOffer ? `<span class="badge-offer">${t("menu.badge.offer")}</span>` : ""}
         <img src="${p.image || placeholder}" alt="${p.name}">
       </div>
       <h3 class="product-name">${p.name}</h3>
-      <p class="category">${p.category}</p>
+      <p class="category">${categoryLabel}</p>
       <div class="flags-row">${flags}</div>
       <p class="price">${priceHtml}</p>
       ${
         canAdd
-          ? '<button class="add-btn" type="button"><i class="fa-solid fa-cart-plus"></i> أضف للسلة</button>'
-          : '<button class="add-btn" type="button" disabled style="opacity:.6;cursor:not-allowed"><i class="fa-solid fa-circle-info"></i> غير متاح</button>'
+          ? `<button class="add-btn" type="button"><i class="fa-solid fa-cart-plus"></i> ${addLabel}</button>`
+          : `<button class="add-btn" type="button" disabled style="opacity:.6;cursor:not-allowed"><i class="fa-solid fa-circle-info"></i> ${unavailableLabel}</button>`
       }
     `;
     if (canAdd) {
@@ -364,6 +397,31 @@ function splitCuts(cutsStr) {
     .filter(Boolean);
 }
 
+function getHelperText(product) {
+  if (!product) return "";
+  if (product.sellMode === 1) return t("menu.modal.helper.sellByKg");
+  if (product.sellMode === 2) {
+    const approxText = product.approxKg
+      ? t("menu.modal.helper.sellWhole.withApprox", {
+          kg: formatQtyValue(product.approxKg),
+        })
+      : t("menu.modal.helper.sellWhole.noApprox");
+    return t("menu.modal.helper.sellWhole", { text: approxText });
+  }
+  return t("menu.modal.helper.sellPiece");
+}
+
+function refreshModalLanguage() {
+  const product = state.modalProduct;
+  if (!product) return;
+  const options = els.cutSelect?.options;
+  if (options && options.length && options[0].value === "") {
+    options[0].textContent = t("menu.modal.cutPlaceholder");
+  }
+  const helperEl = els.orderModal?.querySelector(".qty-helper");
+  if (helperEl) helperEl.textContent = getHelperText(product);
+}
+
 function openModal(product) {
   state.modalProduct = product;
 
@@ -375,9 +433,13 @@ function openModal(product) {
   const cuts = splitCuts(product.cuts);
   if (cuts.length) {
     els.cutRow.style.display = "";
-    els.cutSelect.innerHTML = cuts
-      .map((c) => `<option value="${c}">${c}</option>`)
-      .join("");
+    const options = [
+      `<option value="" disabled selected>${t("menu.modal.cutPlaceholder")}</option>`,
+      ...cuts.map((c) => `<option value="${c}">${c}</option>`),
+    ];
+    els.cutSelect.innerHTML = options.join("");
+    els.cutSelect.value = "";
+    els.cutSelect.classList.remove("invalid");
   } else {
     els.cutRow.style.display = "none";
     els.cutSelect.innerHTML = "";
@@ -385,26 +447,18 @@ function openModal(product) {
 
   // الكمية حسب وضع_البيع
   els.qtyInput.value = "1";
-  let helper = "";
   if (product.sellMode === 1) {
     els.qtyInput.step = "0.1";
     els.qtyInput.inputMode = "decimal";
     els.qtyInput.setAttribute("inputmode", "decimal");
-    helper = "سيتم حساب السعر حسب الكيلو.";
   } else if (product.sellMode === 2) {
     els.qtyInput.step = "1";
     els.qtyInput.inputMode = "numeric";
     els.qtyInput.setAttribute("inputmode", "numeric");
-    helper = `هذا المنتج يُباع كاملًا والسعر الظاهر هو سعر الكيلو. ${
-      product.approxKg
-        ? `الوزن التقريبي للقطعة ~${product.approxKg} كجم. السعر النهائي بعد الوزن.`
-        : "سيتم تحديد السعر النهائي بعد الوزن."
-    }`;
   } else {
     els.qtyInput.step = "1";
     els.qtyInput.inputMode = "numeric";
     els.qtyInput.setAttribute("inputmode", "numeric");
-    helper = "الكمية تحسب بالقطعة.";
   }
 
   // نص مساعد تحت خانة الكمية
@@ -414,7 +468,7 @@ function openModal(product) {
     helperEl.className = "qty-helper";
     els.qtyInput.closest(".qty").insertAdjacentElement("afterend", helperEl);
   }
-  helperEl.textContent = helper;
+  helperEl.textContent = getHelperText(product);
 
   // ملاحظة
   els.noteInput.value = "";
@@ -453,6 +507,10 @@ els.qtyMinus?.addEventListener("click", () => {
       : String(Math.max(1, Math.floor(next)));
 });
 
+els.cutSelect?.addEventListener("change", () => {
+  els.cutSelect.classList.remove("invalid");
+});
+
 els.noteInput?.addEventListener("input", () => {
   els.noteCount.textContent = els.noteInput.value.length;
 });
@@ -476,7 +534,14 @@ els.modalAdd?.addEventListener("click", () => {
   if (!state.modalProduct) return;
 
   const p = state.modalProduct;
-  const cut = els.cutSelect.value || "";
+  const requiresCut = splitCuts(p.cuts).length > 0;
+  const cut = (els.cutSelect.value || "").trim();
+  if (requiresCut && !cut) {
+    els.cutSelect.classList.add("invalid");
+    els.cutSelect.focus();
+    alert(t("menu.modal.cutError"));
+    return;
+  }
   let qty = toNum(els.qtyInput.value, 1);
 
   if (p.sellMode === 1)
@@ -544,31 +609,45 @@ function removeItem(i) {
 }
 
 function lineQtyText(it) {
-  if (it.sellMode === 1) return `${(+it.qty).toFixed(2)} كجم`;
-  if (it.sellMode === 2)
-    return `${Math.floor(it.qty)} قطعة (يباع كامل • السعر/كجم${
-      it.approxKg ? ` • ~${it.approxKg}كجم/قطعة` : ""
-    })`;
-  return `${Math.floor(it.qty)} قطعة`;
+  if (it.sellMode === 1) {
+    return `${formatQtyValue(it.qty)} ${t("menu.units.kg")}`;
+  }
+  if (it.sellMode === 2) {
+    const pieces = Math.max(1, Math.floor(it.qty));
+    const approx = it.approxKg
+      ? t("menu.flags.sellWholeApprox", { kg: formatQtyValue(it.approxKg) })
+      : "";
+    return `${pieces} ${t("menu.units.piecePlural")} (${t(
+      "menu.flags.sellWhole"
+    )}${approx})`;
+  }
+  return `${Math.max(1, Math.floor(it.qty))} ${t("menu.units.piecePlural")}`;
 }
 
 function linePriceText(it) {
-  if (it.sellMode === 2) return `${priceFmt(it.price)} / كجم`;
+  if (it.sellMode === 2) return `${priceFmt(it.price)} / ${t("menu.units.kg")}`;
   return priceFmt(it.price);
 }
 
 function qtyForMessage(it) {
-  if (it.sellMode === 1) return `${formatQtyValue(it.qty)} كجم`;
+  if (it.sellMode === 1) {
+    return `${formatQtyValue(it.qty)} ${t("menu.units.kg")}`;
+  }
   if (it.sellMode === 2) {
     const pcs = Math.max(1, Math.floor(+it.qty || 0));
-    const approx = it.approxKg > 0 ? ` (~${it.approxKg} كجم/قطعة)` : "";
-    return `${pcs} قطعة${approx}`;
+    const approx =
+      it.approxKg > 0
+        ? t("menu.units.approxPieceKg", { kg: formatQtyValue(it.approxKg) })
+        : "";
+    return `${pcs} ${t("menu.units.piecePlural")}${approx}`;
   }
-  return `${Math.max(1, Math.floor(+it.qty || 0))} عدد`;
+  return `${Math.max(1, Math.floor(+it.qty || 0))} ${t("menu.units.count")}`;
 }
 
 function priceLabelForMessage(it) {
-  return it.sellMode === 0 ? "سعر القطعة" : "سعر الكيلو";
+  return it.sellMode === 0
+    ? t("menu.price.unitPiece")
+    : t("menu.price.unitKg");
 }
 
 function calcTotals() {
@@ -606,7 +685,7 @@ function updateCartUI() {
 
   // ✅ لو السلة فاضية: عطّل الزر
   if (!state.cart.length) {
-    els.cartItems.innerHTML = `<p class="muted">السلة فارغة</p>`;
+    els.cartItems.innerHTML = `<p class="muted">${t("menu.cart.empty")}</p>`;
     els.cartTotal.textContent = priceFmt(0);
     if (els.goConfirm) els.goConfirm.disabled = true; // << هنا التعطيل
     updateWALink();
@@ -615,30 +694,32 @@ function updateCartUI() {
 
   // رسم عناصر السلة
   els.cartItems.innerHTML = state.cart
-    .map(
-      (it, i) => `
+    .map((it, i) => {
+      const cutText = it.cut || t("menu.cart.meta.none");
+      const qtyLabel = t("menu.cart.meta.quantity");
+      const noteLabel = t("menu.cart.meta.note");
+      const deleteLabel = t("menu.cart.meta.delete");
+      return `
       <div class="cart-row">
         <img src="${it.image}" alt="">
         <div>
           <div class="title">${it.name}</div>
-          <div class="meta">${it.cut || "بدون تحديد"} • الكمية: ${lineQtyText(
-        it
-      )}</div>
+          <div class="meta">${cutText} • ${qtyLabel}: ${lineQtyText(it)}</div>
           ${
             it.note
-              ? `<div class="meta" style="color:#444">${it.note}</div>`
+              ? `<div class="meta" style="color:#444">${noteLabel}: ${it.note}</div>`
               : ""
           }
         </div>
         <div style="text-align:left">
           <div class="price ltr-text">${linePriceText(it)}</div>
-          <button title="حذف" style="border:none;background:#f5f5f5;border-radius:8px;padding:6px 8px;cursor:pointer" data-rm="${i}">
+          <button title="${deleteLabel}" style="border:none;background:#f5f5f5;border-radius:8px;padding:6px 8px;cursor:pointer" data-rm="${i}">
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
       </div>
-    `
-    )
+    `;
+    })
     .join("");
 
   els.cartItems
@@ -665,9 +746,7 @@ function updateCartUI() {
       const confirmBtn = footer.querySelector("#goConfirm");
       footer.insertBefore(note, confirmBtn || footer.firstChild);
     }
-    note.textContent = hasUnpriced
-      ? "تنبيه: يوجد أصناف تُباع كاملة وسيتم تحديد سعرها النهائي بعد الوزن الفعلي."
-      : "";
+    note.textContent = hasUnpriced ? t("common.note.unpriced") : "";
     note.style.display = hasUnpriced ? "block" : "none";
   }
 
@@ -681,25 +760,27 @@ function updateWALink() {
     const parts = [
       `• ${item.name}`,
       `      ${priceLabelForMessage(item)}: ${moneyTL(item.price)}`,
-      `      الكمية: ${qtyForMessage(item)}`,
+      `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(item)}`,
     ];
-    if (item.cut) parts.push(`      طريقة التقطيع: ${item.cut}`);
-    if (item.note) parts.push(`      ملاحظة: ${item.note}`);
+    if (item.cut)
+      parts.push(`      ${t("menu.whatsapp.cut")}: ${item.cut}`);
+    if (item.note)
+      parts.push(`      ${t("menu.whatsapp.noteLabel")}: ${item.note}`);
     return parts.join("\n");
   });
 
   const { total, hasUnpriced } = calcTotals();
-  const header = "طلب جديد من مزارع البركات 🌾🥩";
-  const totalLine = `💰 الإجمالي التقريبي: ${moneyTL(total)}${
-    hasUnpriced ? " (قد تتغير الأصناف الكاملة بعد الوزن)" : ""
-  }`;
-  const approxLine =
-    "ℹ️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
+  const header = t("menu.whatsapp.header", { brand: t("common.brandName") });
+  const totalLine = `${t("menu.whatsapp.total", {
+    total: moneyTL(total),
+  })}${hasUnpriced ? t("menu.whatsapp.totalChange") : ""}`;
+  const approxLine = t("menu.whatsapp.note");
+  const detailsLabel = t("menu.whatsapp.details");
 
   const msgRaw = [
     header,
     "",
-    "🧾 تفاصيل الطلب:",
+    detailsLabel,
     ...lines,
     "",
     totalLine,
@@ -738,21 +819,21 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
 /* ===== زر تأكيد الطلب ➜ confirm.html ===== */
 (function setupConfirmButton() {
   if (!els.goConfirm) return; // لو لسه ما غيرتش زرار الواتساب في HTML
-  const BRAND_NAME = "مزارع البركات";
+  const BRAND_NAME = t("common.brandName");
   const WA_NUMBER = "905524821848"; // بدون +
 
   els.goConfirm.addEventListener("click", () => {
     if (!state.cart.length) {
-      alert("السلة فارغة");
+      alert(t("menu.alert.cartEmpty"));
       return;
     }
 
     // جهّز عناصر للـ confirm.html
     const items = state.cart.map((x) => {
       // الوحدة: بالكيلو/كامل (السعر/كجم)/قطعة
-      let unit = "قطعة";
-      if (x.sellMode === 1) unit = "كجم";
-      else if (x.sellMode === 2) unit = "كجم"; // السعر/كجم لكن الكمية قطع
+      let unit = "piece";
+      if (x.sellMode === 1) unit = "kg";
+      else if (x.sellMode === 2) unit = "kg"; // السعر/كجم لكن الكمية قطع
 
       // الكمية تُحترم كما هي (قد تكون كسر للكيلو)
       const qty = Number(x.qty) || 0;
@@ -811,6 +892,14 @@ function setupScrollTop() {
 
 setupFilterArrows();
 setupScrollTop();
+
+i18nApi.onChange(() => {
+  buildFilters();
+  applyFilters();
+  updateCartUI();
+  updateWALink();
+  refreshModalLanguage();
+});
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) return;

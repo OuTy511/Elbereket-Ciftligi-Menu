@@ -56,15 +56,21 @@ const DIGIT_MAP = {
 const normalizeDigits = (value = "") =>
   String(value).replace(/[٠-٩۰-۹]/g, (d) => DIGIT_MAP[d] ?? d);
 const sanitizeNumericInput = (value = "", allowDecimal = false) => {
-  let v = normalizeDigits(value).replace(/[^0-9.,]/g, "");
-  if (allowDecimal) {
-    v = v.replace(/,/g, ".");
-    const [lead, ...rest] = v.split(".");
-    v = lead + (rest.length ? "." + rest.join("") : "");
-  } else {
-    v = v.replace(/[.,]/g, "");
-  }
-  return v;
+  if (value == null) return "";
+  const normalized = normalizeDigits(value)
+    .replace(/[\u066C\s\u00A0]/g, "") // remove Arabic thousands separator & spaces
+    .replace(/[\u060C\u061B]/g, "") // remove Arabic comma/semicolon
+    .replace(/\u066B/g, "."); // Arabic decimal separator
+
+  if (!allowDecimal)
+    return normalized.replace(/[.,٫٬،]/g, "").replace(/[^0-9]/g, "");
+
+  const prepared = normalized
+    .replace(/[٫٬،]/g, ".")
+    .replace(/,/g, ".")
+    .replace(/[^0-9.]/g, "");
+  const [lead, ...rest] = prepared.split(".");
+  return lead + (rest.length ? "." + rest.join("") : "");
 };
 const toNum = (v, def = 0) => {
   if (v == null) return def;
@@ -78,21 +84,64 @@ const bindNumericInput = (el, opts = {}) => {
     typeof opts.allowDecimal === "function"
       ? opts.allowDecimal()
       : Boolean(opts.allowDecimal);
-  el.addEventListener("input", () => {
+
+  const coerce = () => {
+    const { selectionStart, selectionEnd } = el;
     const cleaned = sanitizeNumericInput(el.value, allowDecimal());
     if (cleaned !== el.value) {
       el.value = cleaned;
       if (el.setSelectionRange) {
-        const caret = cleaned.length;
-        requestAnimationFrame(() => el.setSelectionRange(caret, caret));
+        const caret = selectionStart ?? cleaned.length;
+        const endCaret = selectionEnd ?? caret;
+        requestAnimationFrame(() =>
+          el.setSelectionRange(
+            Math.min(caret, cleaned.length),
+            Math.min(endCaret, cleaned.length)
+          )
+        );
       }
     }
-  });
-  el.addEventListener("focus", () => {
+  };
+
+  el.lang = "en";
+  el.dir = "ltr";
+  el.autocapitalize = "off";
+  el.setAttribute("autocorrect", "off");
+  if (!el.getAttribute("autocomplete")) el.setAttribute("autocomplete", "off");
+  if (typeof el.spellcheck !== "undefined") el.spellcheck = false;
+  if (!el.getAttribute("inputmode"))
+    el.setAttribute("inputmode", allowDecimal() ? "decimal" : "numeric");
+
+  el.addEventListener("beforeinput", (evt) => {
+    if (!evt.data) return;
+    const sanitized = sanitizeNumericInput(evt.data, allowDecimal());
+    if (sanitized === evt.data) return;
+    evt.preventDefault();
+    if (!sanitized) return;
+    const value = el.value || "";
+    const start = el.selectionStart ?? value.length;
+    const end = el.selectionEnd ?? value.length;
+    const nextValue = value.slice(0, start) + sanitized + value.slice(end);
+    el.value = nextValue;
+    const caret = start + sanitized.length;
     requestAnimationFrame(() => {
-      if (document.activeElement === el && el.select) el.select();
+      if (el.setSelectionRange) el.setSelectionRange(caret, caret);
+      coerce();
     });
   });
+
+  el.addEventListener("input", coerce);
+  el.addEventListener("blur", coerce);
+  el.addEventListener("focus", () => {
+    requestAnimationFrame(() => {
+      if (document.activeElement === el && el.select) {
+        try {
+          el.select();
+        } catch (_) {}
+      }
+    });
+  });
+  coerce();
 };
 
 /* ===== عناصر الصفحة ===== */
@@ -339,10 +388,12 @@ function openModal(product) {
   let helper = "";
   if (product.sellMode === 1) {
     els.qtyInput.step = "0.1";
+    els.qtyInput.inputMode = "decimal";
     els.qtyInput.setAttribute("inputmode", "decimal");
     helper = "سيتم حساب السعر حسب الكيلو.";
   } else if (product.sellMode === 2) {
     els.qtyInput.step = "1";
+    els.qtyInput.inputMode = "numeric";
     els.qtyInput.setAttribute("inputmode", "numeric");
     helper = `هذا المنتج يُباع كاملًا والسعر الظاهر هو سعر الكيلو. ${
       product.approxKg
@@ -351,6 +402,7 @@ function openModal(product) {
     }`;
   } else {
     els.qtyInput.step = "1";
+    els.qtyInput.inputMode = "numeric";
     els.qtyInput.setAttribute("inputmode", "numeric");
     helper = "الكمية تحسب بالقطعة.";
   }
@@ -442,8 +494,10 @@ const CART_KEY = "elb_cart_v1";
 function hydrateCart() {
   try {
     const raw = localStorage.getItem(CART_KEY);
-    if (raw) state.cart = JSON.parse(raw);
-  } catch {}
+    state.cart = raw ? JSON.parse(raw) : [];
+  } catch {
+    state.cart = [];
+  }
 }
 function persistCart() {
   localStorage.setItem(CART_KEY, JSON.stringify(state.cart));
@@ -757,3 +811,15 @@ function setupScrollTop() {
 
 setupFilterArrows();
 setupScrollTop();
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) return;
+  hydrateCart();
+  updateCartUI();
+});
+
+window.addEventListener("storage", (evt) => {
+  if (evt.key && evt.key !== CART_KEY) return;
+  hydrateCart();
+  updateCartUI();
+});

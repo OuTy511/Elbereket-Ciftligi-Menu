@@ -45,15 +45,21 @@ const DIGIT_MAP = {
 const normalizeDigits = (value = "") =>
   String(value).replace(/[٠-٩۰-۹]/g, (d) => DIGIT_MAP[d] ?? d);
 const sanitizeNumericInput = (value = "", allowDecimal = false) => {
-  let v = normalizeDigits(value).replace(/[^0-9.,]/g, "");
-  if (allowDecimal) {
-    v = v.replace(/,/g, ".");
-    const [lead, ...rest] = v.split(".");
-    v = lead + (rest.length ? "." + rest.join("") : "");
-  } else {
-    v = v.replace(/[.,]/g, "");
-  }
-  return v;
+  if (value == null) return "";
+  const normalized = normalizeDigits(value)
+    .replace(/[\u066C\s\u00A0]/g, "") // remove Arabic thousands separator & spaces
+    .replace(/[\u060C\u061B]/g, "")
+    .replace(/\u066B/g, ".");
+
+  if (!allowDecimal)
+    return normalized.replace(/[.,٫٬،]/g, "").replace(/[^0-9]/g, "");
+
+  const prepared = normalized
+    .replace(/[٫٬،]/g, ".")
+    .replace(/,/g, ".")
+    .replace(/[^0-9.]/g, "");
+  const [lead, ...rest] = prepared.split(".");
+  return lead + (rest.length ? "." + rest.join("") : "");
 };
 const bindNumericInput = (el, opts = {}) => {
   if (!el) return;
@@ -61,21 +67,64 @@ const bindNumericInput = (el, opts = {}) => {
     typeof opts.allowDecimal === "function"
       ? opts.allowDecimal()
       : Boolean(opts.allowDecimal);
-  el.addEventListener("input", () => {
+
+  const coerce = () => {
+    const { selectionStart, selectionEnd } = el;
     const cleaned = sanitizeNumericInput(el.value, allowDecimal());
     if (cleaned !== el.value) {
       el.value = cleaned;
       if (el.setSelectionRange) {
-        const caret = cleaned.length;
-        requestAnimationFrame(() => el.setSelectionRange(caret, caret));
+        const caret = selectionStart ?? cleaned.length;
+        const endCaret = selectionEnd ?? caret;
+        requestAnimationFrame(() =>
+          el.setSelectionRange(
+            Math.min(caret, cleaned.length),
+            Math.min(endCaret, cleaned.length)
+          )
+        );
       }
     }
-  });
-  el.addEventListener("focus", () => {
+  };
+
+  el.lang = "en";
+  el.dir = "ltr";
+  el.autocapitalize = "off";
+  el.setAttribute("autocorrect", "off");
+  if (!el.getAttribute("autocomplete")) el.setAttribute("autocomplete", "off");
+  if (typeof el.spellcheck !== "undefined") el.spellcheck = false;
+  if (!el.getAttribute("inputmode"))
+    el.setAttribute("inputmode", allowDecimal() ? "decimal" : "numeric");
+
+  el.addEventListener("beforeinput", (evt) => {
+    if (!evt.data) return;
+    const sanitized = sanitizeNumericInput(evt.data, allowDecimal());
+    if (sanitized === evt.data) return;
+    evt.preventDefault();
+    if (!sanitized) return;
+    const value = el.value || "";
+    const start = el.selectionStart ?? value.length;
+    const end = el.selectionEnd ?? value.length;
+    const nextValue = value.slice(0, start) + sanitized + value.slice(end);
+    el.value = nextValue;
+    const caret = start + sanitized.length;
     requestAnimationFrame(() => {
-      if (document.activeElement === el && el.select) el.select();
+      if (el.setSelectionRange) el.setSelectionRange(caret, caret);
+      coerce();
     });
   });
+
+  el.addEventListener("input", coerce);
+  el.addEventListener("blur", coerce);
+  el.addEventListener("focus", () => {
+    requestAnimationFrame(() => {
+      if (document.activeElement === el && el.select) {
+        try {
+          el.select();
+        } catch (_) {}
+      }
+    });
+  });
+  coerce();
 };
 
 /* قراءة المسودة */
@@ -293,10 +342,15 @@ function renderRows() {
     minus.type = "button";
     minus.textContent = "−";
     const input = document.createElement("input");
-    input.type = "number";
+    input.type = "text";
     input.step = String(step);
     input.min = String(isDecimal ? 0.1 : 1);
     input.value = String(it.qty ?? (isDecimal ? 0.1 : 1));
+    const inputMode = isDecimal ? "decimal" : "numeric";
+    input.inputMode = inputMode;
+    input.setAttribute("inputmode", inputMode);
+    input.pattern = isDecimal ? "[0-9.,٫٬،]*" : "[0-9]*";
+    input.autocomplete = "off";
     input.classList.add("numeric-input");
     input.lang = "en";
     input.dir = "ltr";
@@ -610,6 +664,13 @@ sendBtn.addEventListener("click", () => {
     .join("\n");
 
   const waURL = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  try {
+    localStorage.removeItem(CART_KEY);
+    localStorage.removeItem("orderDraft");
+  } catch (err) {
+    console.error("clear storage error:", err);
+  }
+  if (order && Array.isArray(order.items)) order.items.length = 0;
   window.location.href = waURL;
 });
 

@@ -6,10 +6,6 @@
   const SUPPORTED = ["ar", "tr"];
 
   const FLAG_ICONS = { ar: "🇸🇦", tr: "🇹🇷" };
-  const FLAG_IMAGES = {
-    ar: "img/flags/sa.svg",
-    tr: "img/flags/tr.svg",
-  };
   const FALLBACK_FLAG = "🌐";
 
   let gateEl;
@@ -528,27 +524,9 @@
     if (!fabEl) return;
     fabEl.hidden = gateVisible;
     const flagSymbol = FLAG_ICONS[currentLang] || FALLBACK_FLAG;
-    const flagImage = FLAG_IMAGES[currentLang];
     if (fabFlag) {
-      let img = fabFlag.querySelector("img");
-      if (!img && flagImage) {
-        img = document.createElement("img");
-        img.setAttribute("alt", "");
-        img.setAttribute("loading", "lazy");
-        fabFlag.textContent = "";
-        fabFlag.appendChild(img);
-      }
-      if (img && flagImage) {
-        img.setAttribute("src", flagImage);
-        img.setAttribute("alt", "");
-        img.setAttribute("decoding", "async");
-      } else if (img) {
-        img.removeAttribute("src");
-        img.remove();
-      }
-      if (!flagImage) {
-        fabFlag.textContent = flagSymbol;
-      }
+      fabFlag.textContent = flagSymbol;
+      fabFlag.setAttribute("data-lang-code", currentLang);
     }
     if (fabToggle) {
       const label = t("common.langSwitch.label");

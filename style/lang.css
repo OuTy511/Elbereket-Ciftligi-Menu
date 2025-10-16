@@ -108,14 +108,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.lang-option__flag img,
-.lang-fab__flag img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  font-size: 24px;
+  line-height: 1;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
 }
 
 .lang-option__label {
@@ -192,6 +187,7 @@
 .lang-fab__menu-inner .lang-option__flag {
   width: 28px;
   height: 28px;
+  font-size: 20px;
 }
 
 .sr-only {

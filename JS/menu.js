@@ -1,3 +1,97 @@
+const fallbackI18n = {
+  t: (key) => key,
+  onChange: () => () => {},
+};
+
+const getI18n = () => window.i18n || fallbackI18n;
+
+const t = (key, params) => {
+  const api = getI18n();
+  return typeof api.t === "function" ? api.t(key, params) : key;
+};
+
+const onLangChange = (handler) => {
+  const api = getI18n();
+  return typeof api.onChange === "function" ? api.onChange(handler) : () => {};
+};
+
+const getLangCode = () => {
+  const api = getI18n();
+  return typeof api.getLang === "function" ? api.getLang() : "ar";
+};
+
+const makeRecord = (arValue, trValue) => {
+  const ar = (arValue || "").trim();
+  const tr = (trValue || "").trim();
+  if (!ar && !tr) return { ar: "", tr: "" };
+  return { ar: ar || tr, tr: tr || ar };
+};
+
+const ensureRecord = (value, fallback = "") => {
+  if (!value && fallback) return ensureRecord(fallback);
+  if (typeof value === "string") {
+    const text = value.trim();
+    if (!text) return { ar: "", tr: "" };
+    return { ar: text, tr: text };
+  }
+  if (value && typeof value === "object") {
+    const ar = (value.ar || value.Ar || "").trim();
+    const tr = (value.tr || value.Tr || "").trim();
+    if (!ar && !tr) {
+      const fb = (fallback || "").trim();
+      return fb ? { ar: fb, tr: fb } : { ar: "", tr: "" };
+    }
+    return { ar: ar || tr, tr: tr || ar };
+  }
+  const fb = (fallback || "").trim();
+  return fb ? { ar: fb, tr: fb } : { ar: "", tr: "" };
+};
+
+const labelFor = (value, lang = getLangCode()) => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  const record = ensureRecord(value);
+  return record[lang] || record.ar || record.tr || "";
+};
+
+const splitValues = (raw = "") =>
+  raw
+    .split(/[,،|\/\n]+/g)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+const buildCutOptions = (arStr, trStr) => {
+  const arList = splitValues(arStr);
+  const trList = splitValues(trStr);
+  const len = Math.max(arList.length, trList.length);
+  const cuts = [];
+  for (let i = 0; i < len; i += 1) {
+    const record = makeRecord(arList[i], trList[i]);
+    if (!record.ar && !record.tr) continue;
+    cuts.push({ id: String(i), names: record });
+  }
+  return cuts;
+};
+
+const getCategoryId = (category) => {
+  if (!category) return "";
+  if (typeof category === "string") return category;
+  return category.id || "";
+};
+
+const recordMatchesQuery = (record, queryAr, queryTr) => {
+  if (!record) return false;
+  const rec = ensureRecord(record);
+  const arText = (rec.ar || "").toLowerCase();
+  const trText = (rec.tr || "").toLocaleLowerCase("tr-TR");
+  return (
+    (queryAr && arText.includes(queryAr)) ||
+    (queryTr && trText.includes(queryTr))
+  );
+};
+
+const ALL_CATEGORY = "__ALL__";
+
 /* ===== منيو الموبايل ===== */
 const btn = document.querySelector(".menu-toggle");
 const navMobile = document.querySelector(".nav-mobile");
@@ -185,7 +279,7 @@ const state = {
   products: [],
   filtered: [],
   categories: [],
-  activeCategory: "الكل",
+  activeCategory: ALL_CATEGORY,
   query: "",
   cart: [],
   modalProduct: null,
@@ -195,6 +289,38 @@ bindNumericInput(els.qtyInput, {
   allowDecimal: () => state.modalProduct?.sellMode === 1,
 });
 
+const parseProductRow = (row, idx) => {
+  const nameAr = (row["الاسم_عربي"] || row["الاسم"] || "").trim();
+  const nameTr = (row["الاسم_تركي"] || "").trim();
+  const categoryAr = (row["القسم_عربي"] || row["القسم"] || "").trim();
+  const categoryTr = (row["القسم_تركي"] || "").trim();
+  if (!nameAr && !nameTr) return null;
+  if (!categoryAr && !categoryTr) return null;
+
+  const categoryId = categoryAr || categoryTr || `category-${idx}`;
+  const nameBase = nameAr || nameTr || `item-${idx}`;
+  const safeName = nameBase.replace(/\s+/g, "-");
+  const productId = `${idx}-${safeName}`;
+
+  const cutsAr = row["خيارات_التقطيع_عربي"] || row["خيارات_التقطيع"] || "";
+  const cutsTr = row["خيارات_التقطيع_تركي"] || "";
+
+  return {
+    id: productId,
+    names: makeRecord(nameAr, nameTr),
+    category: {
+      id: categoryId,
+      names: makeRecord(categoryAr || categoryId, categoryTr),
+    },
+    price: toNum(row["السعر"], 0),
+    salePrice: toNum(row["سعر_الخصم"], 0),
+    cuts: buildCutOptions(cutsAr, cutsTr),
+    image: (row["الصورة"] || "").trim(),
+    sellMode: Number((row["وضع_البيع"] || "0").trim()) || 0,
+    approxKg: toNum(row["وزن_تقريبي_كجم"], 0),
+  };
+};
+
 /* ===== تحميل CSV ===== */
 if (window.Papa) {
   Papa.parse(CSV_PATH, {
@@ -203,22 +329,20 @@ if (window.Papa) {
     skipEmptyLines: true,
     complete: ({ data }) => {
       state.products = data
-        .map((r) => ({
-          name: (r["الاسم"] || "").trim(),
-          category: (r["القسم"] || "").trim(),
-          price: toNum(r["السعر"], 0),
-          salePrice: toNum(r["سعر_الخصم"], 0),
-          cuts: (r["خيارات_التقطيع"] || "").trim(),
-          image: (r["الصورة"] || "").trim(),
-          sellMode: Number((r["وضع_البيع"] || "0").trim()) || 0,
-          approxKg: toNum(r["وزن_تقريبي_كجم"], 0),
-        }))
-        .filter((p) => p.name && p.category);
+        .map((row, idx) => parseProductRow(row, idx))
+        .filter(Boolean);
 
-      state.categories = [
-        "الكل",
-        ...new Set(state.products.map((p) => p.category)),
-      ];
+      const categoryMap = new Map();
+      state.products.forEach((p) => {
+        if (!p?.category) return;
+        const id = getCategoryId(p.category);
+        if (!id || categoryMap.has(id)) return;
+        categoryMap.set(id, {
+          id,
+          names: ensureRecord(p.category.names || p.category, id),
+        });
+      });
+      state.categories = Array.from(categoryMap.values());
       buildFilters();
       applyFilters();
       buildOffers();
@@ -228,24 +352,57 @@ if (window.Papa) {
     },
     error: (err) => {
       console.error("CSV error:", err);
-      els.menuGrid.innerHTML = `<p class="muted">تعذر تحميل القائمة الآن. جرّب التحديث لاحقًا.</p>`;
+      els.menuGrid.innerHTML = `<p class="muted">${t(
+        "menu.alert.loadFail"
+      )}</p>`;
     },
   });
 } else {
-  els.menuGrid.innerHTML = `<p class="muted">تعذر تحميل القائمة (مكتبة PapaParse غير متاحة).</p>`;
+  els.menuGrid.innerHTML = `<p class="muted">${t(
+    "menu.alert.noPapa"
+  )}</p>`;
 }
+
+const getCategoryLabel = (category) => {
+  if (!category) return "";
+  if (category === ALL_CATEGORY) return t("menu.filters.all");
+  if (typeof category === "string") {
+    const key = `menu.categories.${category}`;
+    const label = t(key);
+    return label === key ? category : label;
+  }
+  const text = labelFor(category.names || category);
+  if (text) return text;
+  const id = category.id || "";
+  if (!id) return "";
+  const key = `menu.categories.${id}`;
+  const fallback = t(key);
+  return fallback === key ? id : fallback;
+};
 
 /* ===== الفلاتر والبحث ===== */
 function buildFilters() {
+  if (!els.categoryFilters) return;
   els.categoryFilters.innerHTML = "";
-  state.categories.forEach((cat) => {
+  const entries = [
+    { id: ALL_CATEGORY, label: t("menu.filters.all") },
+    ...state.categories.map((cat) => {
+      const id = getCategoryId(cat);
+      return {
+        id,
+        label: getCategoryLabel(cat) || id,
+      };
+    }),
+  ].filter((item) => item.id);
+
+  entries.forEach(({ id, label }) => {
     const b = document.createElement("button");
     b.className =
-      "filter-btn" + (cat === state.activeCategory ? " active" : "");
+      "filter-btn" + (id === state.activeCategory ? " active" : "");
     b.type = "button";
-    b.textContent = cat;
+    b.textContent = label;
     b.addEventListener("click", () => {
-      state.activeCategory = cat;
+      state.activeCategory = id;
       document
         .querySelectorAll(".filter-btn")
         .forEach((x) => x.classList.remove("active"));
@@ -255,14 +412,17 @@ function buildFilters() {
     els.categoryFilters.appendChild(b);
   });
 
-  let qTimer;
-  els.searchInput.addEventListener("input", () => {
-    clearTimeout(qTimer);
-    qTimer = setTimeout(() => {
-      state.query = els.searchInput.value.trim();
-      applyFilters();
-    }, 200);
-  });
+  if (els.searchInput && !els.searchInput.dataset.bound) {
+    let qTimer;
+    els.searchInput.addEventListener("input", () => {
+      clearTimeout(qTimer);
+      qTimer = setTimeout(() => {
+        state.query = els.searchInput.value.trim();
+        applyFilters();
+      }, 200);
+    });
+    els.searchInput.dataset.bound = "1";
+  }
 }
 
 function setupFilterArrows() {
@@ -286,12 +446,21 @@ function setupFilterArrows() {
 }
 
 function applyFilters() {
-  const q = state.query.toLowerCase();
+  const rawQuery = state.query.trim();
+  const queryAr = rawQuery.toLowerCase();
+  const queryTr = rawQuery.toLocaleLowerCase("tr-TR");
+  const hasQuery = rawQuery.length > 0;
+
   state.filtered = state.products.filter((p) => {
+    const catId = getCategoryId(p.category);
     const byCat =
-      state.activeCategory === "الكل" || p.category === state.activeCategory;
-    const byQuery = !q || p.name.toLowerCase().includes(q);
-    return byCat && byQuery;
+      state.activeCategory === ALL_CATEGORY || catId === state.activeCategory;
+    if (!byCat) return false;
+    if (!hasQuery) return true;
+    return (
+      recordMatchesQuery(p.names, queryAr, queryTr) ||
+      recordMatchesQuery(p.category?.names, queryAr, queryTr)
+    );
   });
   renderProducts(state.filtered, els.menuGrid);
 }
@@ -310,41 +479,51 @@ function renderProducts(list, mount) {
   list.forEach((p) => {
     const hasOffer = p.salePrice > 0 && p.salePrice < p.price;
     const showPrice = p.price > 0;
+    const productName = labelFor(p.names);
+    const categoryLabel = getCategoryLabel(p.category);
     const priceHtml = hasOffer
       ? `<span class="old ltr-text">${priceFmt(
           p.price
         )}</span> <span class="new ltr-text">${priceFmt(p.salePrice)}</span>`
       : showPrice
       ? `<span class="ltr-text">${priceFmt(p.price)}</span>`
-      : `<span class="coming-soon">اتصل للتسعير</span>`;
+      : `<span class="coming-soon">${t("menu.product.callForPrice")}</span>`;
 
     const flags = (() => {
       if (p.sellMode === 1)
-        return `<span class="flag"><i class="fa-solid fa-scale-balanced"></i> يباع بالكيلو</span>`;
-      if (p.sellMode === 2)
-        return `<span class="flag warn"><i class="fa-solid fa-drumstick-bite"></i> يباع كامل • السعر/كجم${
-          p.approxKg ? ` • ~${p.approxKg}كجم/قطعة` : ""
-        }</span>`;
+        return `<span class="flag"><i class="fa-solid fa-scale-balanced"></i> ${t(
+          "menu.flags.sellByKg"
+        )}</span>`;
+      if (p.sellMode === 2) {
+        const approx = p.approxKg
+          ? t("menu.flags.sellWholeApprox", { kg: formatQtyValue(p.approxKg) })
+          : "";
+        return `<span class="flag warn"><i class="fa-solid fa-drumstick-bite"></i> ${t(
+          "menu.flags.sellWhole"
+        )}${approx}</span>`;
+      }
       return "";
     })();
 
     const canAdd = showPrice;
+    const addLabel = t("common.actions.addToCart");
+    const unavailableLabel = t("menu.product.unavailable");
 
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
       <div class="image-wrap">
-        ${hasOffer ? '<span class="badge-offer">عرض</span>' : ""}
-        <img src="${p.image || placeholder}" alt="${p.name}">
+        ${hasOffer ? `<span class="badge-offer">${t("menu.badge.offer")}</span>` : ""}
+        <img src="${p.image || placeholder}" alt="${productName}">
       </div>
-      <h3 class="product-name">${p.name}</h3>
-      <p class="category">${p.category}</p>
+      <h3 class="product-name">${productName}</h3>
+      <p class="category">${categoryLabel}</p>
       <div class="flags-row">${flags}</div>
       <p class="price">${priceHtml}</p>
       ${
         canAdd
-          ? '<button class="add-btn" type="button"><i class="fa-solid fa-cart-plus"></i> أضف للسلة</button>'
-          : '<button class="add-btn" type="button" disabled style="opacity:.6;cursor:not-allowed"><i class="fa-solid fa-circle-info"></i> غير متاح</button>'
+          ? `<button class="add-btn" type="button"><i class="fa-solid fa-cart-plus"></i> ${addLabel}</button>`
+          : `<button class="add-btn" type="button" disabled style="opacity:.6;cursor:not-allowed"><i class="fa-solid fa-circle-info"></i> ${unavailableLabel}</button>`
       }
     `;
     if (canAdd) {
@@ -357,27 +536,55 @@ function renderProducts(list, mount) {
 }
 
 /* ===== المودال ===== */
-function splitCuts(cutsStr) {
-  return (cutsStr || "")
-    .split(/[,،|\/\n]+/g)
-    .map((s) => s.trim())
-    .filter(Boolean);
+function getHelperText(product) {
+  if (!product) return "";
+  if (product.sellMode === 1) return t("menu.modal.helper.sellByKg");
+  if (product.sellMode === 2) {
+    const approxText = product.approxKg
+      ? t("menu.modal.helper.sellWhole.withApprox", {
+          kg: formatQtyValue(product.approxKg),
+        })
+      : t("menu.modal.helper.sellWhole.noApprox");
+    return t("menu.modal.helper.sellWhole", { text: approxText });
+  }
+  return t("menu.modal.helper.sellPiece");
+}
+
+function refreshModalLanguage() {
+  const product = state.modalProduct;
+  if (!product) return;
+  const options = els.cutSelect?.options;
+  if (options && options.length) {
+    Array.from(options).forEach((opt) => {
+      if (opt.value === "") {
+        opt.textContent = t("menu.modal.cutPlaceholder");
+        return;
+      }
+      const cut = product.cuts?.find((c) => c.id === opt.value);
+      if (cut) opt.textContent = labelFor(cut.names);
+    });
+  }
+  const helperEl = els.orderModal?.querySelector(".qty-helper");
+  if (helperEl) helperEl.textContent = getHelperText(product);
 }
 
 function openModal(product) {
   state.modalProduct = product;
 
   els.modalImg.src = product.image || placeholder;
-  els.modalName.textContent = product.name;
-  els.modalCat.textContent = product.category;
+  els.modalName.textContent = labelFor(product.names);
+  els.modalCat.textContent = getCategoryLabel(product.category);
 
-  // التقطيع: خانة واحدة من CSV
-  const cuts = splitCuts(product.cuts);
+  const cuts = Array.isArray(product.cuts) ? product.cuts : [];
   if (cuts.length) {
     els.cutRow.style.display = "";
-    els.cutSelect.innerHTML = cuts
-      .map((c) => `<option value="${c}">${c}</option>`)
-      .join("");
+    const options = [
+      `<option value="" disabled selected>${t("menu.modal.cutPlaceholder")}</option>`,
+      ...cuts.map((c) => `<option value="${c.id}">${labelFor(c.names)}</option>`),
+    ];
+    els.cutSelect.innerHTML = options.join("");
+    els.cutSelect.value = "";
+    els.cutSelect.classList.remove("invalid");
   } else {
     els.cutRow.style.display = "none";
     els.cutSelect.innerHTML = "";
@@ -385,26 +592,18 @@ function openModal(product) {
 
   // الكمية حسب وضع_البيع
   els.qtyInput.value = "1";
-  let helper = "";
   if (product.sellMode === 1) {
     els.qtyInput.step = "0.1";
     els.qtyInput.inputMode = "decimal";
     els.qtyInput.setAttribute("inputmode", "decimal");
-    helper = "سيتم حساب السعر حسب الكيلو.";
   } else if (product.sellMode === 2) {
     els.qtyInput.step = "1";
     els.qtyInput.inputMode = "numeric";
     els.qtyInput.setAttribute("inputmode", "numeric");
-    helper = `هذا المنتج يُباع كاملًا والسعر الظاهر هو سعر الكيلو. ${
-      product.approxKg
-        ? `الوزن التقريبي للقطعة ~${product.approxKg} كجم. السعر النهائي بعد الوزن.`
-        : "سيتم تحديد السعر النهائي بعد الوزن."
-    }`;
   } else {
     els.qtyInput.step = "1";
     els.qtyInput.inputMode = "numeric";
     els.qtyInput.setAttribute("inputmode", "numeric");
-    helper = "الكمية تحسب بالقطعة.";
   }
 
   // نص مساعد تحت خانة الكمية
@@ -414,7 +613,7 @@ function openModal(product) {
     helperEl.className = "qty-helper";
     els.qtyInput.closest(".qty").insertAdjacentElement("afterend", helperEl);
   }
-  helperEl.textContent = helper;
+  helperEl.textContent = getHelperText(product);
 
   // ملاحظة
   els.noteInput.value = "";
@@ -453,6 +652,10 @@ els.qtyMinus?.addEventListener("click", () => {
       : String(Math.max(1, Math.floor(next)));
 });
 
+els.cutSelect?.addEventListener("change", () => {
+  els.cutSelect.classList.remove("invalid");
+});
+
 els.noteInput?.addEventListener("input", () => {
   els.noteCount.textContent = els.noteInput.value.length;
 });
@@ -476,7 +679,15 @@ els.modalAdd?.addEventListener("click", () => {
   if (!state.modalProduct) return;
 
   const p = state.modalProduct;
-  const cut = els.cutSelect.value || "";
+  const cuts = Array.isArray(p.cuts) ? p.cuts : [];
+  const requiresCut = cuts.length > 0;
+  const cutId = (els.cutSelect.value || "").trim();
+  if (requiresCut && !cutId) {
+    els.cutSelect.classList.add("invalid");
+    els.cutSelect.focus();
+    alert(t("menu.modal.cutError"));
+    return;
+  }
   let qty = toNum(els.qtyInput.value, 1);
 
   if (p.sellMode === 1)
@@ -484,53 +695,122 @@ els.modalAdd?.addEventListener("click", () => {
   else qty = Math.max(1, Math.floor(qty)); // قطعة/كامل: أعداد صحيحة
 
   const note = els.noteInput.value.trim();
-  addToCart(p, qty, cut, note);
+  addToCart(p, qty, cutId, note);
   closeModal();
   openCart();
 });
 
 /* ===== السلة ===== */
 const CART_KEY = "elb_cart_v1";
+
+function normalizeCartItem(item, idx = 0) {
+  if (!item) return null;
+  const nameRecord = ensureRecord(
+    item.name,
+    item.nameAr || item.nameTr || item.legacyName || item.name || ""
+  );
+  const categorySource =
+    (item.category && typeof item.category === "object" && item.category.names)
+      ? item.category.names
+      : item.category;
+  const categoryId =
+    (item.category && typeof item.category === "object" && item.category.id) ||
+    item.categoryId ||
+    (typeof item.category === "string" ? item.category : "");
+  const categoryRecord = ensureRecord(categorySource, categoryId);
+  const cutRecord = item.cut ? ensureRecord(item.cut) : null;
+  const cutId = item.cutId || item.cutOptionId || "";
+  const fallbackName = nameRecord.ar || nameRecord.tr || `item-${idx}`;
+  const fallbackCat = categoryId || "category";
+  const productId =
+    item.productId ||
+    item.id ||
+    `${fallbackCat}__${fallbackName}`.replace(/\s+/g, "_");
+
+  return {
+    ...item,
+    productId,
+    name: nameRecord,
+    category: { id: categoryId, names: categoryRecord },
+    categoryId,
+    image: item.image || placeholder,
+    price: Number(item.price) || 0,
+    cutId: cutId || (cutRecord ? cutRecord.ar || cutRecord.tr || "" : ""),
+    cut: cutRecord,
+    note: item.note || "",
+    qty: Number(item.qty) || 0,
+    sellMode: Number(item.sellMode) || 0,
+    approxKg: toNum(item.approxKg, 0),
+    legacyName: nameRecord.ar || nameRecord.tr || "",
+    legacyCategory: categoryRecord.ar || categoryRecord.tr || "",
+    cutText: cutRecord ? cutRecord.ar || cutRecord.tr || "" : "",
+  };
+}
+
 function hydrateCart() {
   try {
     const raw = localStorage.getItem(CART_KEY);
-    state.cart = raw ? JSON.parse(raw) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    state.cart = Array.isArray(parsed)
+      ? parsed.map((item, idx) => normalizeCartItem(item, idx)).filter(Boolean)
+      : [];
   } catch {
     state.cart = [];
   }
 }
 function persistCart() {
+  state.cart = state.cart.map((item, idx) => normalizeCartItem(item, idx)).filter(Boolean);
   localStorage.setItem(CART_KEY, JSON.stringify(state.cart));
   // عرّض السلة عالميًا لأي سكربت خارجي
   window.cart = state.cart;
 }
 
-function addToCart(product, qty, cut, note) {
-  const idx = state.cart.findIndex(
-    (x) => x.name === product.name && x.cut === cut
-  );
+function addToCart(product, qty, cutId, note) {
+  const cuts = Array.isArray(product.cuts) ? product.cuts : [];
+  const cutOption = cutId ? cuts.find((c) => c.id === cutId) : null;
   const unit =
     product.salePrice > 0 && product.salePrice < product.price
       ? product.salePrice
       : product.price;
 
   const base = {
-    name: product.name,
+    productId: product.id,
+    name: product.names,
     category: product.category,
+    categoryId: product.category?.id || "",
     image: product.image || placeholder,
     price: unit,
-    cut,
+    cutId: cutOption?.id || "",
+    cut: cutOption ? cutOption.names : null,
     note: note || "",
     qty,
     sellMode: product.sellMode,
     approxKg: product.approxKg || 0,
   };
 
+  const normalized = normalizeCartItem(base, state.cart.length);
+  const idx = state.cart.findIndex(
+    (x) =>
+      x.productId === normalized.productId &&
+      (x.cutId || "") === (normalized.cutId || "")
+  );
+
   if (idx > -1) {
-    state.cart[idx].qty += qty;
-    if (note) state.cart[idx].note = note;
+    const existing = normalizeCartItem(state.cart[idx], idx);
+    existing.qty = Number(existing.qty || 0) + qty;
+    if (note) existing.note = note;
+    existing.price = normalized.price;
+    existing.sellMode = normalized.sellMode;
+    existing.approxKg = normalized.approxKg;
+    existing.image = normalized.image;
+    existing.cut = normalized.cut;
+    existing.cutId = normalized.cutId;
+    existing.category = normalized.category;
+    existing.categoryId = normalized.categoryId;
+    existing.name = normalized.name;
+    state.cart[idx] = existing;
   } else {
-    state.cart.push(base);
+    state.cart.push(normalized);
   }
   persistCart();
   updateCartUI();
@@ -544,31 +824,45 @@ function removeItem(i) {
 }
 
 function lineQtyText(it) {
-  if (it.sellMode === 1) return `${(+it.qty).toFixed(2)} كجم`;
-  if (it.sellMode === 2)
-    return `${Math.floor(it.qty)} قطعة (يباع كامل • السعر/كجم${
-      it.approxKg ? ` • ~${it.approxKg}كجم/قطعة` : ""
-    })`;
-  return `${Math.floor(it.qty)} قطعة`;
+  if (it.sellMode === 1) {
+    return `${formatQtyValue(it.qty)} ${t("menu.units.kg")}`;
+  }
+  if (it.sellMode === 2) {
+    const pieces = Math.max(1, Math.floor(it.qty));
+    const approx = it.approxKg
+      ? t("menu.flags.sellWholeApprox", { kg: formatQtyValue(it.approxKg) })
+      : "";
+    return `${pieces} ${t("menu.units.piecePlural")} (${t(
+      "menu.flags.sellWhole"
+    )}${approx})`;
+  }
+  return `${Math.max(1, Math.floor(it.qty))} ${t("menu.units.piecePlural")}`;
 }
 
 function linePriceText(it) {
-  if (it.sellMode === 2) return `${priceFmt(it.price)} / كجم`;
+  if (it.sellMode === 2) return `${priceFmt(it.price)} / ${t("menu.units.kg")}`;
   return priceFmt(it.price);
 }
 
 function qtyForMessage(it) {
-  if (it.sellMode === 1) return `${formatQtyValue(it.qty)} كجم`;
+  if (it.sellMode === 1) {
+    return `${formatQtyValue(it.qty)} ${t("menu.units.kg")}`;
+  }
   if (it.sellMode === 2) {
     const pcs = Math.max(1, Math.floor(+it.qty || 0));
-    const approx = it.approxKg > 0 ? ` (~${it.approxKg} كجم/قطعة)` : "";
-    return `${pcs} قطعة${approx}`;
+    const approx =
+      it.approxKg > 0
+        ? t("menu.units.approxPieceKg", { kg: formatQtyValue(it.approxKg) })
+        : "";
+    return `${pcs} ${t("menu.units.piecePlural")}${approx}`;
   }
-  return `${Math.max(1, Math.floor(+it.qty || 0))} عدد`;
+  return `${Math.max(1, Math.floor(+it.qty || 0))} ${t("menu.units.count")}`;
 }
 
 function priceLabelForMessage(it) {
-  return it.sellMode === 0 ? "سعر القطعة" : "سعر الكيلو";
+  return it.sellMode === 0
+    ? t("menu.price.unitPiece")
+    : t("menu.price.unitKg");
 }
 
 function calcTotals() {
@@ -606,7 +900,7 @@ function updateCartUI() {
 
   // ✅ لو السلة فاضية: عطّل الزر
   if (!state.cart.length) {
-    els.cartItems.innerHTML = `<p class="muted">السلة فارغة</p>`;
+    els.cartItems.innerHTML = `<p class="muted">${t("menu.cart.empty")}</p>`;
     els.cartTotal.textContent = priceFmt(0);
     if (els.goConfirm) els.goConfirm.disabled = true; // << هنا التعطيل
     updateWALink();
@@ -615,30 +909,33 @@ function updateCartUI() {
 
   // رسم عناصر السلة
   els.cartItems.innerHTML = state.cart
-    .map(
-      (it, i) => `
+    .map((it, i) => {
+      const nameText = labelFor(it.name);
+      const cutText = it.cut ? labelFor(it.cut) : t("menu.cart.meta.none");
+      const qtyLabel = t("menu.cart.meta.quantity");
+      const noteLabel = t("menu.cart.meta.note");
+      const deleteLabel = t("menu.cart.meta.delete");
+      return `
       <div class="cart-row">
-        <img src="${it.image}" alt="">
+        <img src="${it.image}" alt="${nameText}">
         <div>
-          <div class="title">${it.name}</div>
-          <div class="meta">${it.cut || "بدون تحديد"} • الكمية: ${lineQtyText(
-        it
-      )}</div>
+          <div class="title">${nameText}</div>
+          <div class="meta">${cutText} • ${qtyLabel}: ${lineQtyText(it)}</div>
           ${
             it.note
-              ? `<div class="meta" style="color:#444">${it.note}</div>`
+              ? `<div class="meta" style="color:#444">${noteLabel}: ${it.note}</div>`
               : ""
           }
         </div>
         <div style="text-align:left">
           <div class="price ltr-text">${linePriceText(it)}</div>
-          <button title="حذف" style="border:none;background:#f5f5f5;border-radius:8px;padding:6px 8px;cursor:pointer" data-rm="${i}">
+          <button title="${deleteLabel}" style="border:none;background:#f5f5f5;border-radius:8px;padding:6px 8px;cursor:pointer" data-rm="${i}">
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
       </div>
-    `
-    )
+    `;
+    })
     .join("");
 
   els.cartItems
@@ -665,9 +962,7 @@ function updateCartUI() {
       const confirmBtn = footer.querySelector("#goConfirm");
       footer.insertBefore(note, confirmBtn || footer.firstChild);
     }
-    note.textContent = hasUnpriced
-      ? "تنبيه: يوجد أصناف تُباع كاملة وسيتم تحديد سعرها النهائي بعد الوزن الفعلي."
-      : "";
+    note.textContent = hasUnpriced ? t("common.note.unpriced") : "";
     note.style.display = hasUnpriced ? "block" : "none";
   }
 
@@ -678,28 +973,32 @@ function updateCartUI() {
 function updateWALink() {
   if (!els.waCheckout) return; // لو اتشال اللينك من الـ HTML
   const lines = state.cart.map((item) => {
+    const nameText = labelFor(item.name);
     const parts = [
-      `• ${item.name}`,
+      `• ${nameText}`,
       `      ${priceLabelForMessage(item)}: ${moneyTL(item.price)}`,
-      `      الكمية: ${qtyForMessage(item)}`,
+      `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(item)}`,
     ];
-    if (item.cut) parts.push(`      طريقة التقطيع: ${item.cut}`);
-    if (item.note) parts.push(`      ملاحظة: ${item.note}`);
+    const cutText = item.cut ? labelFor(item.cut) : "";
+    if (cutText)
+      parts.push(`      ${t("menu.whatsapp.cut")}: ${cutText}`);
+    if (item.note)
+      parts.push(`      ${t("menu.whatsapp.noteLabel")}: ${item.note}`);
     return parts.join("\n");
   });
 
   const { total, hasUnpriced } = calcTotals();
-  const header = "طلب جديد من مزارع البركات 🌾🥩";
-  const totalLine = `💰 الإجمالي التقريبي: ${moneyTL(total)}${
-    hasUnpriced ? " (قد تتغير الأصناف الكاملة بعد الوزن)" : ""
-  }`;
-  const approxLine =
-    "ℹ️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
+  const header = t("menu.whatsapp.header", { brand: t("common.brandName") });
+  const totalLine = `${t("menu.whatsapp.total", {
+    total: moneyTL(total),
+  })}${hasUnpriced ? t("menu.whatsapp.totalChange") : ""}`;
+  const approxLine = t("menu.whatsapp.note");
+  const detailsLabel = t("menu.whatsapp.details");
 
   const msgRaw = [
     header,
     "",
-    "🧾 تفاصيل الطلب:",
+    detailsLabel,
     ...lines,
     "",
     totalLine,
@@ -738,21 +1037,21 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
 /* ===== زر تأكيد الطلب ➜ confirm.html ===== */
 (function setupConfirmButton() {
   if (!els.goConfirm) return; // لو لسه ما غيرتش زرار الواتساب في HTML
-  const BRAND_NAME = "مزارع البركات";
+  const BRAND_NAME = t("common.brandName");
   const WA_NUMBER = "905524821848"; // بدون +
 
   els.goConfirm.addEventListener("click", () => {
     if (!state.cart.length) {
-      alert("السلة فارغة");
+      alert(t("menu.alert.cartEmpty"));
       return;
     }
 
     // جهّز عناصر للـ confirm.html
-    const items = state.cart.map((x) => {
+    const items = state.cart.map((x, idx) => {
       // الوحدة: بالكيلو/كامل (السعر/كجم)/قطعة
-      let unit = "قطعة";
-      if (x.sellMode === 1) unit = "كجم";
-      else if (x.sellMode === 2) unit = "كجم"; // السعر/كجم لكن الكمية قطع
+      let unit = "piece";
+      if (x.sellMode === 1) unit = "kg";
+      else if (x.sellMode === 2) unit = "kg"; // السعر/كجم لكن الكمية قطع
 
       // الكمية تُحترم كما هي (قد تكون كسر للكيلو)
       const qty = Number(x.qty) || 0;
@@ -760,17 +1059,34 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
       // السعر: رقم فقط بدون رمز
       const price = Number(x.price) || 0;
 
+      const nameRecord = ensureRecord(x.name);
+      const categoryRecord = ensureRecord(
+        (x.category && x.category.names) || x.category,
+        x.categoryId || ""
+      );
+      const cutRecord = x.cut ? ensureRecord(x.cut) : null;
+      const productId =
+        x.productId ||
+        `${x.categoryId || "cat"}__${nameRecord.ar || nameRecord.tr || idx}`;
+
       return {
-        name: x.name,
-        category: x.category || "",
+        productId,
+        name: nameRecord,
+        category: {
+          id: x.categoryId || (x.category && x.category.id) || "",
+          names: categoryRecord,
+        },
         image: x.image || "",
         qty,
         unit,
         price,
-        cut: x.cut || "",
+        cut: cutRecord,
         note: x.note || "",
         sellMode: x.sellMode,
         approxKg: x.approxKg || 0,
+        legacyName: nameRecord.ar || nameRecord.tr || "",
+        legacyCategory: categoryRecord.ar || categoryRecord.tr || "",
+        cutText: cutRecord ? cutRecord.ar || cutRecord.tr || "" : "",
       };
     });
 
@@ -811,6 +1127,14 @@ function setupScrollTop() {
 
 setupFilterArrows();
 setupScrollTop();
+
+onLangChange(() => {
+  buildFilters();
+  applyFilters();
+  updateCartUI();
+  updateWALink();
+  refreshModalLanguage();
+});
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) return;

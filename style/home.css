@@ -23,6 +23,14 @@ body {
   color: var(--text);
   direction: rtl;
 }
+
+body.lang-tr {
+  direction: ltr;
+}
+
+body.lang-ar {
+  direction: rtl;
+}
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -150,6 +158,10 @@ body {
   padding: 14px 6px;
   text-decoration: none;
   color: var(--text);
+}
+
+body.lang-tr .navm-list a {
+  text-align: left;
 }
 
 /* ===== الهيرو ===== */
@@ -367,7 +379,8 @@ body {
 .scroll-top-fab {
   position: fixed;
   bottom: 18px;
-  inset-inline-start: 18px;
+  right: 18px;
+  left: auto;
   width: 52px;
   height: 52px;
   border-radius: 999px;
@@ -481,6 +494,9 @@ body {
   .mobile-actions,
   .nav-mobile {
     display: flex;
+  }
+  .mobile-actions {
+    gap: 8px;
   }
   .overlay-content p {
     max-width: 520px;

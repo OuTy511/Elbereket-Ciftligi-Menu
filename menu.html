@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <title>المنيو – مزارع البركات</title>
+    <title data-i18n="menu.meta.title">المنيو – مزارع البركات</title>
 
     <!-- Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,10 +22,79 @@
       rel="stylesheet"
     />
 
+    <link rel="stylesheet" href="style/lang.css" />
     <link rel="stylesheet" href="style/menu.css" />
+    <script src="js/i18n.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   </head>
   <body class="menu-page">
+    <div class="lang-gate" data-lang-gate hidden>
+      <div class="lang-gate__panel" role="dialog" aria-modal="true">
+        <div class="lang-gate__title" id="langGateTitle">
+          <span>اختر لغتك</span>
+          <span>Dilinizi seçin</span>
+        </div>
+        <p class="lang-gate__subtitle">
+          <span>من فضلك اختر اللغة التي تفضلها للمتابعة.</span>
+          <span>Lütfen devam etmek için dili seçin.</span>
+        </p>
+        <div
+          class="lang-gate__options lang-switch"
+          role="group"
+          aria-labelledby="langGateTitle"
+        >
+          <button type="button" class="lang-option" data-lang="ar">
+            <span class="lang-option__flag" aria-hidden="true">
+              <img src="img/flags/egypt.svg" alt="" />
+            </span>
+            <span class="lang-option__label">عربي</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="tr">
+            <span class="lang-option__flag" aria-hidden="true">
+              <img src="img/flags/turkey.svg" alt="" />
+            </span>
+            <span class="lang-option__label">Türkçe</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="lang-fab" data-lang-fab hidden>
+      <button
+        type="button"
+        class="lang-fab__toggle"
+        data-lang-fab-toggle
+        aria-haspopup="true"
+        aria-expanded="false"
+        data-i18n-title="common.langSwitch.label"
+      >
+        <span class="lang-fab__flag" aria-hidden="true">
+          <img data-lang-flag-img src="img/flags/egypt.svg" alt="" />
+        </span>
+        <span class="sr-only" data-i18n="common.langSwitch.label">تغيير اللغة</span>
+      </button>
+      <div class="lang-fab__menu" data-lang-fab-menu>
+        <div
+          class="lang-fab__menu-inner lang-switch"
+          role="group"
+          data-i18n-attr='{"aria-label":"common.langSwitch.label"}'
+        >
+          <button type="button" class="lang-option" data-lang="ar">
+            <span class="lang-option__flag" aria-hidden="true">
+              <img src="img/flags/egypt.svg" alt="" />
+            </span>
+            <span class="lang-option__label">عربي</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="tr">
+            <span class="lang-option__flag" aria-hidden="true">
+              <img src="img/flags/turkey.svg" alt="" />
+            </span>
+            <span class="lang-option__label">Türkçe</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Header -->
     <header class="header">
       <div class="container header__inner">
@@ -33,33 +102,46 @@
           ><img src="img/logos/logo-3.png" alt="مزارع البركات"
         /></a>
 
-        <nav class="nav-desktop" aria-label="القائمة الرئيسية">
+        <nav
+          class="nav-desktop"
+          aria-label="القائمة الرئيسية"
+          data-i18n-attr='{"aria-label":"nav.aria.main"}'
+        >
           <ul class="nav-list">
-            <li><a href="index.html">الصفحة الرئيسية</a></li>
-            <li><a class="active" href="menu.html">المنيو</a></li>
-            <li><a href="index.html#about">من نحن</a></li>
-            <li><a href="index.html#contact">تواصل معنا</a></li>
+            <li><a href="index.html" data-i18n="nav.home">الصفحة الرئيسية</a></li>
+            <li>
+              <a class="active" href="menu.html" data-i18n="nav.menu">المنيو</a>
+            </li>
+            <li><a href="index.html#about" data-i18n="nav.about">من نحن</a></li>
+            <li><a href="index.html#contact" data-i18n="nav.contact">تواصل معنا</a></li>
           </ul>
         </nav>
 
         <!-- موبايل -->
         <div class="mobile-actions">
-          <a class="nav-home" href="index.html">الصفحة الرئيسية</a>
+          <a class="nav-home" href="index.html" data-i18n="nav.home"
+            >الصفحة الرئيسية</a
+          >
           <button
             class="menu-toggle"
             aria-label="فتح القائمة"
             aria-expanded="false"
+            data-i18n-attr='{"aria-label":"common.aria.openMenu"}'
           >
             <span class="bar"></span><span class="bar"></span
             ><span class="bar"></span>
           </button>
         </div>
 
-        <nav class="nav-mobile" aria-label="قائمة الموبايل">
+        <nav
+          class="nav-mobile"
+          aria-label="قائمة الموبايل"
+          data-i18n-attr='{"aria-label":"nav.aria.mobile"}'
+        >
           <ul class="navm-list">
-            <li><a class="active" href="menu.html">المنيو</a></li>
-            <li><a href="index.html#about">من نحن</a></li>
-            <li><a href="index.html#contact">تواصل معنا</a></li>
+            <li><a class="active" href="menu.html" data-i18n="nav.menu">المنيو</a></li>
+            <li><a href="index.html#about" data-i18n="nav.about">من نحن</a></li>
+            <li><a href="index.html#contact" data-i18n="nav.contact">تواصل معنا</a></li>
           </ul>
         </nav>
       </div>
@@ -74,6 +156,7 @@
             type="button"
             data-filter-arrow="prev"
             aria-label="تصنيفات سابقة"
+            data-i18n-attr='{"aria-label":"menu.filters.prev"}'
           >
             <i class="fa-solid fa-angle-right"></i>
           </button>
@@ -85,31 +168,45 @@
             type="button"
             data-filter-arrow="next"
             aria-label="تصنيفات إضافية"
+            data-i18n-attr='{"aria-label":"menu.filters.next"}'
           >
             <i class="fa-solid fa-angle-left"></i>
           </button>
         </div>
         <label class="search-wrap" for="searchInput">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input id="searchInput" type="text" placeholder="ابحث عن منتج..." />
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="ابحث عن منتج..."
+            data-i18n-placeholder="menu.filters.search"
+          />
         </label>
       </div>
     </section>
 
     <!-- العروض -->
     <section id="offers" class="offers-section container" style="display: none">
-      <h2><i class="fa-solid fa-tags"></i> عروض اليوم</h2>
+      <h2>
+        <i class="fa-solid fa-tags"></i>
+        <span data-i18n="menu.offers.title">عروض اليوم</span>
+      </h2>
       <div id="offersGrid" class="menu-grid"></div>
     </section>
 
     <!-- شبكة المنتجات -->
     <section class="menu-section container">
-      <h2>قائمة المنتجات</h2>
+      <h2 data-i18n="menu.products.title">قائمة المنتجات</h2>
       <div id="menuGrid" class="menu-grid"></div>
     </section>
 
     <!-- فاب للسلة -->
-    <button id="cartFab" class="cart-fab" aria-label="فتح السلة">
+    <button
+      id="cartFab"
+      class="cart-fab"
+      aria-label="سلتك"
+      data-i18n-attr='{"aria-label":"menu.cart.title"}'
+    >
       <i class="fa-solid fa-basket-shopping"></i>
       <span class="count">0</span>
     </button>
@@ -119,6 +216,7 @@
       class="scroll-top-fab"
       type="button"
       aria-label="العودة إلى أعلى الصفحة"
+      data-i18n-attr='{"aria-label":"common.aria.backToTop"}'
     >
       <i class="fa-solid fa-arrow-up"></i>
     </button>
@@ -126,32 +224,42 @@
     <!-- درج السلة -->
     <aside id="cartDrawer" class="cart-drawer" aria-hidden="true">
       <div class="drawer-head">
-        <h3><i class="fa-solid fa-basket-shopping"></i> سلتك</h3>
-        <button class="drawer-close" aria-label="إغلاق">
+        <h3>
+          <i class="fa-solid fa-basket-shopping"></i>
+          <span data-i18n="menu.cart.title">سلتك</span>
+        </h3>
+        <button
+          class="drawer-close"
+          aria-label="إغلاق"
+          data-i18n-attr='{"aria-label":"common.actions.close"}'
+        >
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
       <div id="cartItems" class="drawer-body">
-        <p class="muted">السلة فارغة</p>
+        <p class="muted" data-i18n="menu.cart.empty">السلة فارغة</p>
       </div>
       <div class="drawer-footer">
         <div class="total">
-          <span>الإجمالي التقريبي:</span>
+          <span data-i18n="menu.cart.totalLabel">الإجمالي التقريبي:</span>
           <b class="ltr-text" id="cartTotal">0₺</b>
         </div>
-        <p class="muted total-note">
+        <p class="muted total-note" data-i18n="menu.cart.totalNote">
           الإجمالي تقريبي وقد تختلف القيمة النهائية بعد الوزن الفعلي.
-          <span class="note-em">احتمال فروقات بسيطة باختلاف الوزن.</span>
+        </p>
+        <p class="muted total-note note-em" data-i18n="menu.cart.totalNoteEm">
+          احتمال فروقات بسيطة باختلاف الوزن.
         </p>
         <button id="goConfirm" class="btn-confirm" type="button">
           <span class="ico"><i class="fa-solid fa-list-check"></i></span>
-          <span>تأكيد الطلب</span>
+          <span data-i18n="menu.cart.confirm">تأكيد الطلب</span>
         </button>
 
         <button
           id="cartClear"
           class="btn-secondary"
           style="width: 100%; margin-top: 8px"
+          data-i18n="menu.cart.clear"
         >
           تفريغ السلة
         </button>
@@ -164,9 +272,14 @@
       <div class="modal-content">
         <div class="modal-head">
           <h3 id="modalTitle">
-            <i class="fa-solid fa-list-check"></i> تفاصيل الطلب
+            <i class="fa-solid fa-list-check"></i>
+            <span data-i18n="menu.modal.title">تفاصيل الطلب</span>
           </h3>
-          <button class="modal-close" aria-label="إغلاق">
+          <button
+            class="modal-close"
+            aria-label="إغلاق"
+            data-i18n-attr='{"aria-label":"common.actions.close"}'
+          >
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -182,11 +295,13 @@
 
           <!-- نُخفيه تلقائيًا لو مفيش تقطيع -->
           <div id="cutRow">
-            <label class="lbl">اختر طريقة التقطيع</label>
+            <label class="lbl" data-i18n="menu.modal.cutLabel"
+              >اختر طريقة التقطيع</label
+            >
             <select id="cutSelect"></select>
           </div>
 
-          <label class="lbl">الكمية</label>
+          <label class="lbl" data-i18n="menu.modal.quantity">الكمية</label>
           <div class="qty">
             <button id="qtyMinus" type="button">
               <i class="fa-solid fa-minus"></i>
@@ -213,26 +328,30 @@
           </div>
 
           <label class="lbl with-count">
-            ملاحظة (اختياري)
+            <span data-i18n="menu.modal.noteLabel">ملاحظة (اختياري)</span>
             <span class="char-count"><b id="noteCount">0</b>/160</span>
           </label>
           <textarea
             id="noteInput"
             maxlength="160"
             placeholder="يمكنك كتابة ملاحظة قصيرة بحد أقصى 160 حرفًا. مثال: قطع صغيرة؛ بدون دهن؛ تعبئة مزدوجة."
+            data-i18n-placeholder="menu.modal.notePlaceholder"
           ></textarea>
         </div>
 
         <div class="modal-footer">
-          <button class="btn-secondary" id="modalCancel">إلغاء</button>
+          <button class="btn-secondary" id="modalCancel">
+            <span data-i18n="common.actions.cancel">إلغاء</span>
+          </button>
           <button class="btn-primary" id="modalAdd">
-            <i class="fa-solid fa-cart-plus"></i> أضف للسلة
+            <i class="fa-solid fa-cart-plus"></i>
+            <span data-i18n="common.actions.addToCart">أضف للسلة</span>
           </button>
         </div>
       </div>
       <div class="backdrop"></div>
     </div>
 
-    <script src="JS/menu.js"></script>
+    <script src="JS/menu.js" defer></script>
   </body>
 </html>

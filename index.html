@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <title>مزارع البركات | الصفحة الرئيسية</title>
+    <title data-i18n="home.meta.title">مزارع البركات | الصفحة الرئيسية</title>
 
     <!-- Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,9 +22,78 @@
       rel="stylesheet"
     />
 
+    <link rel="stylesheet" href="style/lang.css" />
     <link rel="stylesheet" href="style/home.css" />
+    <script src="js/i18n.js" defer></script>
   </head>
   <body class="home-page">
+    <div class="lang-gate" data-lang-gate hidden>
+      <div class="lang-gate__panel" role="dialog" aria-modal="true">
+        <div class="lang-gate__title" id="langGateTitle">
+          <span>اختر لغتك</span>
+          <span>Dilinizi seçin</span>
+        </div>
+        <p class="lang-gate__subtitle">
+          <span>من فضلك اختر اللغة التي تفضلها للمتابعة.</span>
+          <span>Lütfen devam etmek için dili seçin.</span>
+        </p>
+        <div
+          class="lang-gate__options lang-switch"
+          role="group"
+          aria-labelledby="langGateTitle"
+        >
+          <button type="button" class="lang-option" data-lang="ar">
+            <span class="lang-option__flag" aria-hidden="true">
+              <img src="img/flags/egypt.svg" alt="" />
+            </span>
+            <span class="lang-option__label">عربي</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="tr">
+            <span class="lang-option__flag" aria-hidden="true">
+              <img src="img/flags/turkey.svg" alt="" />
+            </span>
+            <span class="lang-option__label">Türkçe</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="lang-fab" data-lang-fab hidden>
+      <button
+        type="button"
+        class="lang-fab__toggle"
+        data-lang-fab-toggle
+        aria-haspopup="true"
+        aria-expanded="false"
+        data-i18n-title="common.langSwitch.label"
+      >
+        <span class="lang-fab__flag" aria-hidden="true">
+          <img data-lang-flag-img src="img/flags/egypt.svg" alt="" />
+        </span>
+        <span class="sr-only" data-i18n="common.langSwitch.label">تغيير اللغة</span>
+      </button>
+      <div class="lang-fab__menu" data-lang-fab-menu>
+        <div
+          class="lang-fab__menu-inner lang-switch"
+          role="group"
+          data-i18n-attr='{"aria-label":"common.langSwitch.label"}'
+        >
+          <button type="button" class="lang-option" data-lang="ar">
+            <span class="lang-option__flag" aria-hidden="true">
+              <img src="img/flags/egypt.svg" alt="" />
+            </span>
+            <span class="lang-option__label">عربي</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="tr">
+            <span class="lang-option__flag" aria-hidden="true">
+              <img src="img/flags/turkey.svg" alt="" />
+            </span>
+            <span class="lang-option__label">Türkçe</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Header -->
     <header class="header">
       <div class="container header__inner">
@@ -32,33 +101,48 @@
           ><img src="img/logos/logo-3.png" alt="مزارع البركات"
         /></a>
 
-        <nav class="nav-desktop" aria-label="القائمة الرئيسية">
+        <nav
+          class="nav-desktop"
+          aria-label="القائمة الرئيسية"
+          data-i18n-attr='{"aria-label":"nav.aria.main"}'
+        >
           <ul class="nav-list">
-            <li><a class="active" href="index.html">الصفحة الرئيسية</a></li>
-            <li><a href="menu.html">المنيو</a></li>
-            <li><a href="#about">من نحن</a></li>
-            <li><a href="#contact">تواصل معنا</a></li>
+            <li>
+              <a class="active" href="index.html" data-i18n="nav.home"
+                >الصفحة الرئيسية</a
+              >
+            </li>
+            <li><a href="menu.html" data-i18n="nav.menu">المنيو</a></li>
+            <li><a href="#about" data-i18n="nav.about">من نحن</a></li>
+            <li><a href="#contact" data-i18n="nav.contact">تواصل معنا</a></li>
           </ul>
         </nav>
 
         <!-- موبايل -->
         <div class="mobile-actions">
-          <a class="nav-home" href="index.html">الصفحة الرئيسية</a>
+          <a class="nav-home" href="index.html" data-i18n="nav.home"
+            >الصفحة الرئيسية</a
+          >
           <button
             class="menu-toggle"
             aria-label="فتح القائمة"
             aria-expanded="false"
+            data-i18n-attr='{"aria-label":"common.aria.openMenu"}'
           >
             <span class="bar"></span><span class="bar"></span
             ><span class="bar"></span>
           </button>
         </div>
 
-        <nav class="nav-mobile" aria-label="قائمة الموبايل">
+        <nav
+          class="nav-mobile"
+          aria-label="قائمة الموبايل"
+          data-i18n-attr='{"aria-label":"nav.aria.mobile"}'
+        >
           <ul class="navm-list">
-            <li><a href="menu.html">المنيو</a></li>
-            <li><a href="#about">من نحن</a></li>
-            <li><a href="#contact">تواصل معنا</a></li>
+            <li><a href="menu.html" data-i18n="nav.menu">المنيو</a></li>
+            <li><a href="#about" data-i18n="nav.about">من نحن</a></li>
+            <li><a href="#contact" data-i18n="nav.contact">تواصل معنا</a></li>
           </ul>
         </nav>
       </div>
@@ -74,8 +158,8 @@
         playsinline
       ></video>
       <div class="overlay-content">
-        <h1>مزارع البركات</h1>
-        <p>
+        <h1 data-i18n="home.hero.title">مزارع البركات</h1>
+        <p data-i18n="home.hero.body">
           بفضل الذبح الحلال واليومي نحصل على لحوم طازجة دائمًا، وبفضل أفضل طرق
           التغليف تبقى نظيفة وآمنة في كل الأوقات. يمكنكم اختيار لحومنا بكل
           اطمئنان، فهي تصل إلى موائدكم بطعمها الطبيعي الأصيل.
@@ -83,8 +167,14 @@
 
         <!-- زر مباشر للمنيو -->
         <div class="hero-cta">
-          <a class="cta-btn" href="menu.html" aria-label="افتح المنيو الآن">
-            <i class="fa-solid fa-utensils"></i> افتح المنيو الآن
+          <a
+            class="cta-btn"
+            href="menu.html"
+            aria-label="افتح المنيو الآن"
+            data-i18n-attr='{"aria-label":"home.hero.cta"}'
+          >
+            <i class="fa-solid fa-utensils"></i>
+            <span data-i18n="home.hero.cta">افتح المنيو الآن</span>
           </a>
         </div>
       </div>
@@ -95,8 +185,8 @@
     <!-- من نحن (مع تداخل الفاصل الأبيض) -->
     <section class="about-us section-overlap" id="about">
       <div class="text">
-        <h2>من نحن</h2>
-        <p>
+        <h2 data-i18n="home.about.title">من نحن</h2>
+        <p data-i18n="home.about.body">
           "مزارع البركات تأسست لتقديم أجود أنواع اللحوم الطازجة من مزارعنا في
           أدرنة إلى منازلكم في إسطنبول. نذبح يوميًا تحت إشراف بيطري، ونوفر تغليف
           محكم وتوصيل سريع إلى بشاك شهير وكايا شهير."
@@ -118,14 +208,19 @@
     <!-- تواصل معنا (تصميم جديد) -->
     <section class="contact-v2" id="contact">
       <div class="container">
-        <h2 class="c-title"><i class="fa-solid fa-headset"></i> تواصل معنا</h2>
+        <h2 class="c-title">
+          <i class="fa-solid fa-headset"></i>
+          <span data-i18n="home.contact.title">تواصل معنا</span>
+        </h2>
 
         <div class="c-grid">
           <!-- الهاتف -->
           <article class="c-card">
             <div class="c-icon"><i class="fa-solid fa-phone"></i></div>
-            <h3>رقم الهاتف</h3>
-            <p class="c-sub">متاح عبر المكالمات</p>
+            <h3 data-i18n="home.contact.phone.title">رقم الهاتف</h3>
+            <p class="c-sub" data-i18n="home.contact.phone.subtitle">
+              متاح عبر المكالمات
+            </p>
             <div class="c-actions">
               <a class="c-btn c-primary ltr-text" href="tel:+905524821848"
                 >+90 552 482 18 48</a
@@ -134,27 +229,7 @@
                 class="c-btn c-ghost c-copy"
                 data-copy="+905524821848"
                 title="نسخ الرقم"
-              >
-                <i class="fa-regular fa-copy"></i>
-              </button>
-            </div>
-          </article>
-
-          <!-- الشكاوى -->
-          <article class="c-card">
-            <div class="c-icon">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h3>رقم الشكاوى</h3>
-            <p class="c-sub">للشكاوى والملاحظات</p>
-            <div class="c-actions">
-              <a class="c-btn c-primary ltr-text" href="tel:+905444266009"
-                >+90 544 426 60 09</a
-              >
-              <button
-                class="c-btn c-ghost c-copy"
-                data-copy="+905444266009"
-                title="نسخ الرقم"
+                data-i18n-title="common.contact.copy"
               >
                 <i class="fa-regular fa-copy"></i>
               </button>
@@ -164,13 +239,16 @@
           <!-- واتساب مباشر -->
           <article class="c-card">
             <div class="c-icon"><i class="fa-brands fa-whatsapp"></i></div>
-            <h3>واتساب</h3>
-            <p class="c-sub">راسلنا مباشرة</p>
+            <h3 data-i18n="home.contact.whatsapp.title">واتساب</h3>
+            <p class="c-sub" data-i18n="home.contact.whatsapp.subtitle">
+              راسلنا مباشرة
+            </p>
             <div class="c-actions">
               <a
                 class="c-btn c-wa"
                 target="_blank"
                 href="https://wa.me/905524821848"
+                data-i18n="common.contact.openWhatsApp"
               >
                 فتح واتساب
                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
@@ -181,13 +259,16 @@
           <!-- جروب واتساب -->
           <article class="c-card">
             <div class="c-icon"><i class="fa-solid fa-users"></i></div>
-            <h3>جروب واتساب</h3>
-            <p class="c-sub">عروض يومية وتحديثات</p>
+            <h3 data-i18n="home.contact.group.title">جروب واتساب</h3>
+            <p class="c-sub" data-i18n="home.contact.group.subtitle">
+              عروض يومية وتحديثات
+            </p>
             <div class="c-actions">
               <a
                 class="c-btn c-light"
                 target="_blank"
                 href="https://chat.whatsapp.com/EMzA7uOlnEy3RHwKaZSQkp"
+                data-i18n="common.contact.joinGroup"
                 >انضم للجروب</a
               >
             </div>
@@ -196,8 +277,10 @@
           <!-- تليجرام -->
           <article class="c-card">
             <div class="c-icon"><i class="fa-brands fa-telegram"></i></div>
-            <h3>تليجرام</h3>
-            <p class="c-sub">قناتنا الرسمية</p>
+            <h3 data-i18n="home.contact.telegram.title">تليجرام</h3>
+            <p class="c-sub" data-i18n="home.contact.telegram.subtitle">
+              قناتنا الرسمية
+            </p>
             <div class="c-actions">
               <a
                 class="c-btn c-light ltr-text"
@@ -211,8 +294,10 @@
           <!-- البريد الإلكتروني -->
           <article class="c-card">
             <div class="c-icon"><i class="fa-regular fa-envelope"></i></div>
-            <h3>البريد الإلكتروني</h3>
-            <p class="c-sub">للطلبات والشكاوى</p>
+            <h3 data-i18n="home.contact.email.title">البريد الإلكتروني</h3>
+            <p class="c-sub" data-i18n="home.contact.email.subtitle">
+              للطلبات والشكاوى
+            </p>
             <div class="c-actions">
               <a
                 class="c-btn c-primary ltr-text"
@@ -223,6 +308,7 @@
                 class="c-btn c-ghost c-copy"
                 data-copy="elbereketciftilgi@gmail.com"
                 title="نسخ البريد"
+                data-i18n-title="common.contact.copyEmail"
               >
                 <i class="fa-regular fa-copy"></i>
               </button>
@@ -232,8 +318,10 @@
           <!-- إنستجرام -->
           <article class="c-card">
             <div class="c-icon"><i class="fa-brands fa-instagram"></i></div>
-            <h3>إنستجرام</h3>
-            <p class="c-sub">تابع أحدث الصور</p>
+            <h3 data-i18n="home.contact.instagram.title">إنستجرام</h3>
+            <p class="c-sub" data-i18n="home.contact.instagram.subtitle">
+              تابع أحدث الصور
+            </p>
             <div class="c-actions">
               <a
                 class="c-btn c-light ltr-text"
@@ -247,13 +335,16 @@
           <!-- فيسبوك -->
           <article class="c-card">
             <div class="c-icon"><i class="fa-brands fa-facebook"></i></div>
-            <h3>فيسبوك</h3>
-            <p class="c-sub">صفحتنا الرسمية</p>
+            <h3 data-i18n="home.contact.facebook.title">فيسبوك</h3>
+            <p class="c-sub" data-i18n="home.contact.facebook.subtitle">
+              صفحتنا الرسمية
+            </p>
             <div class="c-actions">
               <a
                 class="c-btn c-light"
                 target="_blank"
                 href="https://www.facebook.com/elbereketciftligi/?locale=tr_TR"
+                data-i18n="common.contact.openPage"
                 >زر الصفحة</a
               >
             </div>
@@ -262,7 +353,13 @@
       </div>
 
       <!-- Toast للنسخ -->
-      <div id="copyToast" class="c-toast" role="status" aria-live="polite">
+      <div
+        id="copyToast"
+        class="c-toast"
+        role="status"
+        aria-live="polite"
+        data-i18n="toast.copy.success"
+      >
         تم النسخ ✅
       </div>
     </section>
@@ -272,10 +369,11 @@
       class="scroll-top-fab"
       type="button"
       aria-label="العودة إلى أعلى الصفحة"
+      data-i18n-attr='{"aria-label":"common.aria.backToTop"}'
     >
       <i class="fa-solid fa-arrow-up"></i>
     </button>
 
-    <script src="JS/home.js"></script>
+    <script src="JS/home.js" defer></script>
   </body>
 </html>

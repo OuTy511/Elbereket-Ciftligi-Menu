@@ -1,3 +1,103 @@
+const fallbackI18n = {
+  t: (key) => key,
+  onChange: () => () => {},
+};
+
+const getI18n = () => window.i18n || fallbackI18n;
+
+const t = (key, params) => {
+  const api = getI18n();
+  return typeof api.t === "function" ? api.t(key, params) : key;
+};
+
+const onLangChange = (handler) => {
+  const api = getI18n();
+  return typeof api.onChange === "function" ? api.onChange(handler) : () => {};
+};
+
+const getLangCode = () => {
+  const api = getI18n();
+  return typeof api.getLang === "function" ? api.getLang() : "ar";
+};
+
+const ensureRecord = (value, fallback = "") => {
+  if (!value && fallback) return ensureRecord(fallback);
+  if (typeof value === "string") {
+    const text = value.trim();
+    if (!text) return { ar: "", tr: "" };
+    return { ar: text, tr: text };
+  }
+  if (value && typeof value === "object") {
+    const ar = (value.ar || value.Ar || "").trim();
+    const tr = (value.tr || value.Tr || "").trim();
+    if (!ar && !tr) {
+      const fb = (fallback || "").trim();
+      return fb ? { ar: fb, tr: fb } : { ar: "", tr: "" };
+    }
+    return { ar: ar || tr, tr: tr || ar };
+  }
+  const fb = (fallback || "").trim();
+  return fb ? { ar: fb, tr: fb } : { ar: "", tr: "" };
+};
+
+const labelFor = (value, lang = getLangCode()) => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  const record = ensureRecord(value);
+  return record[lang] || record.ar || record.tr || "";
+};
+
+const normalizeCartItem = (item, idx = 0) => {
+  if (!item) return null;
+  const nameRecord = ensureRecord(
+    item.name,
+    item.nameAr || item.nameTr || item.legacyName || item.name || ""
+  );
+  const categorySource =
+    (item.category && item.category.names) || item.category;
+  const categoryId =
+    (item.category && item.category.id) || item.categoryId || "";
+  const categoryRecord = ensureRecord(categorySource, categoryId);
+  const cutRecord = item.cut ? ensureRecord(item.cut) : item.cutText ? ensureRecord(item.cutText) : null;
+  const cutId = item.cutId || item.cutOptionId || "";
+  const fallbackName = nameRecord.ar || nameRecord.tr || `item-${idx}`;
+  const fallbackCat = categoryId || "category";
+  const productId =
+    item.productId ||
+    `${fallbackCat}__${fallbackName}`.replace(/\s+/g, "_");
+
+  return {
+    ...item,
+    productId,
+    name: nameRecord,
+    category: { id: categoryId, names: categoryRecord },
+    categoryId,
+    image: item.image || "",
+    price: Number(item.price) || 0,
+    cutId: cutId || (cutRecord ? cutRecord.ar || cutRecord.tr || "" : ""),
+    cut: cutRecord,
+    note: item.note || "",
+    qty: Number(item.qty) || 0,
+    sellMode: Number(item.sellMode) || 0,
+    approxKg: toNum(item.approxKg, 0),
+    legacyName: nameRecord.ar || nameRecord.tr || "",
+    legacyCategory: categoryRecord.ar || categoryRecord.tr || "",
+    cutText: cutRecord ? cutRecord.ar || cutRecord.tr || "" : "",
+  };
+};
+
+const normalizeOrderItem = (item, idx = 0) => {
+  const normalized = normalizeCartItem(item, idx);
+  normalized.unit = item.unit || normalized.unit || "";
+  return normalized;
+};
+
+const itemKey = (item) =>
+  `${item?.productId || ""}__${item?.cutId || ""}`;
+
+const legacyKey = (item) =>
+  `${labelFor(item?.name)}__${item?.cut ? labelFor(item.cut) : ""}`;
+
 /* ===== منيو الموبايل (نفس menu.js لعمل التوجل هنا) ===== */
 const btn = document.querySelector(".menu-toggle");
 const navMobile = document.querySelector(".nav-mobile");
@@ -133,8 +233,14 @@ try {
   order = JSON.parse(localStorage.getItem("orderDraft") || "null");
 } catch {}
 if (!order || !order.items || !order.items.length) {
-  toast("لا يوجد طلب قيد التأكيد. سيتم الرجوع للمنيو.", "error");
+  toast(t("confirm.toast.noDraft"), "error");
   window.location.href = "menu.html";
+}
+
+if (order && Array.isArray(order.items)) {
+  order.items = order.items
+    .map((item, idx) => normalizeOrderItem(item, idx))
+    .filter(Boolean);
 }
 
 let cartSnapshot = [];
@@ -142,35 +248,49 @@ try {
   cartSnapshot = JSON.parse(localStorage.getItem(CART_KEY) || "null") || [];
 } catch {}
 
+cartSnapshot = Array.isArray(cartSnapshot)
+  ? cartSnapshot.map((item, idx) => normalizeCartItem(item, idx)).filter(Boolean)
+  : [];
+
 if (order && Array.isArray(order.items) && cartSnapshot.length) {
-  const map = new Map(
-    cartSnapshot.map((item) => [
-      `${item?.name || ""}__${item?.cut || ""}`,
-      item,
-    ])
-  );
-  order.items.forEach((it) => {
-    const key = `${it?.name || ""}__${it?.cut || ""}`;
-    const src = map.get(key);
+  const map = new Map(cartSnapshot.map((item) => [itemKey(item), item]));
+  order.items.forEach((it, idx) => {
+    let src = map.get(itemKey(it));
+    if (!src) {
+      const legacy = legacyKey(it);
+      if (legacy) {
+        src = cartSnapshot.find((candidate) => legacyKey(candidate) === legacy);
+      }
+    }
     if (src) {
-      if (!it.category && src.category) it.category = src.category;
+      if (!it.category?.id && src.category) it.category = src.category;
+      if (!it.categoryId && src.categoryId) it.categoryId = src.categoryId;
       if (!it.image && src.image) it.image = src.image;
       if (typeof it.sellMode === "undefined" && src.sellMode != null)
         it.sellMode = src.sellMode;
       if ((!it.approxKg || !Number(it.approxKg)) && src.approxKg)
         it.approxKg = src.approxKg;
+      if (!it.cut && src.cut) it.cut = src.cut;
+      if (!it.cutId && src.cutId) it.cutId = src.cutId;
+      if (!it.productId && src.productId) it.productId = src.productId;
+      if (!it.price && src.price) it.price = src.price;
+      if (!it.qty && src.qty) it.qty = src.qty;
     }
     if (typeof it.sellMode === "undefined") {
-      if (it.unit === "كجم") it.sellMode = 1;
+      if (it.unit === "كجم" || it.unit === "kg") it.sellMode = 1;
       else it.sellMode = 0;
     }
+    order.items[idx] = normalizeOrderItem(it, idx);
   });
 }
 
 /* ===== عناصر الصفحة ===== */
 const tbody = $("#itemsBody");
 const totalEl = $("#totalAmount");
-$("#brandName").textContent = order?.brand ? `المتجر: ${order.brand}` : "";
+const brandDisplay = order?.brand
+  ? t("confirm.summary.store", { brand: order.brand })
+  : "";
+$("#brandName").textContent = brandDisplay;
 if (order?.waNumber) WA_NUMBER = order.waNumber;
 
 const addressGroup = $("#addressGroup");
@@ -206,50 +326,87 @@ const formatQtyValue = (qty) => {
   return parseFloat(n.toFixed(2)).toString();
 };
 
+const translatePayMethod = (value = "") => {
+  const v = value.trim();
+  if (!v) return "";
+  const lower = v.toLowerCase();
+  if (
+    v === "نقدًا" ||
+    lower.includes("nakit") ||
+    lower.includes("cash") ||
+    lower.includes("نقد") ||
+    lower.includes("كاش")
+  )
+    return t("confirm.form.payment.cash");
+  if (
+    v.includes("POS") ||
+    lower.includes("pos") ||
+    lower.includes("kredi") ||
+    lower.includes("card") ||
+    lower.includes("kart")
+  )
+    return t("confirm.form.payment.pos");
+  return v;
+};
+
 function resolveMode(it) {
   if (typeof it.sellMode === "number") return it.sellMode;
-  if (it.unit === "كجم") return 1;
+  const unit = (it.unit || "").toLowerCase();
+  if (unit.includes("كجم") || unit.includes("kg")) return 1;
   return 0;
+}
+
+function unitLabel(it) {
+  const unitRaw = (it.unit || "").trim();
+  const unitLower = unitRaw.toLowerCase();
+  const mode = resolveMode(it);
+  if (mode === 1) return t("menu.units.kg");
+  if (mode === 2) return t("menu.units.piecePlural");
+  if (!unitRaw) return t("menu.units.count");
+  if (unitLower === "piece" || unitRaw === "قطعة") return t("menu.units.piece");
+  if (unitLower === "عدد") return t("menu.units.count");
+  if (unitLower.includes("kg") || unitLower.includes("كجم"))
+    return t("menu.units.kg");
+  return unitRaw;
 }
 
 function qtyForMessage(it) {
   const mode = resolveMode(it);
-  if (mode === 1) return `${formatQtyValue(it.qty)} كجم`;
+  if (mode === 1) return `${formatQtyValue(it.qty)} ${t("menu.units.kg")}`;
   if (mode === 2) {
     const pieces = Math.max(1, Math.floor(Number(it.qty) || 0));
-    const approx = it.approxKg > 0 ? ` (~${it.approxKg} كجم/قطعة)` : "";
-    return `${pieces} قطعة${approx}`;
+    const approx =
+      it.approxKg > 0
+        ? t("menu.units.approxPieceKg", { kg: formatQtyValue(it.approxKg) })
+        : "";
+    return `${pieces} ${t("menu.units.piecePlural")}${approx}`;
   }
-  if (String(it.unit || "").includes("كجم"))
-    return `${formatQtyValue(it.qty)} ${it.unit}`.trim();
+  if ((it.unit || "").toLowerCase().includes("kg") || (it.unit || "").includes("كجم"))
+    return `${formatQtyValue(it.qty)} ${t("menu.units.kg")}`;
   const pieces = Math.max(1, Math.floor(Number(it.qty) || 0));
-  return `${pieces} ${it.unit && it.unit !== "قطعة" ? it.unit : "عدد"}`.trim();
+  return `${pieces} ${unitLabel(it)}`;
 }
 
 function priceLabelForMessage(it) {
   const mode = resolveMode(it);
-  if (mode === 0 && it.unit && !it.unit.includes("كجم")) return "سعر القطعة";
-  return "سعر الكيلو";
+  if (mode === 0 && !(it.unit || "").toLowerCase().includes("kg"))
+    return t("menu.price.unitPiece");
+  return t("menu.price.unitKg");
 }
 
 function buildCartSnapshot() {
   if (!order || !Array.isArray(order.items)) return [];
-  return order.items.map((it) => {
-    const mode = resolveMode(it);
-    let qty = toNum(it.qty, mode === 1 ? 0.1 : 1);
+  return order.items.map((it, idx) => {
+    const normalized = normalizeOrderItem(it, idx);
+    const mode = resolveMode(normalized);
+    let qty = toNum(normalized.qty, mode === 1 ? 0.1 : 1);
     if (mode === 1) qty = Math.max(0.1, Math.round(qty * 100) / 100);
     else qty = Math.max(1, Math.floor(qty));
 
     return {
-      name: it.name,
-      category: it.category || "",
-      image: it.image || "",
-      price: toNum(it.price, 0),
-      cut: it.cut || "",
-      note: it.note || "",
+      ...normalized,
       qty,
       sellMode: mode,
-      approxKg: toNum(it.approxKg, 0),
     };
   });
 }
@@ -314,18 +471,21 @@ function renderRows() {
   tbody.innerHTML = "";
   order.items.forEach((it, idx) => {
     const tr = document.createElement("tr");
+    const mode = resolveMode(it);
 
     const tdName = document.createElement("td");
-    tdName.dataset.label = "الصنف";
+    tdName.dataset.label = t("confirm.summary.table.item");
     const nameWrap = document.createElement("div");
     nameWrap.className = "cell-title";
-    nameWrap.textContent = it.name || "-";
+    const nameText = labelFor(it.name) || "-";
+    nameWrap.textContent = nameText;
     tdName.appendChild(nameWrap);
     const extras = [];
-    if (it.cut) extras.push(`تقطيع: ${it.cut}`);
-    if (it.note) extras.push(`ملاحظة: ${it.note}`);
-    if (!extras.length && /\((.+)\)/.test(it.name || "")) {
-      const match = (it.name || "").match(/\((.+)\)/);
+    const cutText = it.cut ? labelFor(it.cut) : "";
+    if (cutText) extras.push(`${t("menu.cart.meta.cut")}: ${cutText}`);
+    if (it.note) extras.push(`${t("menu.cart.meta.note")}: ${it.note}`);
+    if (!extras.length && /\((.+)\)/.test(nameText || "")) {
+      const match = (nameText || "").match(/\((.+)\)/);
       if (match && match[1]) extras.push(match[1]);
     }
     if (extras.length) {
@@ -336,8 +496,8 @@ function renderRows() {
     }
 
     const tdQty = document.createElement("td");
-    tdQty.dataset.label = "الكمية";
-    const isDecimal = it.unit === "كجم" || String(it.qty).includes(".");
+    tdQty.dataset.label = t("confirm.summary.table.qty");
+    const isDecimal = mode === 1;
     const step = isDecimal ? 0.1 : 1;
 
     const box = document.createElement("div");
@@ -364,7 +524,7 @@ function renderRows() {
     plus.textContent = "+";
     const unit = document.createElement("span");
     unit.style.marginInlineStart = "6px";
-    unit.textContent = it.unit || "";
+    unit.textContent = unitLabel(it);
 
     function clamp(val) {
       let n = toNum(val, isDecimal ? 0.1 : 1);
@@ -392,25 +552,26 @@ function renderRows() {
     tdQty.append(box, unit);
 
     const tdPrice = document.createElement("td");
-    tdPrice.dataset.label = "السعر/وحدة";
+    tdPrice.dataset.label = t("confirm.summary.table.price");
     tdPrice.className = "ltr-text";
     tdPrice.textContent = `${money(it.price)} TL`;
 
     const tdLine = document.createElement("td");
-    tdLine.dataset.label = "الإجمالي التقريبي";
+    tdLine.dataset.label = t("confirm.summary.table.total");
     tdLine.className = "ltr-text";
     tdLine.textContent = moneyTL(lineTotal(it));
 
     const tdDel = document.createElement("td");
-    tdDel.dataset.label = "حذف";
+    tdDel.dataset.label = t("confirm.summary.table.delete");
     const del = document.createElement("button");
     del.className = "del-btn";
+    del.setAttribute("aria-label", t("confirm.summary.table.delete"));
     del.innerHTML = '<i class="fa-solid fa-trash"></i>';
     del.addEventListener("click", () => {
       order.items.splice(idx, 1);
       if (!order.items.length) {
         saveDraft();
-        toast("تم حذف جميع الأصناف.", "success");
+        toast(t("confirm.toast.allRemoved"), "success");
         return (window.location.href = "menu.html");
       }
       totalEl.textContent = money(calcTotal());
@@ -425,6 +586,10 @@ function renderRows() {
   const total = calcTotal();
   totalEl.textContent = money(total);
   if (order) order.total = total;
+  const brandText = order?.brand
+    ? t("confirm.summary.store", { brand: order.brand })
+    : "";
+  $("#brandName").textContent = brandText;
 }
 renderRows();
 syncCartStorage();
@@ -447,9 +612,18 @@ const LEAFLET_JS_URLS = [
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
 ];
 
-function updateCoordsHint(text) {
+let mapHintState = { key: "confirm.map.hint.empty", params: null };
+
+function applyMapHint() {
   const hint = $("#coordsHint");
-  if (hint) hint.textContent = text;
+  if (!hint) return;
+  const { key, params } = mapHintState || {};
+  hint.textContent = t(key || "confirm.map.hint.empty", params);
+}
+
+function setMapHint(key, params) {
+  mapHintState = { key, params };
+  applyMapHint();
 }
 
 function ensureLeafletCSS() {
@@ -476,9 +650,10 @@ function placeMarker(latLng) {
   if (marker) marker.remove();
   marker = L.marker([pos.lat, pos.lng]).addTo(map);
   chosenLatLng = { lat: pos.lat, lng: pos.lng };
-  updateCoordsHint(
-    `الموقع المحدد: ${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`
-  );
+  setMapHint("confirm.map.hint.selected", {
+    lat: pos.lat.toFixed(6),
+    lng: pos.lng.toFixed(6),
+  });
 }
 
 function initLeafletMap() {
@@ -489,9 +664,7 @@ function initLeafletMap() {
     return;
   }
   if (typeof L === "undefined") {
-    updateCoordsHint(
-      "تعذّر تحميل خريطة OpenStreetMap. تأكد من الاتصال بالإنترنت ثم حدِّث الصفحة."
-    );
+    setMapHint("confirm.toast.mapLoadError");
     return;
   }
 
@@ -507,7 +680,7 @@ function initLeafletMap() {
   map.on("click", (e) => placeMarker(e.latlng));
   mapReady = true;
   leafletLoaded = true;
-  updateCoordsHint("لم يتم اختيار موقع بعد.");
+  setMapHint("confirm.map.hint.empty");
   setTimeout(() => map.invalidateSize(), 100);
 }
 
@@ -517,9 +690,7 @@ function loadLeafletLibrary() {
     return;
   }
   if (leafletSourceIndex >= LEAFLET_JS_URLS.length) {
-    updateCoordsHint(
-      "تعذّر تحميل خريطة OpenStreetMap. تأكد من الاتصال بالإنترنت ثم حدِّث الصفحة."
-    );
+    setMapHint("confirm.toast.mapLoadError");
     return;
   }
 
@@ -542,7 +713,7 @@ function loadLeafletLibrary() {
 }
 
 if (document.getElementById("map")) {
-  updateCoordsHint("جاري تحميل خريطة OpenStreetMap...");
+  setMapHint("confirm.map.hint.loading");
   ensureLeafletCSS();
   loadLeafletLibrary();
 }
@@ -551,17 +722,17 @@ const geoBtn = $("#geoBtn");
 if (geoBtn) {
   geoBtn.addEventListener("click", () => {
     if (!mapReady || !map) {
-      return toast("جاري تحميل خريطة OpenStreetMap، برجاء المحاولة بعد لحظات.");
+      return toast(t("confirm.toast.mapLoading"));
     }
     if (!navigator.geolocation)
-      return toast("المتصفح لا يدعم تحديد الموقع.", "error");
+      return toast(t("confirm.toast.geoUnsupported"), "error");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const ll = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         map.setView([ll.lat, ll.lng], 16);
         placeMarker(ll);
       },
-      () => toast("تعذّر تحديد الموقع. اختره يدويًا من الخريطة.", "error"),
+      () => toast(t("confirm.toast.geoFailed"), "error"),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   });
@@ -578,9 +749,12 @@ function toggleDeliveryUI() {
   if (payGroup) payGroup.style.display = "";
   if (mapCard) mapCard.style.display = isPickup ? "none" : "";
 
-  sendBtn.innerHTML = isPickup
-    ? '<i class="fa-brands fa-whatsapp"></i> تأكيد الطلب (استلام من المحل)'
-    : '<i class="fa-brands fa-whatsapp"></i> تأكيد وإرسال على واتساب';
+  if (sendBtn) {
+    const label = isPickup
+      ? t("confirm.actions.sendPickup")
+      : t("common.actions.sendWhatsApp");
+    sendBtn.innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${label}`;
+  }
 }
 document
   .querySelectorAll('input[name="deliveryType"]')
@@ -600,6 +774,13 @@ payInputs.forEach((input) =>
 );
 updatePayPlaceholder();
 
+onLangChange(() => {
+  renderRows();
+  toggleDeliveryUI();
+  applyMapHint();
+  updatePayPlaceholder();
+});
+
 /* ===== إرسال واتساب ===== */
 sendBtn.addEventListener("click", () => {
   const name = $("#custName").value.trim();
@@ -609,56 +790,78 @@ sendBtn.addEventListener("click", () => {
   const address = $("#custAddress") ? $("#custAddress").value.trim() : "";
   const payInput = document.querySelector('input[name="pay"]:checked');
   const pay = payInput ? payInput.value : "";
+  const payLabelKey = payInput
+    ? payInput
+        .closest("label")
+        ?.querySelector("[data-i18n]")
+        ?.getAttribute("data-i18n")
+    : null;
   const deliveryType =
     (document.querySelector('input[name="deliveryType"]:checked') || {})
       .value || "delivery";
 
   // تحقق جميل
-  if (!name) return toast("من فضلك أدخل الاسم.", "error");
-  if (!phone) return toast("من فضلك أدخل رقم الهاتف.", "error");
+  if (!name) return toast(t("confirm.toast.needName"), "error");
+  if (!phone) return toast(t("confirm.toast.needPhone"), "error");
 
   if (deliveryType === "delivery" && !address)
-    return toast("من فضلك اكتب العنوان التفصيلي.", "error");
+    return toast(t("confirm.toast.needAddress"), "error");
 
-  if (!pay) return toast("من فضلك اختر طريقة الدفع المناسبة.", "error");
+  if (!pay) return toast(t("confirm.toast.needPayment"), "error");
 
   const lines = order.items.map((it) => {
+    const nameText = labelFor(it.name);
+    const cutText = it.cut ? labelFor(it.cut) : "";
     const parts = [
-      `• ${it.name}`,
+      `• ${nameText}`,
       `      ${priceLabelForMessage(it)}: ${moneyTL(it.price)}`,
-      `      الكمية: ${qtyForMessage(it)}`,
+      `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(it)}`,
     ];
-    if (it.cut) parts.push(`      طريقة التقطيع: ${it.cut}`);
-    if (it.note) parts.push(`      ملاحظة: ${it.note}`);
+    if (cutText)
+      parts.push(`      ${t("confirm.whatsapp.cut")}: ${cutText}`);
+    if (it.note) parts.push(`      ${t("confirm.whatsapp.note")}: ${it.note}`);
     return parts.join("\n");
   });
 
-  const totalLine = `💰 الإجمالي التقريبي: ${moneyTL(calcTotal())}`;
-  const approxNote =
-    "ℹ️ ملاحظة: الإجمالي تقريبي وقد يحدث فرق بسيط باختلاف الوزن.";
-  const header = `طلب جديد من ${order.brand || "مزارع البركات"} 🌿🐄`;
+  const totalLine = t("confirm.whatsapp.total", {
+    total: moneyTL(calcTotal()),
+  });
+  const approxNote = t("confirm.whatsapp.noteLine");
+  const header = t("confirm.whatsapp.header", {
+    brand: order.brand || t("common.brandName"),
+  });
 
-  const customerBlock = [`👤 الاسم: ${name}`, `📞 الهاتف: ${phone}`];
+  const customerBlock = [
+    t("confirm.whatsapp.customer", { name }),
+    t("confirm.whatsapp.phone", { phone }),
+  ];
 
   let addressLine = "";
   let locationLines = [];
-  const payLine = pay ? `💳 طريقة الدفع: ${pay}` : "";
+  const payTranslated = payLabelKey ? t(payLabelKey) : translatePayMethod(pay);
+  const payLine = payTranslated
+    ? t("confirm.whatsapp.payment", { method: payTranslated })
+    : "";
 
   if (deliveryType === "pickup") {
-    addressLine = "🏪 طريقة الاستلام: استلام من المحل";
+    addressLine = t("confirm.whatsapp.pickup");
     locationLines = [];
   } else {
     const mapLink = chosenLatLng
       ? `https://maps.google.com/?q=${chosenLatLng.lat},${chosenLatLng.lng}`
       : "";
-    addressLine = `🏠 العنوان: ${address || "لم يُذكر"}`;
-    locationLines = mapLink ? [`🧭 اللوكيشن: ${mapLink}`] : [];
+    addressLine = t("confirm.whatsapp.address", {
+      address: address || t("confirm.whatsapp.addressFallback"),
+    });
+    locationLines = mapLink
+      ? [t("confirm.whatsapp.location", { link: mapLink })]
+      : [];
   }
 
   const msgParts = [
     header,
     "",
-    "🧾 تفاصيل الطلب:",
+    t("confirm.whatsapp.details"),
     ...lines,
     "",
     totalLine,

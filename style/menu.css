@@ -23,6 +23,14 @@ body {
   color: var(--text);
   direction: rtl;
 }
+
+body.lang-tr {
+  direction: ltr;
+}
+
+body.lang-ar {
+  direction: rtl;
+}
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -162,6 +170,10 @@ body {
   color: var(--text);
 }
 
+body.lang-tr .navm-list a {
+  text-align: left;
+}
+
 /* ===== أدوات المنيو ===== */
 .menu-tools {
   padding-top: 24px;
@@ -204,6 +216,15 @@ body {
 .filters-arrow:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
+}
+
+body.lang-tr .filters-arrow i {
+  display: inline-block;
+}
+
+body.lang-tr .filters-arrow.prev i,
+body.lang-tr .filters-arrow.next i {
+  transform: scaleX(-1);
 }
 .filters-scroller {
   overflow-x: auto;
@@ -527,7 +548,8 @@ body.modal-open {
 .cart-fab {
   position: fixed;
   bottom: 88px;
-  inset-inline-start: 16px;
+  right: 16px;
+  left: auto;
   z-index: 80;
   width: 54px;
   height: 54px;
@@ -542,7 +564,8 @@ body.modal-open {
 .cart-fab .count {
   position: absolute;
   top: -6px;
-  inset-inline-start: -6px;
+  right: -6px;
+  left: auto;
   background: #111;
   color: #fff;
   border-radius: 999px;
@@ -554,7 +577,8 @@ body.modal-open {
 .scroll-top-fab {
   position: fixed;
   bottom: 18px;
-  inset-inline-start: 18px;
+  right: 18px;
+  left: auto;
   width: 52px;
   height: 52px;
   border-radius: 999px;
@@ -705,6 +729,11 @@ body.modal-open {
   background: #fff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+#cutSelect.invalid {
+  border-color: #e74c3c;
+  background: #fff5f5;
+}
 #cutSelect:focus {
   border-color: var(--brand);
   box-shadow: 0 0 0 3px rgba(84, 180, 53, 0.15);
@@ -812,6 +841,9 @@ body.modal-open {
   .mobile-actions,
   .nav-mobile {
     display: flex;
+  }
+  .mobile-actions {
+    gap: 8px;
   }
   .menu-grid {
     grid-template-columns: 1fr;

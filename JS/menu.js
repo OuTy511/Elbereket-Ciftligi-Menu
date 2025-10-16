@@ -92,6 +92,22 @@ const recordMatchesQuery = (record, queryAr, queryTr) => {
 
 const ALL_CATEGORY = "__ALL__";
 
+const translateCategoryKey = (value) => {
+  if (!value) return "";
+  const key = `menu.categories.${value}`;
+  const label = t(key);
+  return label === key ? "" : label;
+};
+
+const translateCategory = (...candidates) => {
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    const label = translateCategoryKey(candidate);
+    if (label) return label;
+  }
+  return "";
+};
+
 /* ===== منيو الموبايل ===== */
 const btn = document.querySelector(".menu-toggle");
 const navMobile = document.querySelector(".nav-mobile");
@@ -366,18 +382,24 @@ if (window.Papa) {
 const getCategoryLabel = (category) => {
   if (!category) return "";
   if (category === ALL_CATEGORY) return t("menu.filters.all");
+
   if (typeof category === "string") {
-    const key = `menu.categories.${category}`;
-    const label = t(key);
-    return label === key ? category : label;
+    return translateCategory(category) || category;
   }
-  const text = labelFor(category.names || category);
-  if (text) return text;
-  const id = category.id || "";
-  if (!id) return "";
-  const key = `menu.categories.${id}`;
-  const fallback = t(key);
-  return fallback === key ? id : fallback;
+
+  const id = getCategoryId(category);
+  const record = ensureRecord(category.names || category, id);
+  const direct = labelFor(record);
+
+  const hasDistinctTranslations =
+    record.ar && record.tr && record.ar !== record.tr;
+  if (hasDistinctTranslations && direct) return direct;
+
+  const translated = translateCategory(id, record.ar, record.tr);
+  if (translated) return translated;
+
+  if (direct) return direct;
+  return id || "";
 };
 
 /* ===== الفلاتر والبحث ===== */
@@ -1131,6 +1153,7 @@ setupScrollTop();
 onLangChange(() => {
   buildFilters();
   applyFilters();
+  buildOffers();
   updateCartUI();
   updateWALink();
   refreshModalLanguage();

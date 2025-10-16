@@ -1,12 +1,15 @@
 (function () {
   if (typeof window === "undefined") return;
 
-  const STORAGE_KEY = "elb_lang";
+  const STORAGE_KEY = "elb_lang_pref_v2";
   const DEFAULT_LANG = "ar";
   const SUPPORTED = ["ar", "tr"];
 
-  const FLAG_ICONS = { ar: "🇸🇦", tr: "🇹🇷" };
-  const FALLBACK_FLAG = "🌐";
+  const FLAG_IMAGES = {
+    ar: { src: "img/flags/egypt.svg", alt: "علم مصر" },
+    tr: { src: "img/flags/turkey.svg", alt: "Türk bayrağı" },
+  };
+  const FALLBACK_FLAG = { src: "img/flags/globe.svg", alt: "" };
 
   let gateEl;
   let fabEl;
@@ -434,7 +437,7 @@
       fabToggle = fabEl.querySelector("[data-lang-fab-toggle]");
     if (fabEl && !fabMenu)
       fabMenu = fabEl.querySelector("[data-lang-fab-menu]");
-    if (fabEl && !fabFlag) fabFlag = fabEl.querySelector("[data-lang-flag]");
+    if (fabEl && !fabFlag) fabFlag = fabEl.querySelector("[data-lang-flag-img]");
   };
 
   const hasStoredLang = () => {
@@ -523,9 +526,10 @@
     ensureFabRefs();
     if (!fabEl) return;
     fabEl.hidden = gateVisible;
-    const flagSymbol = FLAG_ICONS[currentLang] || FALLBACK_FLAG;
+    const flagMeta = FLAG_IMAGES[currentLang] || FALLBACK_FLAG;
     if (fabFlag) {
-      fabFlag.textContent = flagSymbol;
+      fabFlag.setAttribute("src", flagMeta.src);
+      fabFlag.setAttribute("alt", flagMeta.alt || "");
       fabFlag.setAttribute("data-lang-code", currentLang);
     }
     if (fabToggle) {

@@ -15,6 +15,81 @@ const onLangChange = (handler) => {
   return typeof api.onChange === "function" ? api.onChange(handler) : () => {};
 };
 
+const getLangCode = () => {
+  const api = getI18n();
+  return typeof api.getLang === "function" ? api.getLang() : "ar";
+};
+
+const makeRecord = (arValue, trValue) => {
+  const ar = (arValue || "").trim();
+  const tr = (trValue || "").trim();
+  if (!ar && !tr) return { ar: "", tr: "" };
+  return { ar: ar || tr, tr: tr || ar };
+};
+
+const ensureRecord = (value, fallback = "") => {
+  if (!value && fallback) return ensureRecord(fallback);
+  if (typeof value === "string") {
+    const text = value.trim();
+    if (!text) return { ar: "", tr: "" };
+    return { ar: text, tr: text };
+  }
+  if (value && typeof value === "object") {
+    const ar = (value.ar || value.Ar || "").trim();
+    const tr = (value.tr || value.Tr || "").trim();
+    if (!ar && !tr) {
+      const fb = (fallback || "").trim();
+      return fb ? { ar: fb, tr: fb } : { ar: "", tr: "" };
+    }
+    return { ar: ar || tr, tr: tr || ar };
+  }
+  const fb = (fallback || "").trim();
+  return fb ? { ar: fb, tr: fb } : { ar: "", tr: "" };
+};
+
+const labelFor = (value, lang = getLangCode()) => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  const record = ensureRecord(value);
+  return record[lang] || record.ar || record.tr || "";
+};
+
+const splitValues = (raw = "") =>
+  raw
+    .split(/[,،|\/\n]+/g)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+const buildCutOptions = (arStr, trStr) => {
+  const arList = splitValues(arStr);
+  const trList = splitValues(trStr);
+  const len = Math.max(arList.length, trList.length);
+  const cuts = [];
+  for (let i = 0; i < len; i += 1) {
+    const record = makeRecord(arList[i], trList[i]);
+    if (!record.ar && !record.tr) continue;
+    cuts.push({ id: String(i), names: record });
+  }
+  return cuts;
+};
+
+const getCategoryId = (category) => {
+  if (!category) return "";
+  if (typeof category === "string") return category;
+  return category.id || "";
+};
+
+const recordMatchesQuery = (record, queryAr, queryTr) => {
+  if (!record) return false;
+  const rec = ensureRecord(record);
+  const arText = (rec.ar || "").toLowerCase();
+  const trText = (rec.tr || "").toLocaleLowerCase("tr-TR");
+  return (
+    (queryAr && arText.includes(queryAr)) ||
+    (queryTr && trText.includes(queryTr))
+  );
+};
+
 const ALL_CATEGORY = "__ALL__";
 
 /* ===== منيو الموبايل ===== */
@@ -214,6 +289,38 @@ bindNumericInput(els.qtyInput, {
   allowDecimal: () => state.modalProduct?.sellMode === 1,
 });
 
+const parseProductRow = (row, idx) => {
+  const nameAr = (row["الاسم_عربي"] || row["الاسم"] || "").trim();
+  const nameTr = (row["الاسم_تركي"] || "").trim();
+  const categoryAr = (row["القسم_عربي"] || row["القسم"] || "").trim();
+  const categoryTr = (row["القسم_تركي"] || "").trim();
+  if (!nameAr && !nameTr) return null;
+  if (!categoryAr && !categoryTr) return null;
+
+  const categoryId = categoryAr || categoryTr || `category-${idx}`;
+  const nameBase = nameAr || nameTr || `item-${idx}`;
+  const safeName = nameBase.replace(/\s+/g, "-");
+  const productId = `${idx}-${safeName}`;
+
+  const cutsAr = row["خيارات_التقطيع_عربي"] || row["خيارات_التقطيع"] || "";
+  const cutsTr = row["خيارات_التقطيع_تركي"] || "";
+
+  return {
+    id: productId,
+    names: makeRecord(nameAr, nameTr),
+    category: {
+      id: categoryId,
+      names: makeRecord(categoryAr || categoryId, categoryTr),
+    },
+    price: toNum(row["السعر"], 0),
+    salePrice: toNum(row["سعر_الخصم"], 0),
+    cuts: buildCutOptions(cutsAr, cutsTr),
+    image: (row["الصورة"] || "").trim(),
+    sellMode: Number((row["وضع_البيع"] || "0").trim()) || 0,
+    approxKg: toNum(row["وزن_تقريبي_كجم"], 0),
+  };
+};
+
 /* ===== تحميل CSV ===== */
 if (window.Papa) {
   Papa.parse(CSV_PATH, {
@@ -222,22 +329,20 @@ if (window.Papa) {
     skipEmptyLines: true,
     complete: ({ data }) => {
       state.products = data
-        .map((r) => ({
-          name: (r["الاسم"] || "").trim(),
-          category: (r["القسم"] || "").trim(),
-          price: toNum(r["السعر"], 0),
-          salePrice: toNum(r["سعر_الخصم"], 0),
-          cuts: (r["خيارات_التقطيع"] || "").trim(),
-          image: (r["الصورة"] || "").trim(),
-          sellMode: Number((r["وضع_البيع"] || "0").trim()) || 0,
-          approxKg: toNum(r["وزن_تقريبي_كجم"], 0),
-        }))
-        .filter((p) => p.name && p.category);
+        .map((row, idx) => parseProductRow(row, idx))
+        .filter(Boolean);
 
-      state.categories = [
-        ALL_CATEGORY,
-        ...new Set(state.products.map((p) => p.category)),
-      ];
+      const categoryMap = new Map();
+      state.products.forEach((p) => {
+        if (!p?.category) return;
+        const id = getCategoryId(p.category);
+        if (!id || categoryMap.has(id)) return;
+        categoryMap.set(id, {
+          id,
+          names: ensureRecord(p.category.names || p.category, id),
+        });
+      });
+      state.categories = Array.from(categoryMap.values());
       buildFilters();
       applyFilters();
       buildOffers();
@@ -259,23 +364,45 @@ if (window.Papa) {
 }
 
 const getCategoryLabel = (category) => {
+  if (!category) return "";
   if (category === ALL_CATEGORY) return t("menu.filters.all");
-  const key = `menu.categories.${category}`;
-  const label = t(key);
-  return label === key ? category : label;
+  if (typeof category === "string") {
+    const key = `menu.categories.${category}`;
+    const label = t(key);
+    return label === key ? category : label;
+  }
+  const text = labelFor(category.names || category);
+  if (text) return text;
+  const id = category.id || "";
+  if (!id) return "";
+  const key = `menu.categories.${id}`;
+  const fallback = t(key);
+  return fallback === key ? id : fallback;
 };
 
 /* ===== الفلاتر والبحث ===== */
 function buildFilters() {
+  if (!els.categoryFilters) return;
   els.categoryFilters.innerHTML = "";
-  state.categories.forEach((cat) => {
+  const entries = [
+    { id: ALL_CATEGORY, label: t("menu.filters.all") },
+    ...state.categories.map((cat) => {
+      const id = getCategoryId(cat);
+      return {
+        id,
+        label: getCategoryLabel(cat) || id,
+      };
+    }),
+  ].filter((item) => item.id);
+
+  entries.forEach(({ id, label }) => {
     const b = document.createElement("button");
     b.className =
-      "filter-btn" + (cat === state.activeCategory ? " active" : "");
+      "filter-btn" + (id === state.activeCategory ? " active" : "");
     b.type = "button";
-    b.textContent = getCategoryLabel(cat);
+    b.textContent = label;
     b.addEventListener("click", () => {
-      state.activeCategory = cat;
+      state.activeCategory = id;
       document
         .querySelectorAll(".filter-btn")
         .forEach((x) => x.classList.remove("active"));
@@ -319,12 +446,21 @@ function setupFilterArrows() {
 }
 
 function applyFilters() {
-  const q = state.query.toLowerCase();
+  const rawQuery = state.query.trim();
+  const queryAr = rawQuery.toLowerCase();
+  const queryTr = rawQuery.toLocaleLowerCase("tr-TR");
+  const hasQuery = rawQuery.length > 0;
+
   state.filtered = state.products.filter((p) => {
+    const catId = getCategoryId(p.category);
     const byCat =
-      state.activeCategory === ALL_CATEGORY || p.category === state.activeCategory;
-    const byQuery = !q || p.name.toLowerCase().includes(q);
-    return byCat && byQuery;
+      state.activeCategory === ALL_CATEGORY || catId === state.activeCategory;
+    if (!byCat) return false;
+    if (!hasQuery) return true;
+    return (
+      recordMatchesQuery(p.names, queryAr, queryTr) ||
+      recordMatchesQuery(p.category?.names, queryAr, queryTr)
+    );
   });
   renderProducts(state.filtered, els.menuGrid);
 }
@@ -343,6 +479,8 @@ function renderProducts(list, mount) {
   list.forEach((p) => {
     const hasOffer = p.salePrice > 0 && p.salePrice < p.price;
     const showPrice = p.price > 0;
+    const productName = labelFor(p.names);
+    const categoryLabel = getCategoryLabel(p.category);
     const priceHtml = hasOffer
       ? `<span class="old ltr-text">${priceFmt(
           p.price
@@ -370,16 +508,15 @@ function renderProducts(list, mount) {
     const canAdd = showPrice;
     const addLabel = t("common.actions.addToCart");
     const unavailableLabel = t("menu.product.unavailable");
-    const categoryLabel = getCategoryLabel(p.category);
 
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
       <div class="image-wrap">
         ${hasOffer ? `<span class="badge-offer">${t("menu.badge.offer")}</span>` : ""}
-        <img src="${p.image || placeholder}" alt="${p.name}">
+        <img src="${p.image || placeholder}" alt="${productName}">
       </div>
-      <h3 class="product-name">${p.name}</h3>
+      <h3 class="product-name">${productName}</h3>
       <p class="category">${categoryLabel}</p>
       <div class="flags-row">${flags}</div>
       <p class="price">${priceHtml}</p>
@@ -399,13 +536,6 @@ function renderProducts(list, mount) {
 }
 
 /* ===== المودال ===== */
-function splitCuts(cutsStr) {
-  return (cutsStr || "")
-    .split(/[,،|\/\n]+/g)
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
 function getHelperText(product) {
   if (!product) return "";
   if (product.sellMode === 1) return t("menu.modal.helper.sellByKg");
@@ -424,8 +554,15 @@ function refreshModalLanguage() {
   const product = state.modalProduct;
   if (!product) return;
   const options = els.cutSelect?.options;
-  if (options && options.length && options[0].value === "") {
-    options[0].textContent = t("menu.modal.cutPlaceholder");
+  if (options && options.length) {
+    Array.from(options).forEach((opt) => {
+      if (opt.value === "") {
+        opt.textContent = t("menu.modal.cutPlaceholder");
+        return;
+      }
+      const cut = product.cuts?.find((c) => c.id === opt.value);
+      if (cut) opt.textContent = labelFor(cut.names);
+    });
   }
   const helperEl = els.orderModal?.querySelector(".qty-helper");
   if (helperEl) helperEl.textContent = getHelperText(product);
@@ -435,16 +572,15 @@ function openModal(product) {
   state.modalProduct = product;
 
   els.modalImg.src = product.image || placeholder;
-  els.modalName.textContent = product.name;
-  els.modalCat.textContent = product.category;
+  els.modalName.textContent = labelFor(product.names);
+  els.modalCat.textContent = getCategoryLabel(product.category);
 
-  // التقطيع: خانة واحدة من CSV
-  const cuts = splitCuts(product.cuts);
+  const cuts = Array.isArray(product.cuts) ? product.cuts : [];
   if (cuts.length) {
     els.cutRow.style.display = "";
     const options = [
       `<option value="" disabled selected>${t("menu.modal.cutPlaceholder")}</option>`,
-      ...cuts.map((c) => `<option value="${c}">${c}</option>`),
+      ...cuts.map((c) => `<option value="${c.id}">${labelFor(c.names)}</option>`),
     ];
     els.cutSelect.innerHTML = options.join("");
     els.cutSelect.value = "";
@@ -543,9 +679,10 @@ els.modalAdd?.addEventListener("click", () => {
   if (!state.modalProduct) return;
 
   const p = state.modalProduct;
-  const requiresCut = splitCuts(p.cuts).length > 0;
-  const cut = (els.cutSelect.value || "").trim();
-  if (requiresCut && !cut) {
+  const cuts = Array.isArray(p.cuts) ? p.cuts : [];
+  const requiresCut = cuts.length > 0;
+  const cutId = (els.cutSelect.value || "").trim();
+  if (requiresCut && !cutId) {
     els.cutSelect.classList.add("invalid");
     els.cutSelect.focus();
     alert(t("menu.modal.cutError"));
@@ -558,53 +695,122 @@ els.modalAdd?.addEventListener("click", () => {
   else qty = Math.max(1, Math.floor(qty)); // قطعة/كامل: أعداد صحيحة
 
   const note = els.noteInput.value.trim();
-  addToCart(p, qty, cut, note);
+  addToCart(p, qty, cutId, note);
   closeModal();
   openCart();
 });
 
 /* ===== السلة ===== */
 const CART_KEY = "elb_cart_v1";
+
+function normalizeCartItem(item, idx = 0) {
+  if (!item) return null;
+  const nameRecord = ensureRecord(
+    item.name,
+    item.nameAr || item.nameTr || item.legacyName || item.name || ""
+  );
+  const categorySource =
+    (item.category && typeof item.category === "object" && item.category.names)
+      ? item.category.names
+      : item.category;
+  const categoryId =
+    (item.category && typeof item.category === "object" && item.category.id) ||
+    item.categoryId ||
+    (typeof item.category === "string" ? item.category : "");
+  const categoryRecord = ensureRecord(categorySource, categoryId);
+  const cutRecord = item.cut ? ensureRecord(item.cut) : null;
+  const cutId = item.cutId || item.cutOptionId || "";
+  const fallbackName = nameRecord.ar || nameRecord.tr || `item-${idx}`;
+  const fallbackCat = categoryId || "category";
+  const productId =
+    item.productId ||
+    item.id ||
+    `${fallbackCat}__${fallbackName}`.replace(/\s+/g, "_");
+
+  return {
+    ...item,
+    productId,
+    name: nameRecord,
+    category: { id: categoryId, names: categoryRecord },
+    categoryId,
+    image: item.image || placeholder,
+    price: Number(item.price) || 0,
+    cutId: cutId || (cutRecord ? cutRecord.ar || cutRecord.tr || "" : ""),
+    cut: cutRecord,
+    note: item.note || "",
+    qty: Number(item.qty) || 0,
+    sellMode: Number(item.sellMode) || 0,
+    approxKg: toNum(item.approxKg, 0),
+    legacyName: nameRecord.ar || nameRecord.tr || "",
+    legacyCategory: categoryRecord.ar || categoryRecord.tr || "",
+    cutText: cutRecord ? cutRecord.ar || cutRecord.tr || "" : "",
+  };
+}
+
 function hydrateCart() {
   try {
     const raw = localStorage.getItem(CART_KEY);
-    state.cart = raw ? JSON.parse(raw) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    state.cart = Array.isArray(parsed)
+      ? parsed.map((item, idx) => normalizeCartItem(item, idx)).filter(Boolean)
+      : [];
   } catch {
     state.cart = [];
   }
 }
 function persistCart() {
+  state.cart = state.cart.map((item, idx) => normalizeCartItem(item, idx)).filter(Boolean);
   localStorage.setItem(CART_KEY, JSON.stringify(state.cart));
   // عرّض السلة عالميًا لأي سكربت خارجي
   window.cart = state.cart;
 }
 
-function addToCart(product, qty, cut, note) {
-  const idx = state.cart.findIndex(
-    (x) => x.name === product.name && x.cut === cut
-  );
+function addToCart(product, qty, cutId, note) {
+  const cuts = Array.isArray(product.cuts) ? product.cuts : [];
+  const cutOption = cutId ? cuts.find((c) => c.id === cutId) : null;
   const unit =
     product.salePrice > 0 && product.salePrice < product.price
       ? product.salePrice
       : product.price;
 
   const base = {
-    name: product.name,
+    productId: product.id,
+    name: product.names,
     category: product.category,
+    categoryId: product.category?.id || "",
     image: product.image || placeholder,
     price: unit,
-    cut,
+    cutId: cutOption?.id || "",
+    cut: cutOption ? cutOption.names : null,
     note: note || "",
     qty,
     sellMode: product.sellMode,
     approxKg: product.approxKg || 0,
   };
 
+  const normalized = normalizeCartItem(base, state.cart.length);
+  const idx = state.cart.findIndex(
+    (x) =>
+      x.productId === normalized.productId &&
+      (x.cutId || "") === (normalized.cutId || "")
+  );
+
   if (idx > -1) {
-    state.cart[idx].qty += qty;
-    if (note) state.cart[idx].note = note;
+    const existing = normalizeCartItem(state.cart[idx], idx);
+    existing.qty = Number(existing.qty || 0) + qty;
+    if (note) existing.note = note;
+    existing.price = normalized.price;
+    existing.sellMode = normalized.sellMode;
+    existing.approxKg = normalized.approxKg;
+    existing.image = normalized.image;
+    existing.cut = normalized.cut;
+    existing.cutId = normalized.cutId;
+    existing.category = normalized.category;
+    existing.categoryId = normalized.categoryId;
+    existing.name = normalized.name;
+    state.cart[idx] = existing;
   } else {
-    state.cart.push(base);
+    state.cart.push(normalized);
   }
   persistCart();
   updateCartUI();
@@ -704,15 +910,16 @@ function updateCartUI() {
   // رسم عناصر السلة
   els.cartItems.innerHTML = state.cart
     .map((it, i) => {
-      const cutText = it.cut || t("menu.cart.meta.none");
+      const nameText = labelFor(it.name);
+      const cutText = it.cut ? labelFor(it.cut) : t("menu.cart.meta.none");
       const qtyLabel = t("menu.cart.meta.quantity");
       const noteLabel = t("menu.cart.meta.note");
       const deleteLabel = t("menu.cart.meta.delete");
       return `
       <div class="cart-row">
-        <img src="${it.image}" alt="">
+        <img src="${it.image}" alt="${nameText}">
         <div>
-          <div class="title">${it.name}</div>
+          <div class="title">${nameText}</div>
           <div class="meta">${cutText} • ${qtyLabel}: ${lineQtyText(it)}</div>
           ${
             it.note
@@ -766,13 +973,15 @@ function updateCartUI() {
 function updateWALink() {
   if (!els.waCheckout) return; // لو اتشال اللينك من الـ HTML
   const lines = state.cart.map((item) => {
+    const nameText = labelFor(item.name);
     const parts = [
-      `• ${item.name}`,
+      `• ${nameText}`,
       `      ${priceLabelForMessage(item)}: ${moneyTL(item.price)}`,
       `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(item)}`,
     ];
-    if (item.cut)
-      parts.push(`      ${t("menu.whatsapp.cut")}: ${item.cut}`);
+    const cutText = item.cut ? labelFor(item.cut) : "";
+    if (cutText)
+      parts.push(`      ${t("menu.whatsapp.cut")}: ${cutText}`);
     if (item.note)
       parts.push(`      ${t("menu.whatsapp.noteLabel")}: ${item.note}`);
     return parts.join("\n");
@@ -838,7 +1047,7 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
     }
 
     // جهّز عناصر للـ confirm.html
-    const items = state.cart.map((x) => {
+    const items = state.cart.map((x, idx) => {
       // الوحدة: بالكيلو/كامل (السعر/كجم)/قطعة
       let unit = "piece";
       if (x.sellMode === 1) unit = "kg";
@@ -850,17 +1059,34 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
       // السعر: رقم فقط بدون رمز
       const price = Number(x.price) || 0;
 
+      const nameRecord = ensureRecord(x.name);
+      const categoryRecord = ensureRecord(
+        (x.category && x.category.names) || x.category,
+        x.categoryId || ""
+      );
+      const cutRecord = x.cut ? ensureRecord(x.cut) : null;
+      const productId =
+        x.productId ||
+        `${x.categoryId || "cat"}__${nameRecord.ar || nameRecord.tr || idx}`;
+
       return {
-        name: x.name,
-        category: x.category || "",
+        productId,
+        name: nameRecord,
+        category: {
+          id: x.categoryId || (x.category && x.category.id) || "",
+          names: categoryRecord,
+        },
         image: x.image || "",
         qty,
         unit,
         price,
-        cut: x.cut || "",
+        cut: cutRecord,
         note: x.note || "",
         sellMode: x.sellMode,
         approxKg: x.approxKg || 0,
+        legacyName: nameRecord.ar || nameRecord.tr || "",
+        legacyCategory: categoryRecord.ar || categoryRecord.tr || "",
+        cutText: cutRecord ? cutRecord.ar || cutRecord.tr || "" : "",
       };
     });
 

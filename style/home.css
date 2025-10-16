@@ -85,9 +85,6 @@ body.lang-ar {
   align-items: center;
   gap: 12px;
 }
-.mobile-actions .lang-switch {
-  display: none;
-}
 .nav-home {
   font-weight: 800;
   color: var(--text);
@@ -165,39 +162,6 @@ body.lang-ar {
 
 body.lang-tr .navm-list a {
   text-align: left;
-}
-
-.lang-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px;
-  border-radius: 999px;
-  border: 1px solid #e0e7e2;
-  background: #f6faf5;
-  margin-inline-start: 20px;
-}
-
-.lang-switch button {
-  border: none;
-  background: transparent;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--text);
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.lang-switch button.is-active {
-  background: var(--brand);
-  color: #fff;
-}
-
-.lang-switch button:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
 }
 
 /* ===== الهيرو ===== */
@@ -532,10 +496,6 @@ body.lang-tr .navm-list a {
   }
   .mobile-actions {
     gap: 8px;
-  }
-  .mobile-actions .lang-switch {
-    display: inline-flex;
-    margin-inline-start: 0;
   }
   .overlay-content p {
     max-width: 520px;

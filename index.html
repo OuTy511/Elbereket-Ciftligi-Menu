@@ -22,10 +22,68 @@
       rel="stylesheet"
     />
 
+    <link rel="stylesheet" href="style/lang.css" />
     <link rel="stylesheet" href="style/home.css" />
     <script src="js/i18n.js" defer></script>
   </head>
   <body class="home-page">
+    <div class="lang-gate" data-lang-gate hidden>
+      <div class="lang-gate__panel" role="dialog" aria-modal="true">
+        <div class="lang-gate__title" id="langGateTitle">
+          <span>اختر لغتك</span>
+          <span>Dilinizi seçin</span>
+        </div>
+        <p class="lang-gate__subtitle">
+          <span>من فضلك اختر اللغة التي تفضلها للمتابعة.</span>
+          <span>Lütfen devam etmek için dili seçin.</span>
+        </p>
+        <div
+          class="lang-gate__options lang-switch"
+          role="group"
+          aria-labelledby="langGateTitle"
+        >
+          <button type="button" class="lang-option" data-lang="ar">
+            <span class="lang-option__flag" aria-hidden="true">🇸🇦</span>
+            <span class="lang-option__label">عربي</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="tr">
+            <span class="lang-option__flag" aria-hidden="true">🇹🇷</span>
+            <span class="lang-option__label">Türkçe</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="lang-fab" data-lang-fab hidden>
+      <button
+        type="button"
+        class="lang-fab__toggle"
+        data-lang-fab-toggle
+        aria-haspopup="true"
+        aria-expanded="false"
+        data-i18n-title="common.langSwitch.label"
+      >
+        <span class="lang-fab__flag" data-lang-flag aria-hidden="true">🇸🇦</span>
+        <span class="sr-only" data-i18n="common.langSwitch.label">تغيير اللغة</span>
+      </button>
+      <div class="lang-fab__menu" data-lang-fab-menu>
+        <div
+          class="lang-fab__menu-inner lang-switch"
+          role="group"
+          data-i18n-attr='{"aria-label":"common.langSwitch.label"}'
+        >
+          <button type="button" class="lang-option" data-lang="ar">
+            <span class="lang-option__flag" aria-hidden="true">🇸🇦</span>
+            <span class="lang-option__label">عربي</span>
+          </button>
+          <button type="button" class="lang-option" data-lang="tr">
+            <span class="lang-option__flag" aria-hidden="true">🇹🇷</span>
+            <span class="lang-option__label">Türkçe</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Header -->
     <header class="header">
       <div class="container header__inner">
@@ -50,36 +108,11 @@
           </ul>
         </nav>
 
-        <div
-          class="lang-switch lang-switch--desktop"
-          role="group"
-          data-i18n-attr='{"aria-label":"common.langSwitch.label"}'
-        >
-          <button type="button" data-lang="ar" data-i18n="common.lang.ar">
-            عربي
-          </button>
-          <button type="button" data-lang="tr" data-i18n="common.lang.tr">
-            تركي
-          </button>
-        </div>
-
         <!-- موبايل -->
         <div class="mobile-actions">
           <a class="nav-home" href="index.html" data-i18n="nav.home"
             >الصفحة الرئيسية</a
           >
-          <div
-            class="lang-switch"
-            role="group"
-            data-i18n-attr='{"aria-label":"common.langSwitch.label"}'
-          >
-            <button type="button" data-lang="ar" data-i18n="common.lang.ar">
-              عربي
-            </button>
-            <button type="button" data-lang="tr" data-i18n="common.lang.tr">
-              تركي
-            </button>
-          </div>
           <button
             class="menu-toggle"
             aria-label="فتح القائمة"

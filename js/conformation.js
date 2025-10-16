@@ -15,6 +15,89 @@ const onLangChange = (handler) => {
   return typeof api.onChange === "function" ? api.onChange(handler) : () => {};
 };
 
+const getLangCode = () => {
+  const api = getI18n();
+  return typeof api.getLang === "function" ? api.getLang() : "ar";
+};
+
+const ensureRecord = (value, fallback = "") => {
+  if (!value && fallback) return ensureRecord(fallback);
+  if (typeof value === "string") {
+    const text = value.trim();
+    if (!text) return { ar: "", tr: "" };
+    return { ar: text, tr: text };
+  }
+  if (value && typeof value === "object") {
+    const ar = (value.ar || value.Ar || "").trim();
+    const tr = (value.tr || value.Tr || "").trim();
+    if (!ar && !tr) {
+      const fb = (fallback || "").trim();
+      return fb ? { ar: fb, tr: fb } : { ar: "", tr: "" };
+    }
+    return { ar: ar || tr, tr: tr || ar };
+  }
+  const fb = (fallback || "").trim();
+  return fb ? { ar: fb, tr: fb } : { ar: "", tr: "" };
+};
+
+const labelFor = (value, lang = getLangCode()) => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  const record = ensureRecord(value);
+  return record[lang] || record.ar || record.tr || "";
+};
+
+const normalizeCartItem = (item, idx = 0) => {
+  if (!item) return null;
+  const nameRecord = ensureRecord(
+    item.name,
+    item.nameAr || item.nameTr || item.legacyName || item.name || ""
+  );
+  const categorySource =
+    (item.category && item.category.names) || item.category;
+  const categoryId =
+    (item.category && item.category.id) || item.categoryId || "";
+  const categoryRecord = ensureRecord(categorySource, categoryId);
+  const cutRecord = item.cut ? ensureRecord(item.cut) : item.cutText ? ensureRecord(item.cutText) : null;
+  const cutId = item.cutId || item.cutOptionId || "";
+  const fallbackName = nameRecord.ar || nameRecord.tr || `item-${idx}`;
+  const fallbackCat = categoryId || "category";
+  const productId =
+    item.productId ||
+    `${fallbackCat}__${fallbackName}`.replace(/\s+/g, "_");
+
+  return {
+    ...item,
+    productId,
+    name: nameRecord,
+    category: { id: categoryId, names: categoryRecord },
+    categoryId,
+    image: item.image || "",
+    price: Number(item.price) || 0,
+    cutId: cutId || (cutRecord ? cutRecord.ar || cutRecord.tr || "" : ""),
+    cut: cutRecord,
+    note: item.note || "",
+    qty: Number(item.qty) || 0,
+    sellMode: Number(item.sellMode) || 0,
+    approxKg: toNum(item.approxKg, 0),
+    legacyName: nameRecord.ar || nameRecord.tr || "",
+    legacyCategory: categoryRecord.ar || categoryRecord.tr || "",
+    cutText: cutRecord ? cutRecord.ar || cutRecord.tr || "" : "",
+  };
+};
+
+const normalizeOrderItem = (item, idx = 0) => {
+  const normalized = normalizeCartItem(item, idx);
+  normalized.unit = item.unit || normalized.unit || "";
+  return normalized;
+};
+
+const itemKey = (item) =>
+  `${item?.productId || ""}__${item?.cutId || ""}`;
+
+const legacyKey = (item) =>
+  `${labelFor(item?.name)}__${item?.cut ? labelFor(item.cut) : ""}`;
+
 /* ===== منيو الموبايل (نفس menu.js لعمل التوجل هنا) ===== */
 const btn = document.querySelector(".menu-toggle");
 const navMobile = document.querySelector(".nav-mobile");
@@ -154,33 +237,50 @@ if (!order || !order.items || !order.items.length) {
   window.location.href = "menu.html";
 }
 
+if (order && Array.isArray(order.items)) {
+  order.items = order.items
+    .map((item, idx) => normalizeOrderItem(item, idx))
+    .filter(Boolean);
+}
+
 let cartSnapshot = [];
 try {
   cartSnapshot = JSON.parse(localStorage.getItem(CART_KEY) || "null") || [];
 } catch {}
 
+cartSnapshot = Array.isArray(cartSnapshot)
+  ? cartSnapshot.map((item, idx) => normalizeCartItem(item, idx)).filter(Boolean)
+  : [];
+
 if (order && Array.isArray(order.items) && cartSnapshot.length) {
-  const map = new Map(
-    cartSnapshot.map((item) => [
-      `${item?.name || ""}__${item?.cut || ""}`,
-      item,
-    ])
-  );
-  order.items.forEach((it) => {
-    const key = `${it?.name || ""}__${it?.cut || ""}`;
-    const src = map.get(key);
+  const map = new Map(cartSnapshot.map((item) => [itemKey(item), item]));
+  order.items.forEach((it, idx) => {
+    let src = map.get(itemKey(it));
+    if (!src) {
+      const legacy = legacyKey(it);
+      if (legacy) {
+        src = cartSnapshot.find((candidate) => legacyKey(candidate) === legacy);
+      }
+    }
     if (src) {
-      if (!it.category && src.category) it.category = src.category;
+      if (!it.category?.id && src.category) it.category = src.category;
+      if (!it.categoryId && src.categoryId) it.categoryId = src.categoryId;
       if (!it.image && src.image) it.image = src.image;
       if (typeof it.sellMode === "undefined" && src.sellMode != null)
         it.sellMode = src.sellMode;
       if ((!it.approxKg || !Number(it.approxKg)) && src.approxKg)
         it.approxKg = src.approxKg;
+      if (!it.cut && src.cut) it.cut = src.cut;
+      if (!it.cutId && src.cutId) it.cutId = src.cutId;
+      if (!it.productId && src.productId) it.productId = src.productId;
+      if (!it.price && src.price) it.price = src.price;
+      if (!it.qty && src.qty) it.qty = src.qty;
     }
     if (typeof it.sellMode === "undefined") {
       if (it.unit === "كجم" || it.unit === "kg") it.sellMode = 1;
       else it.sellMode = 0;
     }
+    order.items[idx] = normalizeOrderItem(it, idx);
   });
 }
 
@@ -296,22 +396,17 @@ function priceLabelForMessage(it) {
 
 function buildCartSnapshot() {
   if (!order || !Array.isArray(order.items)) return [];
-  return order.items.map((it) => {
-    const mode = resolveMode(it);
-    let qty = toNum(it.qty, mode === 1 ? 0.1 : 1);
+  return order.items.map((it, idx) => {
+    const normalized = normalizeOrderItem(it, idx);
+    const mode = resolveMode(normalized);
+    let qty = toNum(normalized.qty, mode === 1 ? 0.1 : 1);
     if (mode === 1) qty = Math.max(0.1, Math.round(qty * 100) / 100);
     else qty = Math.max(1, Math.floor(qty));
 
     return {
-      name: it.name,
-      category: it.category || "",
-      image: it.image || "",
-      price: toNum(it.price, 0),
-      cut: it.cut || "",
-      note: it.note || "",
+      ...normalized,
       qty,
       sellMode: mode,
-      approxKg: toNum(it.approxKg, 0),
     };
   });
 }
@@ -382,13 +477,15 @@ function renderRows() {
     tdName.dataset.label = t("confirm.summary.table.item");
     const nameWrap = document.createElement("div");
     nameWrap.className = "cell-title";
-    nameWrap.textContent = it.name || "-";
+    const nameText = labelFor(it.name) || "-";
+    nameWrap.textContent = nameText;
     tdName.appendChild(nameWrap);
     const extras = [];
-    if (it.cut) extras.push(`${t("menu.cart.meta.cut")}: ${it.cut}`);
+    const cutText = it.cut ? labelFor(it.cut) : "";
+    if (cutText) extras.push(`${t("menu.cart.meta.cut")}: ${cutText}`);
     if (it.note) extras.push(`${t("menu.cart.meta.note")}: ${it.note}`);
-    if (!extras.length && /\((.+)\)/.test(it.name || "")) {
-      const match = (it.name || "").match(/\((.+)\)/);
+    if (!extras.length && /\((.+)\)/.test(nameText || "")) {
+      const match = (nameText || "").match(/\((.+)\)/);
       if (match && match[1]) extras.push(match[1]);
     }
     if (extras.length) {
@@ -713,12 +810,15 @@ sendBtn.addEventListener("click", () => {
   if (!pay) return toast(t("confirm.toast.needPayment"), "error");
 
   const lines = order.items.map((it) => {
+    const nameText = labelFor(it.name);
+    const cutText = it.cut ? labelFor(it.cut) : "";
     const parts = [
-      `• ${it.name}`,
+      `• ${nameText}`,
       `      ${priceLabelForMessage(it)}: ${moneyTL(it.price)}`,
       `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(it)}`,
     ];
-    if (it.cut) parts.push(`      ${t("confirm.whatsapp.cut")}: ${it.cut}`);
+    if (cutText)
+      parts.push(`      ${t("confirm.whatsapp.cut")}: ${cutText}`);
     if (it.note) parts.push(`      ${t("confirm.whatsapp.note")}: ${it.note}`);
     return parts.join("\n");
   });

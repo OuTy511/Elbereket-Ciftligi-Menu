@@ -1153,6 +1153,7 @@ setupScrollTop();
 onLangChange(() => {
   buildFilters();
   applyFilters();
+  buildOffers();
   updateCartUI();
   updateWALink();
   refreshModalLanguage();

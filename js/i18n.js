@@ -6,6 +6,10 @@
   const SUPPORTED = ["ar", "tr"];
 
   const FLAG_ICONS = { ar: "🇸🇦", tr: "🇹🇷" };
+  const FLAG_IMAGES = {
+    ar: "img/flags/sa.svg",
+    tr: "img/flags/tr.svg",
+  };
   const FALLBACK_FLAG = "🌐";
 
   let gateEl;
@@ -451,6 +455,8 @@
     if (!el) return;
     el.hidden = false;
     gateVisible = true;
+    ensureFabRefs();
+    if (fabEl) fabEl.hidden = true;
     requestAnimationFrame(() => el.classList.add("is-visible"));
   };
 
@@ -459,6 +465,8 @@
     if (!el) return;
     el.classList.remove("is-visible");
     gateVisible = false;
+    ensureFabRefs();
+    if (fabEl) fabEl.hidden = false;
     window.setTimeout(() => {
       if (!gateVisible && el) el.hidden = true;
     }, 240);
@@ -518,9 +526,30 @@
   const updateFab = () => {
     ensureFabRefs();
     if (!fabEl) return;
-    fabEl.hidden = false;
+    fabEl.hidden = gateVisible;
     const flagSymbol = FLAG_ICONS[currentLang] || FALLBACK_FLAG;
-    if (fabFlag) fabFlag.textContent = flagSymbol;
+    const flagImage = FLAG_IMAGES[currentLang];
+    if (fabFlag) {
+      let img = fabFlag.querySelector("img");
+      if (!img && flagImage) {
+        img = document.createElement("img");
+        img.setAttribute("alt", "");
+        img.setAttribute("loading", "lazy");
+        fabFlag.textContent = "";
+        fabFlag.appendChild(img);
+      }
+      if (img && flagImage) {
+        img.setAttribute("src", flagImage);
+        img.setAttribute("alt", "");
+        img.setAttribute("decoding", "async");
+      } else if (img) {
+        img.removeAttribute("src");
+        img.remove();
+      }
+      if (!flagImage) {
+        fabFlag.textContent = flagSymbol;
+      }
+    }
     if (fabToggle) {
       const label = t("common.langSwitch.label");
       if (label && label !== "common.langSwitch.label") {
@@ -685,7 +714,7 @@
     if (fabToggle && !fabToggle.getAttribute("aria-expanded")) {
       fabToggle.setAttribute("aria-expanded", "false");
     }
-    setGateVisible(true);
+    setGateVisible(!hasStoredLang());
     updateDirection();
     applyTranslations(document);
     updateSwitchers();

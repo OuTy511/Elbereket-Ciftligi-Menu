@@ -685,7 +685,7 @@
     if (fabToggle && !fabToggle.getAttribute("aria-expanded")) {
       fabToggle.setAttribute("aria-expanded", "false");
     }
-    setGateVisible(!hasStoredLang());
+    setGateVisible(true);
     updateDirection();
     applyTranslations(document);
     updateSwitchers();

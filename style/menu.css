@@ -548,7 +548,8 @@ body.modal-open {
 .cart-fab {
   position: fixed;
   bottom: 88px;
-  inset-inline-start: 16px;
+  right: 16px;
+  left: auto;
   z-index: 80;
   width: 54px;
   height: 54px;
@@ -563,7 +564,8 @@ body.modal-open {
 .cart-fab .count {
   position: absolute;
   top: -6px;
-  inset-inline-start: -6px;
+  right: -6px;
+  left: auto;
   background: #111;
   color: #fff;
   border-radius: 999px;
@@ -575,7 +577,8 @@ body.modal-open {
 .scroll-top-fab {
   position: fixed;
   bottom: 18px;
-  inset-inline-start: 18px;
+  right: 18px;
+  left: auto;
   width: 52px;
   height: 52px;
   border-radius: 999px;

@@ -333,7 +333,8 @@ h2 {
 .scroll-top-fab {
   position: fixed;
   bottom: 18px;
-  inset-inline-start: 18px;
+  right: 18px;
+  left: auto;
   width: 52px;
   height: 52px;
   border-radius: 999px;

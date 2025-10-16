@@ -161,6 +161,13 @@ const sanitizeNumericInput = (value = "", allowDecimal = false) => {
   const [lead, ...rest] = prepared.split(".");
   return lead + (rest.length ? "." + rest.join("") : "");
 };
+
+const toNum = (v, def = 0) => {
+  if (v == null) return def;
+  const cleaned = sanitizeNumericInput(v, true);
+  const n = parseFloat(cleaned);
+  return Number.isNaN(n) ? def : n;
+};
 const bindNumericInput = (el, opts = {}) => {
   if (!el) return;
   const allowDecimal = () =>
@@ -311,12 +318,6 @@ if (phoneInput) {
 }
 
 /* ===== Utilities ===== */
-const toNum = (v, def = 0) => {
-  if (v == null) return def;
-  const cleaned = sanitizeNumericInput(v, true);
-  const n = parseFloat(cleaned);
-  return isNaN(n) ? def : n;
-};
 const money = (n) => Number(n || 0).toFixed(2);
 const moneyTL = (n) => `${money(n)} TL`;
 const formatQtyValue = (qty) => {

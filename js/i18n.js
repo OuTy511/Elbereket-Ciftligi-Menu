@@ -1,7 +1,7 @@
 (function () {
   if (typeof window === "undefined") return;
 
-  const STORAGE_KEY = "elb_lang_pref_v2";
+  const STORAGE_KEY = "elb_lang_pref_v3";
   const DEFAULT_LANG = "ar";
   const SUPPORTED = ["ar", "tr"];
 

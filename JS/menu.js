@@ -310,6 +310,19 @@ const offersCarousel = (() => {
   let items = [];
   let activeIndex = 0;
   let timer = null;
+  let currentOffset = 0;
+
+  const markAnimating = () => {
+    const grid = els.offersGrid;
+    if (!grid) return;
+    grid.classList.add("is-sliding");
+    const handle = (event) => {
+      if (event.target !== grid || event.propertyName !== "transform") return;
+      grid.classList.remove("is-sliding");
+      grid.removeEventListener("transitionend", handle);
+    };
+    grid.addEventListener("transitionend", handle);
+  };
 
   const stopAuto = () => {
     if (timer) {
@@ -339,9 +352,13 @@ const offersCarousel = (() => {
       requestAnimationFrame(() => {
         if (els.offersGrid) els.offersGrid.style.transition = prevTransition || "";
       });
+      currentOffset = offset;
       return;
     }
+    if (offset === currentOffset) return;
+    markAnimating();
     els.offersGrid.style.transform = `translateX(${-offset}px)`;
+    currentOffset = offset;
   };
 
   const goTo = (idx, opts = {}) => {
@@ -354,6 +371,9 @@ const offersCarousel = (() => {
     const offset = target ? target.offsetLeft - base : 0;
     applyTransform(offset, instant);
     updateDotsState();
+    items.forEach((item, itemIdx) => {
+      item.classList.toggle("is-active", itemIdx === activeIndex);
+    });
   };
 
   const startAuto = () => {
@@ -405,6 +425,7 @@ const offersCarousel = (() => {
     stopAuto();
     if (!els.offersGrid) return;
     items = Array.from(els.offersGrid.children || []);
+    items.forEach((item) => item.classList.remove("is-active"));
     activeIndex = 0;
     toggleControls(items.length > 1);
     rebuildDots();

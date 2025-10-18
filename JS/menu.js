@@ -312,6 +312,13 @@ const offersCarousel = (() => {
   let timer = null;
   let currentOffset = 0;
 
+  const computeDirection = (from, to, total) => {
+    if (from === to || !total) return 0;
+    const forward = (to - from + total) % total;
+    const backward = (from - to + total) % total;
+    return forward <= backward ? 1 : -1;
+  };
+
   const markAnimating = () => {
     const grid = els.offersGrid;
     if (!grid) return;
@@ -347,7 +354,7 @@ const offersCarousel = (() => {
     if (instant) {
       const prevTransition = els.offersGrid.style.transition;
       els.offersGrid.style.transition = "none";
-      els.offersGrid.style.transform = `translateX(${-offset}px)`;
+      els.offersGrid.style.transform = `translate3d(${-offset}px, 0, 0)`;
       void els.offersGrid.offsetWidth;
       requestAnimationFrame(() => {
         if (els.offersGrid) els.offersGrid.style.transition = prevTransition || "";
@@ -357,7 +364,7 @@ const offersCarousel = (() => {
     }
     if (offset === currentOffset) return;
     markAnimating();
-    els.offersGrid.style.transform = `translateX(${-offset}px)`;
+    els.offersGrid.style.transform = `translate3d(${-offset}px, 0, 0)`;
     currentOffset = offset;
   };
 
@@ -365,15 +372,27 @@ const offersCarousel = (() => {
     if (!items.length) return;
     const { instant = false } = opts;
     const total = items.length;
+    const prevIndex = activeIndex;
     activeIndex = ((idx % total) + total) % total;
+    const direction = instant ? 0 : computeDirection(prevIndex, activeIndex, total);
     const target = items[activeIndex];
     const base = items[0]?.offsetLeft ?? 0;
     const offset = target ? target.offsetLeft - base : 0;
     applyTransform(offset, instant);
     updateDotsState();
     items.forEach((item, itemIdx) => {
+      item.classList.remove("is-entering-forward", "is-entering-backward");
       item.classList.toggle("is-active", itemIdx === activeIndex);
     });
+    const activeItem = items[activeIndex];
+    if (activeItem) {
+      void activeItem.offsetWidth;
+      if (direction !== 0) {
+        activeItem.classList.add(
+          direction > 0 ? "is-entering-forward" : "is-entering-backward"
+        );
+      }
+    }
   };
 
   const startAuto = () => {

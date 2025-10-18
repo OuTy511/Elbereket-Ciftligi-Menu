@@ -86,6 +86,16 @@ body.lang-ar {
   margin: 0;
   padding: 0;
 }
+.nav-list__brand {
+  display: flex;
+  align-items: center;
+}
+.nav-list__brand img {
+  width: clamp(56px, 7vw, 72px);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
+}
 .nav-list a {
   text-decoration: none;
   color: var(--text);

@@ -191,7 +191,28 @@
         <i class="fa-solid fa-tags"></i>
         <span data-i18n="menu.offers.title">عروض اليوم</span>
       </h2>
-      <div id="offersGrid" class="menu-grid offers-grid"></div>
+      <div class="offers-slider" data-offers-slider>
+        <button
+          class="offers-arrow prev"
+          type="button"
+          data-offers-prev
+          aria-label="العرض السابق"
+        >
+          <span class="offers-arrow__icon" aria-hidden="true"></span>
+        </button>
+        <div class="offers-slider__viewport" data-offers-viewport>
+          <div id="offersGrid" class="menu-grid offers-grid"></div>
+        </div>
+        <button
+          class="offers-arrow next"
+          type="button"
+          data-offers-next
+          aria-label="العرض التالي"
+        >
+          <span class="offers-arrow__icon" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="offers-dots" id="offersDots" role="tablist"></div>
     </section>
 
     <!-- شبكة المنتجات -->

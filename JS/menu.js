@@ -262,6 +262,10 @@ const els = {
   searchInput: document.getElementById("searchInput"),
   offers: document.getElementById("offers"),
   offersGrid: document.getElementById("offersGrid"),
+  offersPrev: document.querySelector("[data-offers-prev]"),
+  offersNext: document.querySelector("[data-offers-next]"),
+  offersViewport: document.querySelector("[data-offers-viewport]"),
+  offersDots: document.getElementById("offersDots"),
   menuGrid: document.getElementById("menuGrid"),
 
   cartFab: document.getElementById("cartFab"),
@@ -300,6 +304,206 @@ const state = {
   cart: [],
   modalProduct: null,
 };
+
+const offersCarousel = (() => {
+  const AUTO_DELAY = 2000;
+  let items = [];
+  let activeIndex = 0;
+  let timer = null;
+  let currentOffset = 0;
+
+  const computeDirection = (from, to, total) => {
+    if (from === to || !total) return 0;
+    const forward = (to - from + total) % total;
+    const backward = (from - to + total) % total;
+    return forward <= backward ? 1 : -1;
+  };
+
+  const markAnimating = () => {
+    const grid = els.offersGrid;
+    if (!grid) return;
+    grid.classList.add("is-sliding");
+    const handle = (event) => {
+      if (event.target !== grid || event.propertyName !== "transform") return;
+      grid.classList.remove("is-sliding");
+      grid.removeEventListener("transitionend", handle);
+    };
+    grid.addEventListener("transitionend", handle);
+  };
+
+  const stopAuto = () => {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  };
+
+  const updateDotsState = () => {
+    if (!els.offersDots) return;
+    const dots = els.offersDots.querySelectorAll(".offers-dot");
+    dots.forEach((dot, idx) => {
+      const isActive = idx === activeIndex;
+      dot.classList.toggle("active", isActive);
+      dot.setAttribute("aria-selected", isActive ? "true" : "false");
+      dot.setAttribute("tabindex", isActive ? "0" : "-1");
+    });
+  };
+
+  const applyTransform = (offset, instant = false) => {
+    if (!els.offersGrid) return;
+    if (instant) {
+      const prevTransition = els.offersGrid.style.transition;
+      els.offersGrid.style.transition = "none";
+      els.offersGrid.style.transform = `translate3d(${-offset}px, 0, 0)`;
+      void els.offersGrid.offsetWidth;
+      requestAnimationFrame(() => {
+        if (els.offersGrid) els.offersGrid.style.transition = prevTransition || "";
+      });
+      currentOffset = offset;
+      return;
+    }
+    if (offset === currentOffset) return;
+    markAnimating();
+    els.offersGrid.style.transform = `translate3d(${-offset}px, 0, 0)`;
+    currentOffset = offset;
+  };
+
+  const goTo = (idx, opts = {}) => {
+    if (!items.length) return;
+    const { instant = false } = opts;
+    const total = items.length;
+    const prevIndex = activeIndex;
+    activeIndex = ((idx % total) + total) % total;
+    const direction = instant ? 0 : computeDirection(prevIndex, activeIndex, total);
+    const target = items[activeIndex];
+    const base = items[0]?.offsetLeft ?? 0;
+    const offset = target ? target.offsetLeft - base : 0;
+    applyTransform(offset, instant);
+    updateDotsState();
+    items.forEach((item, itemIdx) => {
+      item.classList.remove("is-entering-forward", "is-entering-backward");
+      item.classList.toggle("is-active", itemIdx === activeIndex);
+    });
+    const activeItem = items[activeIndex];
+    if (activeItem) {
+      void activeItem.offsetWidth;
+      if (direction !== 0) {
+        activeItem.classList.add(
+          direction > 0 ? "is-entering-forward" : "is-entering-backward"
+        );
+      }
+    }
+  };
+
+  const startAuto = () => {
+    stopAuto();
+    if (items.length <= 1) return;
+    timer = setInterval(() => {
+      goTo(activeIndex + 1);
+    }, AUTO_DELAY);
+  };
+
+  const rebuildDots = () => {
+    if (!els.offersDots) return;
+    els.offersDots.innerHTML = "";
+    if (items.length <= 1) {
+      els.offersDots.style.display = "none";
+      return;
+    }
+    els.offersDots.style.display = "";
+    items.forEach((_, idx) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "offers-dot";
+      dot.setAttribute("role", "tab");
+      dot.setAttribute("aria-label", `${idx + 1}`);
+      dot.setAttribute("aria-selected", "false");
+      dot.setAttribute("tabindex", "-1");
+      dot.addEventListener("click", () => {
+        goTo(idx);
+        startAuto();
+      });
+      els.offersDots.appendChild(dot);
+    });
+    updateDotsState();
+  };
+
+  const toggleControls = (show) => {
+    const display = show ? "" : "none";
+    if (els.offersPrev) {
+      els.offersPrev.style.display = display;
+      els.offersPrev.disabled = !show;
+    }
+    if (els.offersNext) {
+      els.offersNext.style.display = display;
+      els.offersNext.disabled = !show;
+    }
+  };
+
+  const update = () => {
+    stopAuto();
+    if (!els.offersGrid) return;
+    items = Array.from(els.offersGrid.children || []);
+    items.forEach((item) => item.classList.remove("is-active"));
+    activeIndex = 0;
+    toggleControls(items.length > 1);
+    rebuildDots();
+    if (!items.length) {
+      applyTransform(0, true);
+      return;
+    }
+    requestAnimationFrame(() => {
+      goTo(0, { instant: true });
+      startAuto();
+    });
+  };
+
+  const prevHandler = () => {
+    if (!items.length) return;
+    goTo(activeIndex - 1);
+    startAuto();
+  };
+
+  const nextHandler = () => {
+    if (!items.length) return;
+    goTo(activeIndex + 1);
+    startAuto();
+  };
+
+  els.offersPrev?.addEventListener("click", prevHandler);
+  els.offersNext?.addEventListener("click", nextHandler);
+
+  const attachPauseHandlers = (el) => {
+    if (!el) return;
+    el.addEventListener("mouseenter", stopAuto);
+    el.addEventListener("mouseleave", startAuto);
+    el.addEventListener("focusin", stopAuto);
+    el.addEventListener("focusout", (event) => {
+      const nextTarget = event.relatedTarget;
+      if (!nextTarget || !el.contains(nextTarget)) startAuto();
+    });
+  };
+
+  if (els.offersViewport) {
+    attachPauseHandlers(els.offersViewport);
+  }
+
+  attachPauseHandlers(els.offersPrev);
+  attachPauseHandlers(els.offersNext);
+  attachPauseHandlers(els.offersDots);
+
+  window.addEventListener("resize", () => {
+    if (!items.length) return;
+    goTo(activeIndex, { instant: true });
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopAuto();
+    else startAuto();
+  });
+
+  return { update };
+})();
 
 bindNumericInput(els.qtyInput, {
   allowDecimal: () => state.modalProduct?.sellMode === 1,
@@ -493,6 +697,8 @@ function buildOffers() {
   );
   els.offers.style.display = offers.length ? "block" : "none";
   if (offers.length) renderProducts(offers, els.offersGrid, true);
+  else if (els.offersGrid) els.offersGrid.innerHTML = "";
+  offersCarousel.update();
 }
 
 /* ===== رسم المنتجات ===== */

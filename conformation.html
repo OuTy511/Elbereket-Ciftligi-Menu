@@ -22,6 +22,12 @@
       rel="stylesheet"
     />
 
+    <link
+      rel="shortcut icon"
+      href="img/logos/favicon.png"
+      type="image/x-icon"
+    />
+
     <!-- نفس ستايل الموقع (لازم ييجي قبل conformation.css) -->
     <link rel="stylesheet" href="style/lang.css" />
     <link rel="stylesheet" href="style/menu.css" />
@@ -79,7 +85,9 @@
         <span class="lang-fab__flag" aria-hidden="true">
           <img data-lang-flag-img src="img/flags/egypt.svg" alt="" />
         </span>
-        <span class="sr-only" data-i18n="common.langSwitch.label">تغيير اللغة</span>
+        <span class="sr-only" data-i18n="common.langSwitch.label"
+          >تغيير اللغة</span
+        >
       </button>
       <div class="lang-fab__menu" data-lang-fab-menu>
         <div
@@ -116,10 +124,18 @@
           data-i18n-attr='{"aria-label":"nav.aria.main"}'
         >
           <ul class="nav-list">
-            <li><a href="index.html" data-i18n="nav.home">الصفحة الرئيسية</a></li>
-            <li><a class="active" href="menu.html" data-i18n="nav.menu">المنيو</a></li>
+            <li>
+              <a href="index.html" data-i18n="nav.home">الصفحة الرئيسية</a>
+            </li>
+            <li>
+              <a class="active" href="menu.html" data-i18n="nav.menu">المنيو</a>
+            </li>
             <li><a href="index.html#about" data-i18n="nav.about">من نحن</a></li>
-            <li><a href="index.html#contact" data-i18n="nav.contact">تواصل معنا</a></li>
+            <li>
+              <a href="index.html#contact" data-i18n="nav.contact"
+                >تواصل معنا</a
+              >
+            </li>
           </ul>
         </nav>
 
@@ -147,7 +163,11 @@
           <ul class="navm-list">
             <li><a href="menu.html" data-i18n="nav.menu">المنيو</a></li>
             <li><a href="index.html#about" data-i18n="nav.about">من نحن</a></li>
-            <li><a href="index.html#contact" data-i18n="nav.contact">تواصل معنا</a></li>
+            <li>
+              <a href="index.html#contact" data-i18n="nav.contact"
+                >تواصل معنا</a
+              >
+            </li>
           </ul>
         </nav>
       </div>
@@ -158,7 +178,9 @@
       <section class="card">
         <h1>
           <span data-i18n="confirm.heading.title">تأكيد الطلب</span>
-          <span class="badge" data-i18n="confirm.heading.badge">خطوة أخيرة</span>
+          <span class="badge" data-i18n="confirm.heading.badge"
+            >خطوة أخيرة</span
+          >
         </h1>
         <p class="muted" data-i18n="confirm.heading.body">
           راجِع الأصناف ثم أدخل بيانات الاستلام واختر طريقة الدفع وحدِّد موقع
@@ -178,7 +200,9 @@
                 <th data-i18n="confirm.summary.table.item">الصنف</th>
                 <th data-i18n="confirm.summary.table.qty">الكمية</th>
                 <th data-i18n="confirm.summary.table.price">السعر/وحدة</th>
-                <th data-i18n="confirm.summary.table.total">الإجمالي التقريبي</th>
+                <th data-i18n="confirm.summary.table.total">
+                  الإجمالي التقريبي
+                </th>
                 <th data-i18n="confirm.summary.table.delete">حذف</th>
               </tr>
             </thead>
@@ -192,7 +216,10 @@
         <p class="muted total-note" data-i18n="confirm.summary.totalNote">
           الإجمالي تقريبي وقد تختلف القيمة النهائية عد الوزن الفعلي.
         </p>
-        <p class="muted total-note note-em" data-i18n="confirm.summary.totalNoteEm">
+        <p
+          class="muted total-note note-em"
+          data-i18n="confirm.summary.totalNoteEm"
+        >
           احتمال فروقات بسيطة باختلاف الوزن.
         </p>
       </section>
@@ -281,7 +308,11 @@
               >طريقة الدفع</label
             >
             <div class="pill-row">
-              <span class="chip chip-placeholder" aria-hidden="true" data-i18n="confirm.form.payment.placeholder">
+              <span
+                class="chip chip-placeholder"
+                aria-hidden="true"
+                data-i18n="confirm.form.payment.placeholder"
+              >
                 اختر طريقة الدفع
               </span>
               <label class="chip"

@@ -20,13 +20,6 @@ const getLangCode = () => {
   return typeof api.getLang === "function" ? api.getLang() : "ar";
 };
 
-const makeRecord = (arValue, trValue) => {
-  const ar = (arValue || "").trim();
-  const tr = (trValue || "").trim();
-  if (!ar && !tr) return { ar: "", tr: "" };
-  return { ar: ar || tr, tr: tr || ar };
-};
-
 const ensureRecord = (value, fallback = "") => {
   if (!value && fallback) return ensureRecord(fallback);
   if (typeof value === "string") {
@@ -52,25 +45,6 @@ const labelFor = (value, lang = getLangCode()) => {
   if (typeof value === "string") return value;
   const record = ensureRecord(value);
   return record[lang] || record.ar || record.tr || "";
-};
-
-const splitValues = (raw = "") =>
-  raw
-    .split(/[,،|\/\n]+/g)
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-const buildCutOptions = (arStr, trStr) => {
-  const arList = splitValues(arStr);
-  const trList = splitValues(trStr);
-  const len = Math.max(arList.length, trList.length);
-  const cuts = [];
-  for (let i = 0; i < len; i += 1) {
-    const record = makeRecord(arList[i], trList[i]);
-    if (!record.ar && !record.tr) continue;
-    cuts.push({ id: String(i), names: record });
-  }
-  return cuts;
 };
 
 const getCategoryId = (category) => {
@@ -126,7 +100,11 @@ if (btn && navMobile && list) {
 }
 
 /* ===== Helpers ===== */
-const CSV_PATH = "data/products.csv";
+const API_ENDPOINTS = {
+  products: "/.netlify/functions/products",
+  offers: "/.netlify/functions/offers",
+  createOrder: "/.netlify/functions/createOrder",
+};
 const placeholder = "https://placehold.co/1024x1024";
 const priceFmt = (n) => `${(+n || 0).toLocaleString("tr-TR")}₺`;
 const moneyTL = (n) =>
@@ -299,6 +277,7 @@ const state = {
   products: [],
   filtered: [],
   categories: [],
+  offers: [],
   activeCategory: ALL_CATEGORY,
   query: "",
   cart: [],
@@ -509,78 +488,59 @@ bindNumericInput(els.qtyInput, {
   allowDecimal: () => state.modalProduct?.sellMode === 1,
 });
 
-const parseProductRow = (row, idx) => {
-  const nameAr = (row["الاسم_عربي"] || row["الاسم"] || "").trim();
-  const nameTr = (row["الاسم_تركي"] || "").trim();
-  const categoryAr = (row["القسم_عربي"] || row["القسم"] || "").trim();
-  const categoryTr = (row["القسم_تركي"] || "").trim();
-  if (!nameAr && !nameTr) return null;
-  if (!categoryAr && !categoryTr) return null;
-
-  const categoryId = categoryAr || categoryTr || `category-${idx}`;
-  const nameBase = nameAr || nameTr || `item-${idx}`;
-  const safeName = nameBase.replace(/\s+/g, "-");
-  const productId = `${idx}-${safeName}`;
-
-  const cutsAr = row["خيارات_التقطيع_عربي"] || row["خيارات_التقطيع"] || "";
-  const cutsTr = row["خيارات_التقطيع_تركي"] || "";
-
-  return {
-    id: productId,
-    names: makeRecord(nameAr, nameTr),
-    category: {
-      id: categoryId,
-      names: makeRecord(categoryAr || categoryId, categoryTr),
-    },
-    price: toNum(row["السعر"], 0),
-    salePrice: toNum(row["سعر_الخصم"], 0),
-    cuts: buildCutOptions(cutsAr, cutsTr),
-    image: (row["الصورة"] || "").trim(),
-    sellMode: Number((row["وضع_البيع"] || "0").trim()) || 0,
-    approxKg: toNum(row["وزن_تقريبي_كجم"], 0),
-  };
+const applyCategorySnapshot = () => {
+  const categoryMap = new Map();
+  state.products.forEach((p) => {
+    if (!p?.category) return;
+    const id = getCategoryId(p.category);
+    if (!id || categoryMap.has(id)) return;
+    categoryMap.set(id, {
+      id,
+      names: ensureRecord(p.category.names || p.category, id),
+    });
+  });
+  state.categories = Array.from(categoryMap.values());
 };
 
-/* ===== تحميل CSV ===== */
-if (window.Papa) {
-  Papa.parse(CSV_PATH, {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: ({ data }) => {
-      state.products = data
-        .map((row, idx) => parseProductRow(row, idx))
-        .filter(Boolean);
+const loadProducts = async () => {
+  try {
+    const response = await fetch(API_ENDPOINTS.products);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    state.products = Array.isArray(data) ? data : [];
+    applyCategorySnapshot();
+    buildFilters();
+    applyFilters();
+    buildOffers();
+    hydrateCart();
+    updateCartUI();
+  } catch (err) {
+    console.error("API error:", err);
+    if (els.menuGrid)
+      els.menuGrid.innerHTML = `<p class="muted">${t("menu.alert.loadFail")}</p>`;
+  }
+};
 
-      const categoryMap = new Map();
-      state.products.forEach((p) => {
-        if (!p?.category) return;
-        const id = getCategoryId(p.category);
-        if (!id || categoryMap.has(id)) return;
-        categoryMap.set(id, {
-          id,
-          names: ensureRecord(p.category.names || p.category, id),
-        });
-      });
-      state.categories = Array.from(categoryMap.values());
-      buildFilters();
-      applyFilters();
-      buildOffers();
+const loadOffers = async () => {
+  try {
+    const response = await fetch(API_ENDPOINTS.offers);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    state.offers = Array.isArray(data) ? data : [];
+    buildOffers();
+  } catch (err) {
+    console.error("Offers API error:", err);
+  }
+};
 
-      hydrateCart();
-      updateCartUI();
-    },
-    error: (err) => {
-      console.error("CSV error:", err);
-      els.menuGrid.innerHTML = `<p class="muted">${t(
-        "menu.alert.loadFail"
-      )}</p>`;
-    },
+async function submitOrder(payload) {
+  const res = await fetch(API_ENDPOINTS.createOrder, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
-} else {
-  els.menuGrid.innerHTML = `<p class="muted">${t(
-    "menu.alert.noPapa"
-  )}</p>`;
+  if (!res.ok) throw new Error("Order failed");
+  return res.json();
 }
 
 const getCategoryLabel = (category) => {
@@ -692,9 +652,12 @@ function applyFilters() {
 }
 
 function buildOffers() {
-  const offers = state.products.filter(
-    (p) => p.salePrice > 0 && p.salePrice < p.price
-  );
+  if (!els.offers) return;
+  const offers = (state.offers && state.offers.length
+    ? state.offers
+    : state.products.filter(
+        (p) => p.salePrice > 0 && p.salePrice < p.price
+      )) || [];
   els.offers.style.display = offers.length ? "block" : "none";
   if (offers.length) renderProducts(offers, els.offersGrid, true);
   else if (els.offersGrid) els.offersGrid.innerHTML = "";
@@ -1352,6 +1315,9 @@ function setupScrollTop() {
   window.addEventListener("scroll", toggle, { passive: true });
   toggle();
 }
+
+loadProducts();
+loadOffers();
 
 setupFilterArrows();
 setupScrollTop();

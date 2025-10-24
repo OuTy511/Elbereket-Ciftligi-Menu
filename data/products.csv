@@ -1,5 +1,5 @@
-﻿الاسم_عربي,الاسم_تركي,القسم_عربي,القسم_تركي,السعر,سعر_الخصم,خيارات_التقطيع_عربي,خيارات_التقطيع_تركي,الصورة,وضع_البيع,وزن_تقريبي_كجم
-لحمه مفرومه,Dana Kiyma,لحم عجل,Dana eti,720,,,,img/products/dana-etti/kiyma-az.jpg,1,
+الاسم_عربي,الاسم_تركي,القسم_عربي,القسم_تركي,السعر,سعر_الخصم,خيارات_التقطيع_عربي,خيارات_التقطيع_تركي,الصورة,وضع_البيع,وزن_تقريبي_كجم
+لحمه مفرومه,Dana Kiyma,لحم عجل,Dana eti,720,529,,,img/products/dana-etti/kiyma-az.jpg,1,
 لحم عجل دهن وسط,Dana Et Orta Yağlı,لحم عجل,Dana eti,720,,"قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور",,img/products/dana-etti/et-orta.jpg,1,
 لحم عجل دهن قليل,Dana Et Az Yağlı,لحم عجل,Dana eti,750,,"قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور",,img/products/dana-etti/et-az.jpg,1,
 لحم عجل بدون دهن,Dana  Et Yağsız,لحم عجل,Dana eti,790,,"قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور",,img/products/dana-etti/et-siz.jpg,1,
@@ -11,9 +11,9 @@
 عرق انتركوت,Dana Antrikot,لحم عجل,Dana eti,950,,"استيك,بوفتيك",,img/products/dana-etti/antrikot.jpg,1,
 عرق فلتو,Dana Bonfile,لحم عجل,Dana eti,1220,,"استيك,بوفتيك",,img/products/dana-etti/dana-bonfile.jpg,2,1.5
 موزه عجل,Dana İncik,لحم عجل,Dana eti,795,,"قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور",,,1,
-موزه عجل بالعظم,Dana Kemikli İncik,لحم عجل,Dana eti,580,,,,img/products/dana-etti/incik-kemikli.jpg,1,
+موزه عجل بالعظم,Dana Kemikli İncik,لحم عجل,Dana eti,590,550,,,img/products/dana-etti/incik-kemikli.jpg,1,
 بيت لوح,Dana Kurek,لحم عجل,Dana eti,820,,"قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور",,img/products/dana-etti/dana-kurek.jpg,1,
-لحم عجل بالعظم,Dana Kemikli Et,لحم عجل,Dana eti,520,,,,img/products/dana-etti/dana-kemikli.jpg,1,
+لحم عجل بالعظم,Dana Kemikli Et,لحم عجل,Dana eti,570,519,,,img/products/dana-etti/dana-kemikli.jpg,1,
 كتف خروف,Kuzu Kol,لحم خروف,Kuzu eti,650,,"تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف(بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)",,img/products/kuzu-etti/kuzu-kol.jpg,2,3
 فخذه خروف,Kuzu But,لحم خروف,Kuzu eti,650,,"تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف(بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)",,img/products/kuzu-etti/kuzu-but.jpg,2,5
 رقبه خروف,Kuzu Gerdan,لحم خروف,Kuzu eti,495,,"تقطيع شرائح,تشفيه",,img/products/kuzu-etti/kuzu-garden.jpg,1,
@@ -42,11 +42,11 @@
 جمبري جامبو,Karadies,اسماك,Balık,570,,,,img/products/balik/karadies.jpg,1,
 هامسي,Hamsi,اسماك,Balık,150,,,,img/products/balik/hamsi.jpg,1,
 سردين,Sardalya,اسماك,Balık,210,,,,img/products/balik/sardayle.jpg,1,
-برجر دجاج,Tavuk Burger,منتجات مزارع البركات,El Bereket ürünleri,290,,,,img/products/elbereket-urunler/tavuk-burger.jpg,1,
-برجر لحم,Et Burger,منتجات مزارع البركات,El Bereket ürünleri,690,,,,img/products/elbereket-urunler/et-burger.jpg,1,
-سجق مصري,Mısırlı Sucuk,منتجات مزارع البركات,El Bereket ürünleri,690,,,,img/products/elbereket-urunler/misirli-sucuk.jpg,1,
+برجر دجاج,Tavuk Burger,منتجات مزارع البركات,El Bereket ürünleri,290,250,,,img/products/elbereket-urunler/tavuk-burger.jpg,1,
+برجر لحم,Et Burger,منتجات مزارع البركات,El Bereket ürünleri,690,560,,,img/products/elbereket-urunler/et-burger.jpg,1,
+سجق مصري,Mısırlı Sucuk,منتجات مزارع البركات,El Bereket ürünleri,690,580,,,img/products/elbereket-urunler/misirli-sucuk.jpg,1,
 حليب 3لتر,Süt 3TL,منتجات مزارع البركات,El Bereket ürünleri,225,,,,img/products/elbereket-urunler/sut.jpg,,
-بيض بلدي,Beyaz Yumurta,منتجات مزارع البركات,El Bereket ürünleri,210,,,,img/products/elbereket-urunler/koy-yumurta.jpg,,
+بيض اورجانيك,Beyaz Yumurta,منتجات مزارع البركات,El Bereket ürünleri,250,215,,,img/products/elbereket-urunler/koy-yumurta.jpg,,
 سمنة بلدي,Gerçek Tereyağı,منتجات مزارع البركات,El Bereket ürünleri,0,,,,img/products/elbereket-urunler/tereyag.jpg,,
 قرفة سيجار,Tarçın Çubuk,بهارات و توابل,Baharat ve çeşniler,45,,,,img/products/baharat/قرفه-سيجار.jpg,,
 قرفة مطحونة,Toz Tarçın,بهارات و توابل,Baharat ve çeşniler,45,,,,img/products/baharat/قرفه-مطحونه.jpeg,,

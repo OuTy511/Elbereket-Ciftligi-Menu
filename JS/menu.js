@@ -127,7 +127,89 @@ if (btn && navMobile && list) {
 
 /* ===== Helpers ===== */
 const CSV_PATH = "data/products.csv";
-const placeholder = "https://placehold.co/1024x1024";
+const placeholder =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect fill='%23f3f4f6' width='160' height='160'/%3E%3Cpath fill='%23e5e7eb' d='M18 118.5 54 74l31 37 18-20 39 49H18z'/%3E%3Ccircle cx='56' cy='52' r='18' fill='%23e5e7eb'/%3E%3C/svg%3E";
+const LEGACY_PLACEHOLDER_REGEX = /^https?:\/\/placehold\.co\//i;
+
+const sanitizeImageSrc = (value) => {
+  const clean = (value || "").trim();
+  if (!clean) return "";
+  return LEGACY_PLACEHOLDER_REGEX.test(clean) ? "" : clean;
+};
+
+const applyImageFallback = (img) => {
+  if (!img || img.dataset.fallbackBound) return;
+  img.dataset.fallbackBound = "1";
+  img.addEventListener("error", () => {
+    if (img.src !== placeholder) img.src = placeholder;
+  });
+};
+
+const loadLazyImage = (img) => {
+  if (!img || !img.dataset) return;
+  const src = (img.dataset.src || "").trim();
+  if (!src) return;
+  img.src = src;
+  delete img.dataset.src;
+};
+
+const lazyLoader = (() => {
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          loadLazyImage(entry.target);
+        });
+      },
+      { rootMargin: "200px 0px", threshold: 0.01 }
+    );
+
+    return {
+      watch(img) {
+        if (img?.dataset?.src) observer.observe(img);
+      },
+      unwatch(img) {
+        if (img) observer.unobserve(img);
+      },
+    };
+  }
+
+  return {
+    watch(img) {
+      loadLazyImage(img);
+    },
+    unwatch() {},
+  };
+})();
+
+const prepareLazyImage = (img, src) => {
+  if (!img) return "";
+  applyImageFallback(img);
+  img.setAttribute("loading", "lazy");
+  img.setAttribute("decoding", "async");
+  const cleanSrc = sanitizeImageSrc(src);
+  if (cleanSrc) {
+    img.src = placeholder;
+    img.dataset.src = cleanSrc;
+  } else {
+    if (img.dataset) delete img.dataset.src;
+    img.src = placeholder;
+  }
+  return cleanSrc;
+};
+
+const setImmediateImage = (img, src) => {
+  if (!img) return;
+  applyImageFallback(img);
+  img.removeAttribute("loading");
+  img.setAttribute("decoding", "async");
+  if (img.dataset) delete img.dataset.src;
+  const cleanSrc = sanitizeImageSrc(src);
+  img.src = cleanSrc || placeholder;
+};
+
 const priceFmt = (n) => `${(+n || 0).toLocaleString("tr-TR")}₺`;
 const moneyTL = (n) =>
   `${Number(n || 0).toLocaleString("tr-TR", {
@@ -535,7 +617,7 @@ const parseProductRow = (row, idx) => {
     price: toNum(row["السعر"], 0),
     salePrice: toNum(row["سعر_الخصم"], 0),
     cuts: buildCutOptions(cutsAr, cutsTr),
-    image: (row["الصورة"] || "").trim(),
+    image: sanitizeImageSrc(row["الصورة"]),
     sellMode: Number((row["وضع_البيع"] || "0").trim()) || 0,
     approxKg: toNum(row["وزن_تقريبي_كجم"], 0),
   };
@@ -742,7 +824,7 @@ function renderProducts(list, mount) {
     card.innerHTML = `
       <div class="image-wrap">
         ${hasOffer ? `<span class="badge-offer">${t("menu.badge.offer")}</span>` : ""}
-        <img src="${p.image || placeholder}" alt="${productName}">
+        <img src="${placeholder}" alt="${productName}">
       </div>
       <h3 class="product-name">${productName}</h3>
       <p class="category">${categoryLabel}</p>
@@ -760,6 +842,10 @@ function renderProducts(list, mount) {
         .addEventListener("click", () => openModal(p));
     }
     mount.appendChild(card);
+    const imgEl = card.querySelector(".image-wrap img");
+    const actualSrc = prepareLazyImage(imgEl, p.image);
+    if (actualSrc) lazyLoader.watch(imgEl);
+    else lazyLoader.unwatch(imgEl);
   });
 }
 
@@ -799,7 +885,8 @@ function refreshModalLanguage() {
 function openModal(product) {
   state.modalProduct = product;
 
-  els.modalImg.src = product.image || placeholder;
+  setImmediateImage(els.modalImg, product.image);
+  if (els.modalImg) els.modalImg.alt = labelFor(product.names);
   els.modalName.textContent = labelFor(product.names);
   els.modalCat.textContent = getCategoryLabel(product.category);
 
@@ -961,7 +1048,7 @@ function normalizeCartItem(item, idx = 0) {
     name: nameRecord,
     category: { id: categoryId, names: categoryRecord },
     categoryId,
-    image: item.image || placeholder,
+    image: sanitizeImageSrc(item.image) || placeholder,
     price: Number(item.price) || 0,
     cutId: cutId || (cutRecord ? cutRecord.ar || cutRecord.tr || "" : ""),
     cut: cutRecord,
@@ -1006,7 +1093,7 @@ function addToCart(product, qty, cutId, note) {
     name: product.names,
     category: product.category,
     categoryId: product.category?.id || "",
-    image: product.image || placeholder,
+    image: sanitizeImageSrc(product.image) || placeholder,
     price: unit,
     cutId: cutOption?.id || "",
     cut: cutOption ? cutOption.names : null,
@@ -1145,7 +1232,7 @@ function updateCartUI() {
       const deleteLabel = t("menu.cart.meta.delete");
       return `
       <div class="cart-row">
-        <img src="${it.image}" alt="${nameText}">
+        <img src="${it.image || placeholder}" alt="${nameText}" loading="lazy" decoding="async">
         <div>
           <div class="title">${nameText}</div>
           <div class="meta">${cutText} • ${qtyLabel}: ${lineQtyText(it)}</div>
@@ -1165,6 +1252,15 @@ function updateCartUI() {
     `;
     })
     .join("");
+
+  els.cartItems
+    .querySelectorAll("img")
+    .forEach((img) => {
+      applyImageFallback(img);
+      if (!img.getAttribute("loading")) img.setAttribute("loading", "lazy");
+      img.setAttribute("decoding", "async");
+      if (!img.src) img.src = placeholder;
+    });
 
   els.cartItems
     .querySelectorAll("[data-rm]")
@@ -1304,7 +1400,7 @@ document.getElementById("cartClear")?.addEventListener("click", () => {
           id: x.categoryId || (x.category && x.category.id) || "",
           names: categoryRecord,
         },
-        image: x.image || "",
+        image: sanitizeImageSrc(x.image),
         qty,
         unit,
         price,

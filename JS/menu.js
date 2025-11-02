@@ -153,7 +153,9 @@ const buildImageSources = (src) => {
   if (!shouldOptimizeImages()) return { primary: clean, fallback: "" };
 
   const separator = clean.includes("?") ? "&" : "?";
-  const optimized = `${clean}${separator}nf_resize=fit&w=600&nf_format=auto`;
+  const optimized =
+    `${clean}${separator}` +
+    "nf_resize=fit&w=600&nf_format=auto&nf_quality=70";
   return { primary: optimized, fallback: clean };
 };
 

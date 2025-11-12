@@ -627,13 +627,6 @@ body.lang-tr .offers-arrow.next i {
 .price .new {
   font-weight: 800;
 }
-.price .unit {
-  display: inline-block;
-  margin-inline-start: 6px;
-  font-size: 14px;
-  color: var(--muted);
-  font-weight: 600;
-}
 .add-btn {
   display: inline-flex;
   align-items: center;

@@ -1,0 +1,18 @@
+backend:
+  name: github
+  repo: OuTy511/Elbereket-Ciftligi-Menu # عدّلها لو اسم الريبو مختلف
+  branch: main
+
+media_folder: "assets/uploads" # فين هيتخزن الصور داخل الريبو
+public_folder: "/assets/uploads" # المسار اللي يبان في الموقع
+
+collections:
+  - name: "content"
+    label: "محتوى تجريبي"
+    files:
+      - file: "content/home.md"
+        label: "صفحة تجريبية"
+        name: "home"
+        fields:
+          - { label: "العنوان", name: "title", widget: "string" }
+          - { label: "النص", name: "body", widget: "markdown" }

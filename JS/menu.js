@@ -131,6 +131,128 @@ const placeholder =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect fill='%23f3f4f6' width='160' height='160'/%3E%3Cpath fill='%23e5e7eb' d='M18 118.5 54 74l31 37 18-20 39 49H18z'/%3E%3Ccircle cx='56' cy='52' r='18' fill='%23e5e7eb'/%3E%3C/svg%3E";
 const LEGACY_PLACEHOLDER_REGEX = /^https?:\/\/placehold\.co\//i;
 
+const PRODUCTS_CACHE_KEY = "elb_products_cache_v1";
+
+const productStorage = (() => {
+  if (typeof window === "undefined") return null;
+  try {
+    const { localStorage } = window;
+    const testKey = "__elb_cache_test__";
+    localStorage.setItem(testKey, "1");
+    localStorage.removeItem(testKey);
+    return localStorage;
+  } catch (err) {
+    console.warn("Local storage unavailable", err);
+    return null;
+  }
+})();
+
+const readProductsCache = () => {
+  if (!productStorage) return null;
+  try {
+    const raw = productStorage.getItem(PRODUCTS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.data) || !parsed.data.length) return null;
+    return parsed.data;
+  } catch (err) {
+    console.warn("Failed to read cached products", err);
+    return null;
+  }
+};
+
+const writeProductsCache = (products) => {
+  if (!productStorage) return;
+  try {
+    productStorage.setItem(
+      PRODUCTS_CACHE_KEY,
+      JSON.stringify({ data: products, updatedAt: Date.now() })
+    );
+  } catch (err) {
+    console.warn("Failed to cache products", err);
+  }
+};
+
+const cloneCutOption = (cut, index = 0) => {
+  if (!cut) return null;
+  const names = cut.names ? ensureRecord(cut.names) : ensureRecord(cut, "");
+  if (!names.ar && !names.tr) return null;
+  const id = cut.id != null && cut.id !== "" ? String(cut.id) : String(index);
+  return { id, names };
+};
+
+const sanitizeProduct = (product, idx = 0) => {
+  if (!product) return null;
+  const hasNamesRecord = product.names && typeof product.names === "object";
+  const names = hasNamesRecord ? ensureRecord(product.names) : ensureRecord(product.names, "");
+  if (!names.ar && !names.tr) return null;
+
+  const categorySource = product.category || {};
+  const categoryId = getCategoryId(categorySource) || categorySource.id || "";
+  const categoryNames = ensureRecord(categorySource.names || categorySource, categoryId);
+
+  const idBase = product.id || `${idx}-${(names.ar || names.tr || "item").replace(/\s+/g, "-")}`;
+
+  const cuts = Array.isArray(product.cuts)
+    ? product.cuts
+        .map((cut, cutIdx) => cloneCutOption(cut, cutIdx))
+        .filter(Boolean)
+    : [];
+
+  return {
+    id: idBase,
+    names,
+    category: {
+      id: categoryId || categoryNames.ar || categoryNames.tr || "",
+      names: categoryNames,
+    },
+    price: Number(product.price) || 0,
+    salePrice: Number(product.salePrice) || 0,
+    cuts,
+    image: sanitizeImageSrc(product.image),
+    sellMode: Number(product.sellMode) || 0,
+    approxKg: toNum(product.approxKg, 0),
+  };
+};
+
+const transformCsvRows = (rows) =>
+  Array.isArray(rows)
+    ? rows
+        .map((row, idx) => parseProductRow(row, idx))
+        .filter(Boolean)
+    : [];
+
+const applyProductData = (products) => {
+  const normalized = Array.isArray(products)
+    ? products.map((product, idx) => sanitizeProduct(product, idx)).filter(Boolean)
+    : [];
+  if (!normalized.length) return;
+
+  state.products = normalized;
+
+  const categoryMap = new Map();
+  state.products.forEach((product) => {
+    if (!product?.category) return;
+    const id = getCategoryId(product.category);
+    if (!id || categoryMap.has(id)) return;
+    categoryMap.set(id, {
+      id,
+      names: ensureRecord(product.category.names || product.category, id),
+    });
+  });
+  state.categories = Array.from(categoryMap.values());
+
+  buildFilters();
+  applyFilters();
+  buildOffers();
+
+  if (!state.cartHydrated) {
+    hydrateCart();
+    state.cartHydrated = true;
+  }
+  updateCartUI();
+};
+
 const sanitizeImageSrc = (value) => {
   const clean = (value || "").trim();
   if (!clean) return "";
@@ -366,6 +488,7 @@ const els = {
   modalCat: document.getElementById("modalCat"),
   cutRow: document.getElementById("cutRow"),
   cutSelect: document.getElementById("cutSelect"),
+  cutError: document.getElementById("cutError"),
   qtyInput: document.getElementById("qtyInput"),
   qtyMinus: document.getElementById("qtyMinus"),
   qtyPlus: document.getElementById("qtyPlus"),
@@ -385,6 +508,8 @@ const state = {
   query: "",
   cart: [],
   modalProduct: null,
+  cartHydrated: false,
+  modalTrigger: null,
 };
 
 const offersCarousel = (() => {
@@ -624,42 +749,41 @@ const parseProductRow = (row, idx) => {
 };
 
 /* ===== تحميل CSV ===== */
+const cachedProducts = readProductsCache();
+if (cachedProducts) {
+  try {
+    applyProductData(cachedProducts);
+  } catch (err) {
+    console.warn("Failed to apply cached products", err);
+  }
+}
+
 if (window.Papa) {
   Papa.parse(CSV_PATH, {
     download: true,
     header: true,
     skipEmptyLines: true,
     complete: ({ data }) => {
-      state.products = data
-        .map((row, idx) => parseProductRow(row, idx))
-        .filter(Boolean);
-
-      const categoryMap = new Map();
-      state.products.forEach((p) => {
-        if (!p?.category) return;
-        const id = getCategoryId(p.category);
-        if (!id || categoryMap.has(id)) return;
-        categoryMap.set(id, {
-          id,
-          names: ensureRecord(p.category.names || p.category, id),
-        });
-      });
-      state.categories = Array.from(categoryMap.values());
-      buildFilters();
-      applyFilters();
-      buildOffers();
-
-      hydrateCart();
-      updateCartUI();
+      const parsedProducts = transformCsvRows(data);
+      if (parsedProducts.length) {
+        applyProductData(parsedProducts);
+        writeProductsCache(state.products);
+      } else if (!state.products.length) {
+        els.menuGrid.innerHTML = `<p class="muted">${t(
+          "menu.alert.loadFail"
+        )}</p>`;
+      }
     },
     error: (err) => {
       console.error("CSV error:", err);
-      els.menuGrid.innerHTML = `<p class="muted">${t(
-        "menu.alert.loadFail"
-      )}</p>`;
+      if (!state.products.length) {
+        els.menuGrid.innerHTML = `<p class="muted">${t(
+          "menu.alert.loadFail"
+        )}</p>`;
+      }
     },
   });
-} else {
+} else if (!state.products.length) {
   els.menuGrid.innerHTML = `<p class="muted">${t(
     "menu.alert.noPapa"
   )}</p>`;
@@ -880,9 +1004,15 @@ function refreshModalLanguage() {
   }
   const helperEl = els.orderModal?.querySelector(".qty-helper");
   if (helperEl) helperEl.textContent = getHelperText(product);
+  if (els.cutError && !els.cutError.hidden) {
+    els.cutError.textContent = t("menu.modal.cutError");
+  }
 }
 
 function openModal(product) {
+  const activeEl = document.activeElement;
+  state.modalTrigger =
+    activeEl && typeof activeEl.focus === "function" ? activeEl : null;
   state.modalProduct = product;
 
   setImmediateImage(els.modalImg, product.image);
@@ -900,9 +1030,15 @@ function openModal(product) {
     els.cutSelect.innerHTML = options.join("");
     els.cutSelect.value = "";
     els.cutSelect.classList.remove("invalid");
+    els.cutSelect.removeAttribute("aria-invalid");
   } else {
     els.cutRow.style.display = "none";
     els.cutSelect.innerHTML = "";
+  }
+
+  if (els.cutError) {
+    els.cutError.textContent = "";
+    els.cutError.hidden = true;
   }
 
   // الكمية حسب وضع_البيع
@@ -937,12 +1073,39 @@ function openModal(product) {
   document.body.classList.add("modal-open");
   els.orderModal.classList.add("show");
   els.orderModal.setAttribute("aria-hidden", "false");
+
+  const focusQty = () => {
+    if (els.qtyInput) {
+      els.qtyInput.focus();
+      if (typeof els.qtyInput.select === "function") els.qtyInput.select();
+    }
+  };
+  if (
+    typeof window !== "undefined" &&
+    typeof window.requestAnimationFrame === "function"
+  )
+    window.requestAnimationFrame(focusQty);
+  else setTimeout(focusQty, 0);
 }
 
 function closeModal() {
   els.orderModal.classList.remove("show");
   els.orderModal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
+  if (els.cutSelect) {
+    els.cutSelect.classList.remove("invalid");
+    els.cutSelect.removeAttribute("aria-invalid");
+  }
+  if (els.cutError) {
+    els.cutError.textContent = "";
+    els.cutError.hidden = true;
+  }
+  const trigger = state.modalTrigger;
+  state.modalTrigger = null;
+  state.modalProduct = null;
+  if (trigger && typeof trigger.focus === "function") {
+    trigger.focus();
+  }
 }
 
 els.qtyPlus?.addEventListener("click", () => {
@@ -969,6 +1132,11 @@ els.qtyMinus?.addEventListener("click", () => {
 
 els.cutSelect?.addEventListener("change", () => {
   els.cutSelect.classList.remove("invalid");
+  els.cutSelect.removeAttribute("aria-invalid");
+  if (els.cutError) {
+    els.cutError.textContent = "";
+    els.cutError.hidden = true;
+  }
 });
 
 els.noteInput?.addEventListener("input", () => {
@@ -984,10 +1152,12 @@ els.orderModal?.addEventListener("click", (e) => {
 
 // ===== إضافة المنتج عند الضغط على Enter =====
 els.orderModal?.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    els.modalAdd?.click();
-  }
+  if (e.key !== "Enter") return;
+  const target = e.target;
+  if (target && target.tagName === "TEXTAREA") return;
+  if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+  e.preventDefault();
+  els.modalAdd?.click();
 });
 
 els.modalAdd?.addEventListener("click", () => {
@@ -999,9 +1169,19 @@ els.modalAdd?.addEventListener("click", () => {
   const cutId = (els.cutSelect.value || "").trim();
   if (requiresCut && !cutId) {
     els.cutSelect.classList.add("invalid");
+    els.cutSelect.setAttribute("aria-invalid", "true");
+    if (els.cutError) {
+      els.cutError.textContent = t("menu.modal.cutError");
+      els.cutError.hidden = false;
+    }
     els.cutSelect.focus();
-    alert(t("menu.modal.cutError"));
     return;
+  }
+  els.cutSelect.classList.remove("invalid");
+  els.cutSelect.removeAttribute("aria-invalid");
+  if (els.cutError) {
+    els.cutError.textContent = "";
+    els.cutError.hidden = true;
   }
   let qty = toNum(els.qtyInput.value, 1);
 
@@ -1294,22 +1474,24 @@ function updateCartUI() {
 }
 
 /* ===== رسالة واتساب القديمة (اختياري لو الرابط لسه موجود) ===== */
+function buildMenuWhatsAppLine(item) {
+  const nameText = labelFor(item.name);
+  if (!nameText) return "";
+  const segments = [`${t("menu.whatsapp.quantity")}: ${qtyForMessage(item)}`];
+  const cutText = item.cut ? labelFor(item.cut) : "";
+  if (cutText) segments.push(`${t("menu.whatsapp.cut")}: ${cutText}`);
+  if (item.note) segments.push(`${t("menu.whatsapp.noteLabel")}: ${item.note}`);
+  const priceLabel = priceLabelForMessage(item);
+  if (priceLabel)
+    segments.push(`${priceLabel}: ${moneyTL(item.price)}`);
+  return segments.length ? `• ${nameText} — ${segments.join(" • ")}` : `• ${nameText}`;
+}
+
 function updateWALink() {
   if (!els.waCheckout) return; // لو اتشال اللينك من الـ HTML
-  const lines = state.cart.map((item) => {
-    const nameText = labelFor(item.name);
-    const parts = [
-      `• ${nameText}`,
-      `      ${priceLabelForMessage(item)}: ${moneyTL(item.price)}`,
-      `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(item)}`,
-    ];
-    const cutText = item.cut ? labelFor(item.cut) : "";
-    if (cutText)
-      parts.push(`      ${t("menu.whatsapp.cut")}: ${cutText}`);
-    if (item.note)
-      parts.push(`      ${t("menu.whatsapp.noteLabel")}: ${item.note}`);
-    return parts.join("\n");
-  });
+  const lines = state.cart
+    .map((item) => buildMenuWhatsAppLine(item))
+    .filter(Boolean);
 
   const { total, hasUnpriced } = calcTotals();
   const header = t("menu.whatsapp.header", { brand: t("common.brandName") });
@@ -1321,12 +1503,9 @@ function updateWALink() {
 
   const msgRaw = [
     header,
-    "",
     detailsLabel,
     ...lines,
-    "",
     totalLine,
-    "",
     approxLine,
   ]
     .filter(Boolean)

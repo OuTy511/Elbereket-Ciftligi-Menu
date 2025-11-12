@@ -944,6 +944,13 @@ body.modal-open {
   border-color: #e74c3c;
   background: #fff5f5;
 }
+
+.form-error {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #d64545;
+  font-weight: 700;
+}
 #cutSelect:focus {
   border-color: var(--brand);
   box-shadow: 0 0 0 3px rgba(84, 180, 53, 0.15);

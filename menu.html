@@ -2,10 +2,7 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title data-i18n="menu.meta.title">المنيو – مزارع البركات</title>
 
     <!-- Cairo -->
@@ -339,7 +336,14 @@
             <label class="lbl" data-i18n="menu.modal.cutLabel"
               >اختر طريقة التقطيع</label
             >
-            <select id="cutSelect"></select>
+            <select id="cutSelect" aria-describedby="cutError"></select>
+            <p
+              id="cutError"
+              class="form-error"
+              role="alert"
+              aria-live="polite"
+              hidden
+            ></p>
           </div>
 
           <label class="lbl" data-i18n="menu.modal.quantity">الكمية</label>

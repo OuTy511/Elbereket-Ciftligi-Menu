@@ -1,0 +1,18 @@
+{
+  "id": "56-بيض-بلدي",
+  "code": "56-بيض-بلدي",
+  "name_ar": "بيض بلدي",
+  "name_tr": "Köy Yumurtası",
+  "category_id": "منتجات مزارع البركات",
+  "category_ar": "منتجات مزارع البركات",
+  "category_tr": "El Bereket ürünleri",
+  "price": 225.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/elbereket-urunler/koy-yumurta.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

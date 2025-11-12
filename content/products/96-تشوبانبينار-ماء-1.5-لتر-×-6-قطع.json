@@ -1,0 +1,18 @@
+{
+  "id": "96-تشوبانبينار-ماء-1.5-لتر-×-6-قطع",
+  "code": "96-تشوبانبينار-ماء-1.5-لتر-×-6-قطع",
+  "name_ar": "تشوبانبينار ماء 1.5 لتر × 6 قطع",
+  "name_tr": "Çobanpınar Su 1.5L × 6 Adet",
+  "category_id": "مياه شرب",
+  "category_ar": "مياه شرب",
+  "category_tr": "İçme suyu",
+  "price": 85.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/icme-suyu/تشوبانبينار-ماء-1-لتر.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

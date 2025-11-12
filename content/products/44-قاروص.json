@@ -1,0 +1,18 @@
+{
+  "id": "44-قاروص",
+  "code": "44-قاروص",
+  "name_ar": "قاروص",
+  "name_tr": "Laverak Balık",
+  "category_id": "اسماك",
+  "category_ar": "اسماك",
+  "category_tr": "Balık",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/balik/laverak.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

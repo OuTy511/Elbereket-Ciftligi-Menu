@@ -1,0 +1,18 @@
+{
+  "id": "81-فيجي-تورك---جوافة-مجمده",
+  "code": "81-فيجي-تورك---جوافة-مجمده",
+  "name_ar": "فيجي تورك - جوافة مجمده",
+  "name_tr": "Vegie Türk - Dondurulmuş Guava",
+  "category_id": "خضروات و فواكه مجمده",
+  "category_ar": "خضروات و فواكه مجمده",
+  "category_tr": "Dondurulmuş sebze & meyve",
+  "price": 220.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/dondurulmus/IMG-20251027-WA0135.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

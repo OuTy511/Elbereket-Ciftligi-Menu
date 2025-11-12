@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>لوحة التحكم - مزارع البركات</title>
+    <link rel="stylesheet" href="/admin/cms.css" />
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
   </head>
   <body>
-    <!-- تحميل لوحة Decap CMS -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <!--
+      يتم ضبط تكوين لوحة التحكم من خلال الملف admin/config.yml
+      قم بتحديث الحقول أو إضافة مجموعات جديدة عند الحاجة.
+    -->
+    <script src="https://unpkg.com/decap-cms@^3.4.1/dist/decap-cms.js"></script>
+    <script src="/admin/cms.js"></script>
   </body>
 </html>

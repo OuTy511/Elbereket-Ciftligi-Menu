@@ -1,0 +1,44 @@
+{
+  "id": "23-دجاجه-كامله",
+  "code": "23-دجاجه-كامله",
+  "name_ar": "دجاجه كامله",
+  "name_tr": "Bütün Tavuk",
+  "category_id": "لحوم بيضاء",
+  "category_ar": "لحوم بيضاء",
+  "category_tr": "Beyaz et",
+  "price": 110.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg (per piece)",
+  "image": "img/products/tavuk/tavuk.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [
+    {
+      "id": "0",
+      "name_ar": "كامله بدون تقطيع",
+      "name_tr": "Tam"
+    },
+    {
+      "id": "1",
+      "name_ar": "2 عدد تقطيع",
+      "name_tr": "2 adet kesim"
+    },
+    {
+      "id": "2",
+      "name_ar": "4 عدد تقطيع",
+      "name_tr": "4 adet kesim"
+    },
+    {
+      "id": "3",
+      "name_ar": "6 عدد تقطيع",
+      "name_tr": "6 adet kesim"
+    },
+    {
+      "id": "4",
+      "name_ar": "8 عدد تقطيع",
+      "name_tr": "8 adet kesim"
+    }
+  ],
+  "sell_mode": 2,
+  "approx_kg": 1.3
+}

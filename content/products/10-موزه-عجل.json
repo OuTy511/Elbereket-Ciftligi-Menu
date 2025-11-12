@@ -1,0 +1,44 @@
+{
+  "id": "10-موزه-عجل",
+  "code": "10-موزه-عجل",
+  "name_ar": "موزه عجل",
+  "name_tr": "Dana İncik",
+  "category_id": "لحم عجل",
+  "category_ar": "لحم عجل",
+  "category_tr": "Dana eti",
+  "price": 795.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/dana-etti/incik.png",
+  "description": "",
+  "available": true,
+  "cuts": [
+    {
+      "id": "0",
+      "name_ar": "بدون تقطيع",
+      "name_tr": "Bütün"
+    },
+    {
+      "id": "1",
+      "name_ar": "قطع متوسطه",
+      "name_tr": "Orta parça"
+    },
+    {
+      "id": "2",
+      "name_ar": "قطع كبيره",
+      "name_tr": "Büyük parça"
+    },
+    {
+      "id": "3",
+      "name_ar": "كباب حله",
+      "name_tr": "Tencere kebabı"
+    },
+    {
+      "id": "4",
+      "name_ar": "رأس عصفور",
+      "name_tr": "Kuşbaşı"
+    }
+  ],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

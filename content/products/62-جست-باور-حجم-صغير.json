@@ -1,0 +1,18 @@
+{
+  "id": "62-جست-باور-حجم-صغير",
+  "code": "62-جست-باور-حجم-صغير",
+  "name_ar": "جست باور حجم صغير",
+  "name_tr": "Just Power Küçük Boy",
+  "category_id": "مشروبات",
+  "category_ar": "مشروبات",
+  "category_tr": "İçecekler",
+  "price": 25.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/icecek/just-power.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

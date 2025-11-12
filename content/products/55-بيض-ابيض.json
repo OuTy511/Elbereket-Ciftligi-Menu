@@ -1,0 +1,18 @@
+{
+  "id": "55-بيض-ابيض",
+  "code": "55-بيض-ابيض",
+  "name_ar": "بيض ابيض",
+  "name_tr": "Beyaz Yumurtası",
+  "category_id": "منتجات مزارع البركات",
+  "category_ar": "منتجات مزارع البركات",
+  "category_tr": "El Bereket ürünleri",
+  "price": 200.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/elbereket-urunler/beyaz-yumurta.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

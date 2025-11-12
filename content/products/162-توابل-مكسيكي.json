@@ -1,0 +1,18 @@
+{
+  "id": "162-توابل-مكسيكي",
+  "code": "162-توابل-مكسيكي",
+  "name_ar": "توابل مكسيكي",
+  "name_tr": "Meksika Baharatı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/توابل-مكسيكي.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

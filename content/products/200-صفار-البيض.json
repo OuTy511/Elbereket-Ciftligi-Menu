@@ -1,0 +1,18 @@
+{
+  "id": "200-صفار-البيض",
+  "code": "200-صفار-البيض",
+  "name_ar": "صفار البيض",
+  "name_tr": "Yumurta Sarısı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 85.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/صفار-البيض.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

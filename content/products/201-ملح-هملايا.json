@@ -1,0 +1,18 @@
+{
+  "id": "201-ملح-هملايا",
+  "code": "201-ملح-هملايا",
+  "name_ar": "ملح هملايا",
+  "name_tr": "Himalaya Tuzu",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 75.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/ملح-هملايا.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

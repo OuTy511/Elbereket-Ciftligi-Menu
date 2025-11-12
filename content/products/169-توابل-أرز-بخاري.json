@@ -1,0 +1,18 @@
+{
+  "id": "169-توابل-أرز-بخاري",
+  "code": "169-توابل-أرز-بخاري",
+  "name_ar": "توابل أرز بخاري",
+  "name_tr": "Buhari Pirinç Baharatı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/توابل-أرز-بخاري.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

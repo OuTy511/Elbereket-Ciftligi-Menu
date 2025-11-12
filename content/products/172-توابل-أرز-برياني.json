@@ -1,0 +1,18 @@
+{
+  "id": "172-توابل-أرز-برياني",
+  "code": "172-توابل-أرز-برياني",
+  "name_ar": "توابل أرز برياني",
+  "name_tr": "Biryani Pilav Baharatı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/توابل-ارز-برياني.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

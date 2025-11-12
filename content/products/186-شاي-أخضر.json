@@ -1,0 +1,18 @@
+{
+  "id": "186-شاي-أخضر",
+  "code": "186-شاي-أخضر",
+  "name_ar": "شاي أخضر",
+  "name_tr": "Yeşil Çay",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 70.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/شاي-أخضر.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

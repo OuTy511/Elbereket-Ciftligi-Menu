@@ -1,0 +1,44 @@
+{
+  "id": "32-كبده-عجل",
+  "code": "32-كبده-عجل",
+  "name_ar": "كبده عجل",
+  "name_tr": "Dana Ciğer",
+  "category_id": "سقطات",
+  "category_ar": "سقطات",
+  "category_tr": "Sakatatlar",
+  "price": 620.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/sakatat/ciger.png",
+  "description": "",
+  "available": true,
+  "cuts": [
+    {
+      "id": "0",
+      "name_ar": "تقطيع شرائح بانيه",
+      "name_tr": "Bütün"
+    },
+    {
+      "id": "1",
+      "name_ar": "تقطيع اسكندراني (صوابع",
+      "name_tr": "Pane dilim"
+    },
+    {
+      "id": "2",
+      "name_ar": "جوليان)",
+      "name_tr": "Julienne"
+    },
+    {
+      "id": "3",
+      "name_ar": "تقطيع رأس عصفور",
+      "name_tr": "Kuşbaşı"
+    },
+    {
+      "id": "4",
+      "name_ar": "بدون تقطيع",
+      "name_tr": "بدون تقطيع"
+    }
+  ],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

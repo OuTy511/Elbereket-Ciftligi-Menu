@@ -1,0 +1,18 @@
+{
+  "id": "193-شطة-فليفلة",
+  "code": "193-شطة-فليفلة",
+  "name_ar": "شطة فليفلة",
+  "name_tr": "Acı Biber Sosu",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 135.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/شطة-فليفلة.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

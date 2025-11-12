@@ -1,0 +1,18 @@
+{
+  "id": "165-توابل-شاورما",
+  "code": "165-توابل-شاورما",
+  "name_ar": "توابل شاورما",
+  "name_tr": "Şavurma Baharatı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/توابل-شاورما.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

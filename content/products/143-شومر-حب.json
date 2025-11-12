@@ -1,0 +1,18 @@
+{
+  "id": "143-شومر-حب",
+  "code": "143-شومر-حب",
+  "name_ar": "شومر حب",
+  "name_tr": "Rezene Tohumu",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 35.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/شومر-حب.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

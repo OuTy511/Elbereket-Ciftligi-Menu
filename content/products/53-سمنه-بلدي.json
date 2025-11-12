@@ -1,0 +1,18 @@
+{
+  "id": "53-سمنه-بلدي",
+  "code": "53-سمنه-بلدي",
+  "name_ar": "سمنه بلدي",
+  "name_tr": "Eritilmiş Tereyağı",
+  "category_id": "منتجات مزارع البركات",
+  "category_ar": "منتجات مزارع البركات",
+  "category_tr": "El Bereket ürünleri",
+  "price": 600.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/elbereket-urunler/tereyag.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

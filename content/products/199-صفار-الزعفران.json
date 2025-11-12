@@ -1,0 +1,18 @@
+{
+  "id": "199-صفار-الزعفران",
+  "code": "199-صفار-الزعفران",
+  "name_ar": "صفار الزعفران",
+  "name_tr": "Safran Tozu",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 85.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/صفار-الزعفران.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

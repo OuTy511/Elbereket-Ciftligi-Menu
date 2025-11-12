@@ -1,0 +1,18 @@
+{
+  "id": "175-نكهة-الليمون-و-شطة",
+  "code": "175-نكهة-الليمون-و-شطة",
+  "name_ar": "نكهة الليمون و شطة",
+  "name_tr": "Limon ve Acı Sos Aroması",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 50.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/نكهة-الليمون-و-شطة.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

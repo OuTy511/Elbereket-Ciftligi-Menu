@@ -1,0 +1,18 @@
+{
+  "id": "135-جوزة-الطيب-مطحونة",
+  "code": "135-جوزة-الطيب-مطحونة",
+  "name_ar": "جوزة الطيب مطحونة",
+  "name_tr": "Toz Muskat",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 85.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/جوزة-الطيب-مطحونة.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

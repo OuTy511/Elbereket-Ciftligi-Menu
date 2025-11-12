@@ -1,0 +1,18 @@
+{
+  "id": "99-PATOS-ROLLS-LİME-FLAVOUR",
+  "code": "99-PATOS-ROLLS-LİME-FLAVOUR",
+  "name_ar": "PATOS ROLLS LİME FLAVOUR",
+  "name_tr": "PATOS ROLLS LİME FLAVOUR",
+  "category_id": "شيبسي",
+  "category_ar": "شيبسي",
+  "category_tr": "Cips",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/cips/PATOS-ROLLS-LİME-FLAVOUR.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

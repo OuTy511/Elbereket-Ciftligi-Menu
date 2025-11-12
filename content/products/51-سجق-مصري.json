@@ -1,0 +1,18 @@
+{
+  "id": "51-سجق-مصري",
+  "code": "51-سجق-مصري",
+  "name_ar": "سجق مصري",
+  "name_tr": "Mısırlı Sucuk",
+  "category_id": "منتجات مزارع البركات",
+  "category_ar": "منتجات مزارع البركات",
+  "category_tr": "El Bereket ürünleri",
+  "price": 690.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/elbereket-urunler/misirli-sucuk.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

@@ -1,18 +1,135 @@
+# تكوين Decap CMS لإدارة محتوى الموقع.
+# أضف مجموعات أو حقول جديدة هنا إذا رغبت في توسيع لوحة التحكم لاحقًا.
 backend:
   name: github
-  repo: OuTy511/Elbereket-Ciftligi-Menu # عدّلها لو اسم الريبو مختلف
+  repo: OuTy511/Elbereket-Ciftligi-Menu
   branch: main
 
-media_folder: "assets/uploads" # فين هيتخزن الصور داخل الريبو
-public_folder: "/assets/uploads" # المسار اللي يبان في الموقع
+media_folder: "img/uploads"        # حفظ الصور داخل المستودع
+public_folder: "/img/uploads"      # مسار الوصول العلني للصور عبر الموقع
+
+publish_mode: editorial_workflow     # تفعيل المراجعة قبل النشر لخطوات أكثر أمانًا
 
 collections:
-  - name: "content"
-    label: "محتوى تجريبي"
-    files:
-      - file: "content/home.md"
-        label: "صفحة تجريبية"
-        name: "home"
+  - name: "products"
+    label: "إدارة المنتجات"
+    label_singular: "منتج"
+    description: |
+      كل ملف يمثل منتجًا واحدًا. استخدم زر "Create new" لإضافة منتج جديد،
+      ويمكنك ترتيب أو تصفية القائمة باستخدام أدوات البحث في الأعلى.
+    folder: "content/products"
+    extension: "json"
+    format: "json"
+    create: true
+    slug: "{{code}}"
+    identifier_field: "code"
+    summary: "{{name_ar}} — {{category_ar}}"
+    editor:
+      preview: false
+    sortable_fields: ["name_ar", "category_ar", "price", "available"]
+    view_filters:
+      - label: "غير متاح"
+        field: "available"
+        pattern: "false"
+      - label: "منتجات عليها عرض"
+        field: "discount_price"
+        pattern: "^(?!0(?:\\.0+)?$).+"
+    view_groups:
+      - label: "التصنيف"
+        field: "category_ar"
+      - label: "الحالة"
+        field: "available"
+    fields:
+      - label: "إظهار في المنيو"
+        name: "available"
+        widget: "boolean"
+        default: true
+        hint: "عطّل هذا الخيار لإخفاء المنتج مؤقتًا بدون حذفه."
+      - label: "كود المنتج"
+        name: "code"
+        widget: "string"
+        hint: "استخدم كودًا فريدًا ليسهل البحث والمبيعات."
+      - label: "المعرّف الداخلي"
+        name: "id"
+        widget: "string"
+        required: false
+        hint: "إذا تُرك فارغًا سيتم توليده تلقائيًا من الكود قبل الحفظ."
+      - label: "اسم المنتج (عربي)"
+        name: "name_ar"
+        widget: "string"
+      - label: "اسم المنتج (تركي)"
+        name: "name_tr"
+        widget: "string"
+        required: false
+      - label: "القسم"
+        name: "category_ar"
+        widget: "string"
+        hint: "مثال: لحم عجل، خروف، دجاج، سمنه، ..."
+      - label: "القسم (تركي)"
+        name: "category_tr"
+        widget: "string"
+        required: false
+      - label: "معرّف القسم"
+        name: "category_id"
+        widget: "string"
+        required: false
+      - label: "سعر المنيو"
+        name: "price"
+        widget: "number"
+        min: 0
+        step: 1
+        hint: "السعر الأساسي المعروض للعملاء."
+      - label: "سعر العرض"
+        name: "discount_price"
+        widget: "number"
+        min: 0
+        step: 1
+        required: false
+        hint: "اتركه صفرًا إذا لم يوجد عرض."
+      - label: "وحدة السعر"
+        name: "unit"
+        widget: "string"
+        default: "TL/kg"
+        hint: "مثال: TL/kg أو TL"
+      - label: "وضع البيع"
+        name: "sell_mode"
+        widget: "select"
+        options:
+          - { label: "بالقطعة", value: 0 }
+          - { label: "بالكيلو", value: 1 }
+          - { label: "ذبيحة كاملة (سعر/كجم)", value: 2 }
+        default: 0
+      - label: "وزن تقريبي (كجم)"
+        name: "approx_kg"
+        widget: "number"
+        min: 0
+        step: 0.1
+        required: false
+      - label: "صورة المنتج"
+        name: "image"
+        widget: "image"
+        hint: "تُرفع الصور تلقائيًا إلى المجلد img/uploads."
+      - label: "وصف مختصر"
+        name: "description"
+        widget: "text"
+        required: false
+      - label: "خيارات التقطيع"
+        name: "cuts"
+        widget: "list"
+        allow_add: true
+        required: false
+        collapsed: true
+        summary: "{{fields.name_ar}}"
         fields:
-          - { label: "العنوان", name: "title", widget: "string" }
-          - { label: "النص", name: "body", widget: "markdown" }
+          - label: "المعرّف"
+            name: "id"
+            widget: "string"
+            required: false
+          - label: "الاسم (عربي)"
+            name: "name_ar"
+            widget: "string"
+          - label: "الاسم (تركي)"
+            name: "name_tr"
+            widget: "string"
+            required: false
+# لإضافة مجموعات جديدة (مثل "عروض" أو "مقالات") انسخ قالب المجموعة أعلاه مع تغيير المسارات والحقول.

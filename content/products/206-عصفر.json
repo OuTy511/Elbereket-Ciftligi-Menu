@@ -1,0 +1,18 @@
+{
+  "id": "206-عصفر",
+  "code": "206-عصفر",
+  "name_ar": "عصفر",
+  "name_tr": "Açafran",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 75.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/عصفر.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

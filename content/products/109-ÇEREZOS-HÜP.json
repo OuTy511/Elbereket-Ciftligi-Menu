@@ -1,0 +1,18 @@
+{
+  "id": "109-ÇEREZOS-HÜP",
+  "code": "109-ÇEREZOS-HÜP",
+  "name_ar": "ÇEREZOS HÜP",
+  "name_tr": "ÇEREZOS HÜP",
+  "category_id": "شيبسي",
+  "category_ar": "شيبسي",
+  "category_tr": "Cips",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/cips/ÇEREZOS-HÜP.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

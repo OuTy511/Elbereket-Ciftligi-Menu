@@ -1,0 +1,18 @@
+{
+  "id": "114-CİPSO-DENİZ-TUZLU",
+  "code": "114-CİPSO-DENİZ-TUZLU",
+  "name_ar": "CİPSO DENİZ TUZLU",
+  "name_tr": "CİPSO DENİZ TUZLU",
+  "category_id": "شيبسي",
+  "category_ar": "شيبسي",
+  "category_tr": "Cips",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/cips/CİPSO-DENİZ-TUZLU.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

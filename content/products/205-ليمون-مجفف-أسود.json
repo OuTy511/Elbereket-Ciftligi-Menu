@@ -1,0 +1,18 @@
+{
+  "id": "205-ليمون-مجفف-أسود",
+  "code": "205-ليمون-مجفف-أسود",
+  "name_ar": "ليمون مجفف أسود",
+  "name_tr": "Kurutulmuş Siyah Limon",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 20.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/ليمون-مجفف-أسود.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

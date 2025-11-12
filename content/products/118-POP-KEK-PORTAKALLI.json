@@ -1,0 +1,18 @@
+{
+  "id": "118-POP-KEK-PORTAKALLI",
+  "code": "118-POP-KEK-PORTAKALLI",
+  "name_ar": "POP KEK PORTAKALLI",
+  "name_tr": "POP KEK PORTAKALLI",
+  "category_id": "شيبسي",
+  "category_ar": "شيبسي",
+  "category_tr": "Cips",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/cips/POP-KEK-PORTAKALLI.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

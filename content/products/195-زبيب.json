@@ -1,0 +1,18 @@
+{
+  "id": "195-زبيب",
+  "code": "195-زبيب",
+  "name_ar": "زبيب",
+  "name_tr": "Kuru Üzüm",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 35.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/زبيب.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

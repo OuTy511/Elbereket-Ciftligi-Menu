@@ -1,0 +1,18 @@
+{
+  "id": "59-سلس-برتقال",
+  "code": "59-سلس-برتقال",
+  "name_ar": "سلس برتقال",
+  "name_tr": "Selse Portakal",
+  "category_id": "مشروبات",
+  "category_ar": "مشروبات",
+  "category_tr": "İçecekler",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/icecek/سلس-برتقال.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

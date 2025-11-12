@@ -1,0 +1,18 @@
+{
+  "id": "86-مخلل-مشكل",
+  "code": "86-مخلل-مشكل",
+  "name_ar": "مخلل مشكل",
+  "name_tr": "Karışık Turşu",
+  "category_id": "منتجات مصريه",
+  "category_ar": "منتجات مصريه",
+  "category_tr": "Mısır ürünleri",
+  "price": 200.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/misirli-urunler/مخلل-مصري.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

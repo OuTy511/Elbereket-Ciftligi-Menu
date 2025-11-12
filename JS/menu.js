@@ -54,25 +54,6 @@ const labelFor = (value, lang = getLangCode()) => {
   return record[lang] || record.ar || record.tr || "";
 };
 
-const splitValues = (raw = "") =>
-  raw
-    .split(/[,،|\/\n]+/g)
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-const buildCutOptions = (arStr, trStr) => {
-  const arList = splitValues(arStr);
-  const trList = splitValues(trStr);
-  const len = Math.max(arList.length, trList.length);
-  const cuts = [];
-  for (let i = 0; i < len; i += 1) {
-    const record = makeRecord(arList[i], trList[i]);
-    if (!record.ar && !record.tr) continue;
-    cuts.push({ id: String(i), names: record });
-  }
-  return cuts;
-};
-
 const getCategoryId = (category) => {
   if (!category) return "";
   if (typeof category === "string") return category;
@@ -126,12 +107,14 @@ if (btn && navMobile && list) {
 }
 
 /* ===== Helpers ===== */
-const CSV_PATH = "data/products.csv";
+// مسار ملف البيانات الذي يتم إدارته من خلال Decap CMS
+// يحتوي الملف على مصفوفة المنتجات تحت المفتاح products
+const PRODUCTS_DATA_PATH = "data/products.json";
 const placeholder =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect fill='%23f3f4f6' width='160' height='160'/%3E%3Cpath fill='%23e5e7eb' d='M18 118.5 54 74l31 37 18-20 39 49H18z'/%3E%3Ccircle cx='56' cy='52' r='18' fill='%23e5e7eb'/%3E%3C/svg%3E";
 const LEGACY_PLACEHOLDER_REGEX = /^https?:\/\/placehold\.co\//i;
 
-const PRODUCTS_CACHE_KEY = "elb_products_cache_v1";
+const PRODUCTS_CACHE_KEY = "elb_products_cache_v2";
 
 const productStorage = (() => {
   if (typeof window === "undefined") return null;
@@ -201,26 +184,40 @@ const sanitizeProduct = (product, idx = 0) => {
 
   return {
     id: idBase,
+    code: product.code || idBase,
     names,
     category: {
       id: categoryId || categoryNames.ar || categoryNames.tr || "",
       names: categoryNames,
     },
-    price: Number(product.price) || 0,
-    salePrice: Number(product.salePrice) || 0,
+    price: toNum(product.price, 0),
+    salePrice: toNum(
+      product.salePrice ?? product.discountPrice ?? product.discount_price,
+      0
+    ),
     cuts,
     image: sanitizeImageSrc(product.image),
-    sellMode: Number(product.sellMode) || 0,
-    approxKg: toNum(product.approxKg, 0),
+    sellMode: Number(product.sellMode ?? product.sell_mode) || 0,
+    approxKg: toNum(product.approxKg ?? product.approx_kg, 0),
+    unit: typeof product.unit === "string" ? product.unit.trim() : "",
+    available: product.available !== false,
+    description: typeof product.description === "string" ? product.description : "",
   };
 };
 
-const transformCsvRows = (rows) =>
-  Array.isArray(rows)
-    ? rows
-        .map((row, idx) => parseProductRow(row, idx))
-        .filter(Boolean)
+// يكتب Decap CMS (راجع admin/config.yml) بيانات المنتجات داخل الملف JSON
+// وتحوّل هذه الدالة السجلات الخام إلى هيكل مناسب للواجهة الأمامية.
+const transformProductEntries = (raw) => {
+  if (!raw) return [];
+  const list = Array.isArray(raw)
+    ? raw
+    : Array.isArray(raw.products)
+    ? raw.products
     : [];
+  return list
+    .map((entry, idx) => parseProductEntry(entry, idx))
+    .filter(Boolean);
+};
 
 const applyProductData = (products) => {
   const normalized = Array.isArray(products)
@@ -232,6 +229,7 @@ const applyProductData = (products) => {
 
   const categoryMap = new Map();
   state.products.forEach((product) => {
+    if (product.available === false) return;
     if (!product?.category) return;
     const id = getCategoryId(product.category);
     if (!id || categoryMap.has(id)) return;
@@ -716,39 +714,72 @@ bindNumericInput(els.qtyInput, {
   allowDecimal: () => state.modalProduct?.sellMode === 1,
 });
 
-const parseProductRow = (row, idx) => {
-  const nameAr = (row["الاسم_عربي"] || row["الاسم"] || "").trim();
-  const nameTr = (row["الاسم_تركي"] || "").trim();
-  const categoryAr = (row["القسم_عربي"] || row["القسم"] || "").trim();
-  const categoryTr = (row["القسم_تركي"] || "").trim();
+const parseProductEntry = (entry, idx) => {
+  if (!entry) return null;
+  const nameAr = (entry.name_ar || entry.nameAr || entry.name || "").trim();
+  const nameTr = (entry.name_tr || entry.nameTr || "").trim();
   if (!nameAr && !nameTr) return null;
-  if (!categoryAr && !categoryTr) return null;
 
-  const categoryId = categoryAr || categoryTr || `category-${idx}`;
-  const nameBase = nameAr || nameTr || `item-${idx}`;
-  const safeName = nameBase.replace(/\s+/g, "-");
-  const productId = `${idx}-${safeName}`;
+  const categoryAr = (entry.category_ar || entry.categoryAr || entry.category || "").trim();
+  const categoryTr = (entry.category_tr || entry.categoryTr || "").trim();
+  const rawCategoryId =
+    entry.category_id || entry.categoryId || entry.category_slug || categoryAr || categoryTr || "";
+  const categoryId = String(rawCategoryId || `category-${idx}`).trim();
 
-  const cutsAr = row["خيارات_التقطيع_عربي"] || row["خيارات_التقطيع"] || "";
-  const cutsTr = row["خيارات_التقطيع_تركي"] || "";
+  const baseIdRaw = entry.id || entry.code || "";
+  const safeName = (nameAr || nameTr || `item-${idx}`).replace(/\s+/g, "-");
+  const productId = String(baseIdRaw || `${idx}-${safeName}`).trim();
+
+  const cuts = Array.isArray(entry.cuts)
+    ? entry.cuts
+        .map((cut, cutIdx) => {
+          if (!cut) return null;
+          if (typeof cut === "string") {
+            const record = makeRecord(cut, cut);
+            return record.ar || record.tr
+              ? { id: String(cutIdx), names: record }
+              : null;
+          }
+          const record = makeRecord(cut.name_ar || cut.ar || cut.name || "", cut.name_tr || cut.tr || "");
+          if (!record.ar && !record.tr) return null;
+          const rawCutId =
+            cut.id != null && cut.id !== ""
+              ? cut.id
+              : cut.code != null && cut.code !== ""
+              ? cut.code
+              : cut.slug;
+          const cutId = rawCutId != null && String(rawCutId).trim() !== ""
+            ? String(rawCutId).trim()
+            : String(cutIdx);
+          return { id: cutId, names: record };
+        })
+        .filter(Boolean)
+    : [];
+
+  const saleRaw =
+    entry.salePrice ?? entry.discount_price ?? entry.discountPrice ?? entry.offer_price ?? 0;
 
   return {
     id: productId,
+    code: entry.code || productId,
     names: makeRecord(nameAr, nameTr),
     category: {
       id: categoryId,
       names: makeRecord(categoryAr || categoryId, categoryTr),
     },
-    price: toNum(row["السعر"], 0),
-    salePrice: toNum(row["سعر_الخصم"], 0),
-    cuts: buildCutOptions(cutsAr, cutsTr),
-    image: sanitizeImageSrc(row["الصورة"]),
-    sellMode: Number((row["وضع_البيع"] || "0").trim()) || 0,
-    approxKg: toNum(row["وزن_تقريبي_كجم"], 0),
+    price: entry.price,
+    salePrice: saleRaw,
+    cuts,
+    image: entry.image,
+    sellMode: entry.sell_mode ?? entry.sellMode,
+    approxKg: entry.approx_kg ?? entry.approxKg,
+    unit: entry.unit,
+    available: entry.available,
+    description: entry.description,
   };
 };
 
-/* ===== تحميل CSV ===== */
+/* ===== تحميل البيانات ===== */
 const cachedProducts = readProductsCache();
 if (cachedProducts) {
   try {
@@ -758,36 +789,27 @@ if (cachedProducts) {
   }
 }
 
-if (window.Papa) {
-  Papa.parse(CSV_PATH, {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: ({ data }) => {
-      const parsedProducts = transformCsvRows(data);
-      if (parsedProducts.length) {
-        applyProductData(parsedProducts);
-        writeProductsCache(state.products);
-      } else if (!state.products.length) {
-        els.menuGrid.innerHTML = `<p class="muted">${t(
-          "menu.alert.loadFail"
-        )}</p>`;
-      }
-    },
-    error: (err) => {
-      console.error("CSV error:", err);
-      if (!state.products.length) {
-        els.menuGrid.innerHTML = `<p class="muted">${t(
-          "menu.alert.loadFail"
-        )}</p>`;
-      }
-    },
-  });
-} else if (!state.products.length) {
-  els.menuGrid.innerHTML = `<p class="muted">${t(
-    "menu.alert.noPapa"
-  )}</p>`;
-}
+const fetchProducts = async () => {
+  try {
+    const response = await fetch(PRODUCTS_DATA_PATH, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+    const payload = await response.json();
+    const parsedProducts = transformProductEntries(payload);
+    if (parsedProducts.length) {
+      applyProductData(parsedProducts);
+      writeProductsCache(state.products);
+    } else if (!state.products.length) {
+      els.menuGrid.innerHTML = `<p class="muted">${t("menu.alert.loadFail")}</p>`;
+    }
+  } catch (err) {
+    console.error("Failed to load products", err);
+    if (!state.products.length) {
+      els.menuGrid.innerHTML = `<p class="muted">${t("menu.alert.loadFail")}</p>`;
+    }
+  }
+};
+
+fetchProducts();
 
 const getCategoryLabel = (category) => {
   if (!category) return "";
@@ -884,6 +906,7 @@ function applyFilters() {
   const hasQuery = rawQuery.length > 0;
 
   state.filtered = state.products.filter((p) => {
+    if (p.available === false) return false;
     const catId = getCategoryId(p.category);
     const byCat =
       state.activeCategory === ALL_CATEGORY || catId === state.activeCategory;
@@ -899,7 +922,7 @@ function applyFilters() {
 
 function buildOffers() {
   const offers = state.products.filter(
-    (p) => p.salePrice > 0 && p.salePrice < p.price
+    (p) => p.available !== false && p.salePrice > 0 && p.salePrice < p.price
   );
   els.offers.style.display = offers.length ? "block" : "none";
   if (offers.length) renderProducts(offers, els.offersGrid, true);
@@ -922,6 +945,8 @@ function renderProducts(list, mount) {
       : showPrice
       ? `<span class="ltr-text">${priceFmt(p.price)}</span>`
       : `<span class="coming-soon">${t("menu.product.callForPrice")}</span>`;
+    const unitLabel = showPrice && p.unit ? `<span class="unit">${p.unit}</span>` : "";
+    const priceBlock = unitLabel ? `${priceHtml} ${unitLabel}` : priceHtml;
 
     const flags = (() => {
       if (p.sellMode === 1)
@@ -939,12 +964,12 @@ function renderProducts(list, mount) {
       return "";
     })();
 
-    const canAdd = showPrice;
+    const canAdd = showPrice && p.available !== false;
     const addLabel = t("common.actions.addToCart");
     const unavailableLabel = t("menu.product.unavailable");
 
     const card = document.createElement("div");
-    card.className = "product-card";
+    card.className = "product-card" + (hasOffer ? " is-offer" : "");
     card.innerHTML = `
       <div class="image-wrap">
         ${hasOffer ? `<span class="badge-offer">${t("menu.badge.offer")}</span>` : ""}
@@ -953,7 +978,7 @@ function renderProducts(list, mount) {
       <h3 class="product-name">${productName}</h3>
       <p class="category">${categoryLabel}</p>
       <div class="flags-row">${flags}</div>
-      <p class="price">${priceHtml}</p>
+      <p class="price">${priceBlock}</p>
       ${
         canAdd
           ? `<button class="add-btn" type="button"><i class="fa-solid fa-cart-plus"></i> ${addLabel}</button>`

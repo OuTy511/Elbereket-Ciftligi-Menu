@@ -1,0 +1,34 @@
+{
+  "id": "33-كرشه-عجل",
+  "code": "33-كرشه-عجل",
+  "name_ar": "كرشه عجل",
+  "name_tr": "Dana İşkembe",
+  "category_id": "سقطات",
+  "category_ar": "سقطات",
+  "category_tr": "Sakatatlar",
+  "price": 230.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/sakatat/iskembe.JPG",
+  "description": "",
+  "available": true,
+  "cuts": [
+    {
+      "id": "0",
+      "name_ar": "بدون تقطيع",
+      "name_tr": "Bütün"
+    },
+    {
+      "id": "1",
+      "name_ar": "شرائح",
+      "name_tr": "Dilim"
+    },
+    {
+      "id": "2",
+      "name_ar": "مكعبات",
+      "name_tr": "Küp"
+    }
+  ],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

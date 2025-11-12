@@ -1,0 +1,39 @@
+{
+  "id": "22-ليه-خروف",
+  "code": "22-ليه-خروف",
+  "name_ar": "ليه خروف",
+  "name_tr": "Kuzu Kuyruk Yağ",
+  "category_id": "لحم خروف",
+  "category_ar": "لحم خروف",
+  "category_tr": "Kuzu eti",
+  "price": 485.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/kuzu-etti/kuyruk.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [
+    {
+      "id": "0",
+      "name_ar": "بدون تقطيع",
+      "name_tr": "Bütün"
+    },
+    {
+      "id": "1",
+      "name_ar": "راس عصفور",
+      "name_tr": "Kuşbaşı"
+    },
+    {
+      "id": "2",
+      "name_ar": "قطع متوسطه",
+      "name_tr": "Orta parça"
+    },
+    {
+      "id": "3",
+      "name_ar": "مفرومه",
+      "name_tr": "Kıyma"
+    }
+  ],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

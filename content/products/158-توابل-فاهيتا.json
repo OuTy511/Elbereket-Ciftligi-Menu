@@ -1,0 +1,18 @@
+{
+  "id": "158-توابل-فاهيتا",
+  "code": "158-توابل-فاهيتا",
+  "name_ar": "توابل فاهيتا",
+  "name_tr": "Fajita Baharatı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/توابل-فاهيتا.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

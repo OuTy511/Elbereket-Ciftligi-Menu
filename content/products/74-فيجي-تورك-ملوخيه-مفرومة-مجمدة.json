@@ -1,0 +1,18 @@
+{
+  "id": "74-فيجي-تورك---ملوخيه-مفرومة-مجمدة",
+  "code": "74-فيجي-تورك---ملوخيه-مفرومة-مجمدة",
+  "name_ar": "فيجي تورك - ملوخيه مفرومة مجمدة",
+  "name_tr": "Vegie Türk - Dondurulmuş Doğranmış Molekhiya",
+  "category_id": "خضروات و فواكه مجمده",
+  "category_ar": "خضروات و فواكه مجمده",
+  "category_tr": "Dondurulmuş sebze & meyve",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/dondurulmus/IMG-20251027-WA0130.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

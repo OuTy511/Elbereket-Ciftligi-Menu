@@ -1,0 +1,18 @@
+{
+  "id": "31-قلب-عجل",
+  "code": "31-قلب-عجل",
+  "name_ar": "قلب عجل",
+  "name_tr": "Dana Yürek",
+  "category_id": "سقطات",
+  "category_ar": "سقطات",
+  "category_tr": "Sakatatlar",
+  "price": 230.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/sakatat/yurek.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

@@ -1,0 +1,34 @@
+{
+  "id": "9-عرق-فلتو",
+  "code": "9-عرق-فلتو",
+  "name_ar": "عرق فلتو",
+  "name_tr": "Dana Bonfile",
+  "category_id": "لحم عجل",
+  "category_ar": "لحم عجل",
+  "category_tr": "Dana eti",
+  "price": 1220.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg (per piece)",
+  "image": "img/products/dana-etti/bonfile.JPG",
+  "description": "",
+  "available": true,
+  "cuts": [
+    {
+      "id": "0",
+      "name_ar": "بدون تقطيع",
+      "name_tr": "Bütün"
+    },
+    {
+      "id": "1",
+      "name_ar": "استيك",
+      "name_tr": "Biftek"
+    },
+    {
+      "id": "2",
+      "name_ar": "بوفتيك",
+      "name_tr": "Bonfile"
+    }
+  ],
+  "sell_mode": 2,
+  "approx_kg": 1.5
+}

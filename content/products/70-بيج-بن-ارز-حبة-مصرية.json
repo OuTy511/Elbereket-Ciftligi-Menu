@@ -1,0 +1,18 @@
+{
+  "id": "70-بيج-بن-ارز-حبة-مصرية",
+  "code": "70-بيج-بن-ارز-حبة-مصرية",
+  "name_ar": "بيج بن ارز حبة مصرية",
+  "name_tr": "Big Ben Mısır Pirinci",
+  "category_id": "ارز و بقوليات",
+  "category_ar": "ارز و بقوليات",
+  "category_tr": "Pirinç ve bakliyat",
+  "price": 55.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/pirinic/بيج-بن.jpeg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

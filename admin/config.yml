@@ -5,10 +5,10 @@ backend:
   repo: OuTy511/Elbereket-Ciftligi-Menu
   branch: main
 
-media_folder: "img/uploads"        # مكان حفظ الصور داخل المستودع
-public_folder: "/img/uploads"      # المسار العام الذي تستخدمه الواجهة الأمامية
+media_folder: "img/uploads" # مكان حفظ الصور داخل المستودع
+public_folder: "/img/uploads" # المسار العام الذي تستخدمه الواجهة الأمامية
 
-publish_mode: editorial_workflow     # لتفعيل نظام المراجعة قبل النشر
+publish_mode: editorial_workflow # لتفعيل نظام المراجعة قبل النشر
 
 collections:
   - name: "products"

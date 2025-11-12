@@ -1,0 +1,18 @@
+{
+  "id": "11-موزه-عجل-بالعظم",
+  "code": "11-موزه-عجل-بالعظم",
+  "name_ar": "موزه عجل بالعظم",
+  "name_tr": "Dana Kemikli İncik",
+  "category_id": "لحم عجل",
+  "category_ar": "لحم عجل",
+  "category_tr": "Dana eti",
+  "price": 680.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/dana-etti/kemikli-incik.JPG",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

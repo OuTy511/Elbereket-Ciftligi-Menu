@@ -1,0 +1,18 @@
+{
+  "id": "194-صلصة-صويا",
+  "code": "194-صلصة-صويا",
+  "name_ar": "صلصة صويا",
+  "name_tr": "Soya Sosu",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 135.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/صلصة-صويا.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

@@ -1,0 +1,18 @@
+{
+  "id": "153-خلطة-دجاج-بروستد-جاهزة",
+  "code": "153-خلطة-دجاج-بروستد-جاهزة",
+  "name_ar": "خلطة دجاج بروستد جاهزة",
+  "name_tr": "Hazır Brosted Tavuk Karışımı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 75.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/خلطة-دجاج-بروستد-جاهزة.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

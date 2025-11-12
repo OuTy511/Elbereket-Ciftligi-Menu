@@ -1,0 +1,18 @@
+{
+  "id": "127-قرفة-سيجار",
+  "code": "127-قرفة-سيجار",
+  "name_ar": "قرفة سيجار",
+  "name_tr": "Tarçın Çubuk",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/قرفه-سيجار.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

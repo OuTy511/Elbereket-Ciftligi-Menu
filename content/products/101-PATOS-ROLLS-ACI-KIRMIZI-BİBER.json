@@ -1,0 +1,18 @@
+{
+  "id": "101-PATOS-ROLLS-ACI-KIRMIZI-BİBER",
+  "code": "101-PATOS-ROLLS-ACI-KIRMIZI-BİBER",
+  "name_ar": "PATOS ROLLS ACI KIRMIZI BİBER",
+  "name_tr": "PATOS ROLLS ACI KIRMIZI BİBER",
+  "category_id": "شيبسي",
+  "category_ar": "شيبسي",
+  "category_tr": "Cips",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/cips/PATOS-ROLLS-ACI-KIRMIZI-BİBER.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

@@ -1,0 +1,18 @@
+{
+  "id": "103-PATOS-ROLLS-JALAPENO",
+  "code": "103-PATOS-ROLLS-JALAPENO",
+  "name_ar": "PATOS ROLLS JALAPENO",
+  "name_tr": "PATOS ROLLS JALAPENO",
+  "category_id": "شيبسي",
+  "category_ar": "شيبسي",
+  "category_tr": "Cips",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/cips/PATOS-ROLLS-JALAPENO.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

@@ -1,0 +1,18 @@
+{
+  "id": "95-تشوبانبينار-ماء-1-لتر",
+  "code": "95-تشوبانبينار-ماء-1-لتر",
+  "name_ar": "تشوبانبينار ماء 1 لتر",
+  "name_tr": "Çobanpınar Su 1L",
+  "category_id": "مياه شرب",
+  "category_ar": "مياه شرب",
+  "category_tr": "İçme suyu",
+  "price": 20.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/icme-suyu/تشوبانبينار-ماء-1-لتر.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

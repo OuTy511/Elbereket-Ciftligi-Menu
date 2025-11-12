@@ -1,0 +1,18 @@
+{
+  "id": "150-بصل-مطحون",
+  "code": "150-بصل-مطحون",
+  "name_ar": "بصل مطحون",
+  "name_tr": "Toz Soğan",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 35.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/بصل-مطحون.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

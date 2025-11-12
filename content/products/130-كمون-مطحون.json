@@ -1,0 +1,18 @@
+{
+  "id": "130-كمون-مطحون",
+  "code": "130-كمون-مطحون",
+  "name_ar": "كمون مطحون",
+  "name_tr": "Toz Kimyon",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 60.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/كمون-مطحون.png",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

@@ -1,0 +1,18 @@
+{
+  "id": "164-توابل-دجاج",
+  "code": "164-توابل-دجاج",
+  "name_ar": "توابل دجاج",
+  "name_tr": "Tavuk Baharatı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/توابل-دجاج.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

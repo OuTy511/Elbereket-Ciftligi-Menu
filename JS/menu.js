@@ -136,7 +136,8 @@ const readProductsCache = () => {
     const raw = productStorage.getItem(PRODUCTS_CACHE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (!parsed || !Array.isArray(parsed.data) || !parsed.data.length) return null;
+    if (!parsed || !Array.isArray(parsed.data) || !parsed.data.length)
+      return null;
     return parsed.data;
   } catch (err) {
     console.warn("Failed to read cached products", err);
@@ -167,14 +168,21 @@ const cloneCutOption = (cut, index = 0) => {
 const sanitizeProduct = (product, idx = 0) => {
   if (!product) return null;
   const hasNamesRecord = product.names && typeof product.names === "object";
-  const names = hasNamesRecord ? ensureRecord(product.names) : ensureRecord(product.names, "");
+  const names = hasNamesRecord
+    ? ensureRecord(product.names)
+    : ensureRecord(product.names, "");
   if (!names.ar && !names.tr) return null;
 
   const categorySource = product.category || {};
   const categoryId = getCategoryId(categorySource) || categorySource.id || "";
-  const categoryNames = ensureRecord(categorySource.names || categorySource, categoryId);
+  const categoryNames = ensureRecord(
+    categorySource.names || categorySource,
+    categoryId
+  );
 
-  const idBase = product.id || `${idx}-${(names.ar || names.tr || "item").replace(/\s+/g, "-")}`;
+  const idBase =
+    product.id ||
+    `${idx}-${(names.ar || names.tr || "item").replace(/\s+/g, "-")}`;
 
   const cuts = Array.isArray(product.cuts)
     ? product.cuts
@@ -201,7 +209,8 @@ const sanitizeProduct = (product, idx = 0) => {
     approxKg: toNum(product.approxKg ?? product.approx_kg, 0),
     unit: typeof product.unit === "string" ? product.unit.trim() : "",
     available: product.available !== false,
-    description: typeof product.description === "string" ? product.description : "",
+    description:
+      typeof product.description === "string" ? product.description : "",
   };
 };
 
@@ -221,7 +230,9 @@ const transformProductEntries = (raw) => {
 
 const applyProductData = (products) => {
   const normalized = Array.isArray(products)
-    ? products.map((product, idx) => sanitizeProduct(product, idx)).filter(Boolean)
+    ? products
+        .map((product, idx) => sanitizeProduct(product, idx))
+        .filter(Boolean)
     : [];
   if (!normalized.length) return;
 
@@ -562,7 +573,8 @@ const offersCarousel = (() => {
       els.offersGrid.style.transform = `translate3d(${-offset}px, 0, 0)`;
       void els.offersGrid.offsetWidth;
       requestAnimationFrame(() => {
-        if (els.offersGrid) els.offersGrid.style.transition = prevTransition || "";
+        if (els.offersGrid)
+          els.offersGrid.style.transition = prevTransition || "";
       });
       currentOffset = offset;
       return;
@@ -579,7 +591,9 @@ const offersCarousel = (() => {
     const total = items.length;
     const prevIndex = activeIndex;
     activeIndex = ((idx % total) + total) % total;
-    const direction = instant ? 0 : computeDirection(prevIndex, activeIndex, total);
+    const direction = instant
+      ? 0
+      : computeDirection(prevIndex, activeIndex, total);
     const target = items[activeIndex];
     const base = items[0]?.offsetLeft ?? 0;
     const offset = target ? target.offsetLeft - base : 0;
@@ -720,10 +734,20 @@ const parseProductEntry = (entry, idx) => {
   const nameTr = (entry.name_tr || entry.nameTr || "").trim();
   if (!nameAr && !nameTr) return null;
 
-  const categoryAr = (entry.category_ar || entry.categoryAr || entry.category || "").trim();
+  const categoryAr = (
+    entry.category_ar ||
+    entry.categoryAr ||
+    entry.category ||
+    ""
+  ).trim();
   const categoryTr = (entry.category_tr || entry.categoryTr || "").trim();
   const rawCategoryId =
-    entry.category_id || entry.categoryId || entry.category_slug || categoryAr || categoryTr || "";
+    entry.category_id ||
+    entry.categoryId ||
+    entry.category_slug ||
+    categoryAr ||
+    categoryTr ||
+    "";
   const categoryId = String(rawCategoryId || `category-${idx}`).trim();
 
   const baseIdRaw = entry.id || entry.code || "";
@@ -740,7 +764,10 @@ const parseProductEntry = (entry, idx) => {
               ? { id: String(cutIdx), names: record }
               : null;
           }
-          const record = makeRecord(cut.name_ar || cut.ar || cut.name || "", cut.name_tr || cut.tr || "");
+          const record = makeRecord(
+            cut.name_ar || cut.ar || cut.name || "",
+            cut.name_tr || cut.tr || ""
+          );
           if (!record.ar && !record.tr) return null;
           const rawCutId =
             cut.id != null && cut.id !== ""
@@ -748,16 +775,21 @@ const parseProductEntry = (entry, idx) => {
               : cut.code != null && cut.code !== ""
               ? cut.code
               : cut.slug;
-          const cutId = rawCutId != null && String(rawCutId).trim() !== ""
-            ? String(rawCutId).trim()
-            : String(cutIdx);
+          const cutId =
+            rawCutId != null && String(rawCutId).trim() !== ""
+              ? String(rawCutId).trim()
+              : String(cutIdx);
           return { id: cutId, names: record };
         })
         .filter(Boolean)
     : [];
 
   const saleRaw =
-    entry.salePrice ?? entry.discount_price ?? entry.discountPrice ?? entry.offer_price ?? 0;
+    entry.salePrice ??
+    entry.discount_price ??
+    entry.discountPrice ??
+    entry.offer_price ??
+    0;
 
   return {
     id: productId,
@@ -799,12 +831,16 @@ const fetchProducts = async () => {
       applyProductData(parsedProducts);
       writeProductsCache(state.products);
     } else if (!state.products.length) {
-      els.menuGrid.innerHTML = `<p class="muted">${t("menu.alert.loadFail")}</p>`;
+      els.menuGrid.innerHTML = `<p class="muted">${t(
+        "menu.alert.loadFail"
+      )}</p>`;
     }
   } catch (err) {
     console.error("Failed to load products", err);
     if (!state.products.length) {
-      els.menuGrid.innerHTML = `<p class="muted">${t("menu.alert.loadFail")}</p>`;
+      els.menuGrid.innerHTML = `<p class="muted">${t(
+        "menu.alert.loadFail"
+      )}</p>`;
     }
   }
 };
@@ -851,8 +887,7 @@ function buildFilters() {
 
   entries.forEach(({ id, label }) => {
     const b = document.createElement("button");
-    b.className =
-      "filter-btn" + (id === state.activeCategory ? " active" : "");
+    b.className = "filter-btn" + (id === state.activeCategory ? " active" : "");
     b.type = "button";
     b.textContent = label;
     b.addEventListener("click", () => {
@@ -945,7 +980,8 @@ function renderProducts(list, mount) {
       : showPrice
       ? `<span class="ltr-text">${priceFmt(p.price)}</span>`
       : `<span class="coming-soon">${t("menu.product.callForPrice")}</span>`;
-    const unitLabel = showPrice && p.unit ? `<span class="unit">${p.unit}</span>` : "";
+    const unitLabel =
+      showPrice && p.unit ? `<span class="unit">${p.unit}</span>` : "";
     const priceBlock = unitLabel ? `${priceHtml} ${unitLabel}` : priceHtml;
 
     const flags = (() => {
@@ -972,7 +1008,11 @@ function renderProducts(list, mount) {
     card.className = "product-card" + (hasOffer ? " is-offer" : "");
     card.innerHTML = `
       <div class="image-wrap">
-        ${hasOffer ? `<span class="badge-offer">${t("menu.badge.offer")}</span>` : ""}
+        ${
+          hasOffer
+            ? `<span class="badge-offer">${t("menu.badge.offer")}</span>`
+            : ""
+        }
         <img src="${placeholder}" alt="${productName}">
       </div>
       <h3 class="product-name">${productName}</h3>
@@ -1049,8 +1089,12 @@ function openModal(product) {
   if (cuts.length) {
     els.cutRow.style.display = "";
     const options = [
-      `<option value="" disabled selected>${t("menu.modal.cutPlaceholder")}</option>`,
-      ...cuts.map((c) => `<option value="${c.id}">${labelFor(c.names)}</option>`),
+      `<option value="" disabled selected>${t(
+        "menu.modal.cutPlaceholder"
+      )}</option>`,
+      ...cuts.map(
+        (c) => `<option value="${c.id}">${labelFor(c.names)}</option>`
+      ),
     ];
     els.cutSelect.innerHTML = options.join("");
     els.cutSelect.value = "";
@@ -1230,7 +1274,7 @@ function normalizeCartItem(item, idx = 0) {
     item.nameAr || item.nameTr || item.legacyName || item.name || ""
   );
   const categorySource =
-    (item.category && typeof item.category === "object" && item.category.names)
+    item.category && typeof item.category === "object" && item.category.names
       ? item.category.names
       : item.category;
   const categoryId =
@@ -1279,7 +1323,9 @@ function hydrateCart() {
   }
 }
 function persistCart() {
-  state.cart = state.cart.map((item, idx) => normalizeCartItem(item, idx)).filter(Boolean);
+  state.cart = state.cart
+    .map((item, idx) => normalizeCartItem(item, idx))
+    .filter(Boolean);
   localStorage.setItem(CART_KEY, JSON.stringify(state.cart));
   // عرّض السلة عالميًا لأي سكربت خارجي
   window.cart = state.cart;
@@ -1380,9 +1426,7 @@ function qtyForMessage(it) {
 }
 
 function priceLabelForMessage(it) {
-  return it.sellMode === 0
-    ? t("menu.price.unitPiece")
-    : t("menu.price.unitKg");
+  return it.sellMode === 0 ? t("menu.price.unitPiece") : t("menu.price.unitKg");
 }
 
 function calcTotals() {
@@ -1437,7 +1481,9 @@ function updateCartUI() {
       const deleteLabel = t("menu.cart.meta.delete");
       return `
       <div class="cart-row">
-        <img src="${it.image || placeholder}" alt="${nameText}" loading="lazy" decoding="async">
+        <img src="${
+          it.image || placeholder
+        }" alt="${nameText}" loading="lazy" decoding="async">
         <div>
           <div class="title">${nameText}</div>
           <div class="meta">${cutText} • ${qtyLabel}: ${lineQtyText(it)}</div>
@@ -1458,14 +1504,12 @@ function updateCartUI() {
     })
     .join("");
 
-  els.cartItems
-    .querySelectorAll("img")
-    .forEach((img) => {
-      applyImageFallback(img);
-      if (!img.getAttribute("loading")) img.setAttribute("loading", "lazy");
-      img.setAttribute("decoding", "async");
-      if (!img.src) img.src = placeholder;
-    });
+  els.cartItems.querySelectorAll("img").forEach((img) => {
+    applyImageFallback(img);
+    if (!img.getAttribute("loading")) img.setAttribute("loading", "lazy");
+    img.setAttribute("decoding", "async");
+    if (!img.src) img.src = placeholder;
+  });
 
   els.cartItems
     .querySelectorAll("[data-rm]")
@@ -1507,9 +1551,10 @@ function buildMenuWhatsAppLine(item) {
   if (cutText) segments.push(`${t("menu.whatsapp.cut")}: ${cutText}`);
   if (item.note) segments.push(`${t("menu.whatsapp.noteLabel")}: ${item.note}`);
   const priceLabel = priceLabelForMessage(item);
-  if (priceLabel)
-    segments.push(`${priceLabel}: ${moneyTL(item.price)}`);
-  return segments.length ? `• ${nameText} — ${segments.join(" • ")}` : `• ${nameText}`;
+  if (priceLabel) segments.push(`${priceLabel}: ${moneyTL(item.price)}`);
+  return segments.length
+    ? `• ${nameText} — ${segments.join(" • ")}`
+    : `• ${nameText}`;
 }
 
 function updateWALink() {
@@ -1526,13 +1571,7 @@ function updateWALink() {
   const approxLine = t("menu.whatsapp.note");
   const detailsLabel = t("menu.whatsapp.details");
 
-  const msgRaw = [
-    header,
-    detailsLabel,
-    ...lines,
-    totalLine,
-    approxLine,
-  ]
+  const msgRaw = [header, detailsLabel, ...lines, totalLine, approxLine]
     .filter(Boolean)
     .join("\n");
 

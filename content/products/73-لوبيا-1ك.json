@@ -1,0 +1,18 @@
+{
+  "id": "73-لوبيا-1ك",
+  "code": "73-لوبيا-1ك",
+  "name_ar": "لوبيا 1ك",
+  "name_tr": "Kuru Börülce 1kg",
+  "category_id": "ارز و بقوليات",
+  "category_ar": "ارز و بقوليات",
+  "category_tr": "Pirinç ve bakliyat",
+  "price": 99.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/pirinic/لوبيا.jpeg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

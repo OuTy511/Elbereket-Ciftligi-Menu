@@ -1,0 +1,18 @@
+{
+  "id": "34-كلاوي-عجل",
+  "code": "34-كلاوي-عجل",
+  "name_ar": "كلاوي عجل",
+  "name_tr": "Dana Böbrek",
+  "category_id": "سقطات",
+  "category_ar": "سقطات",
+  "category_tr": "Sakatatlar",
+  "price": 120.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg (per piece)",
+  "image": "img/products/sakatat/bobrek.webp",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 2,
+  "approx_kg": 0.7
+}

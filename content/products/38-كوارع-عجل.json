@@ -1,0 +1,18 @@
+{
+  "id": "38-كوارع-عجل",
+  "code": "38-كوارع-عجل",
+  "name_ar": "كوارع عجل",
+  "name_tr": "Dana Paça",
+  "category_id": "سقطات",
+  "category_ar": "سقطات",
+  "category_tr": "Sakatatlar",
+  "price": 230.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/sakatat/paca.JPG",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

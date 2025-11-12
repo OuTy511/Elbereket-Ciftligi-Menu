@@ -1,0 +1,18 @@
+{
+  "id": "166-توابل-شيش-طاووق",
+  "code": "166-توابل-شيش-طاووق",
+  "name_ar": "توابل شيش طاووق",
+  "name_tr": "Şiş Tavuk Baharatı",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/توابل-شيش-طاووق.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

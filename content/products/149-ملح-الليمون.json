@@ -1,0 +1,18 @@
+{
+  "id": "149-ملح-الليمون",
+  "code": "149-ملح-الليمون",
+  "name_ar": "ملح الليمون",
+  "name_tr": "Limon Tuzu",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 25.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/ملح-الليمون.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

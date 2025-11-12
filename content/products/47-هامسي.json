@@ -1,0 +1,18 @@
+{
+  "id": "47-هامسي",
+  "code": "47-هامسي",
+  "name_ar": "هامسي",
+  "name_tr": "Hamsi",
+  "category_id": "اسماك",
+  "category_ar": "اسماك",
+  "category_tr": "Balık",
+  "price": 0.0,
+  "discount_price": 0.0,
+  "unit": "TL/kg",
+  "image": "img/products/balik/hamsi.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 1,
+  "approx_kg": 0
+}

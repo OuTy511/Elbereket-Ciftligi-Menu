@@ -1,0 +1,18 @@
+{
+  "id": "131-كمون-حب",
+  "code": "131-كمون-حب",
+  "name_ar": "كمون حب",
+  "name_tr": "Kimyon Tohumu",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 45.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/كمون-حب.webp",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

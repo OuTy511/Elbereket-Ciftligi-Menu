@@ -1,0 +1,18 @@
+{
+  "id": "188-قهوة-فلسطينية",
+  "code": "188-قهوة-فلسطينية",
+  "name_ar": "قهوة فلسطينية",
+  "name_tr": "Filistin Kahvesi",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 260.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/قهوة-فلسطينية.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

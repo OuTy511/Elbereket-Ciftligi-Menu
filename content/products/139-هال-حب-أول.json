@@ -1,0 +1,18 @@
+{
+  "id": "139-هال-حب-أول",
+  "code": "139-هال-حب-أول",
+  "name_ar": "هال حب أول",
+  "name_tr": "Kakule (Birinci Kalite)",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 150.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/هال-حب-أول.jpeg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

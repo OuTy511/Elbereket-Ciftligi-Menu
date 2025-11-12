@@ -1,0 +1,18 @@
+{
+  "id": "178-نكهة-الذرة",
+  "code": "178-نكهة-الذرة",
+  "name_ar": "نكهة الذرة",
+  "name_tr": "Mısır Aroması",
+  "category_id": "بهارات و توابل",
+  "category_ar": "بهارات و توابل",
+  "category_tr": "Baharat ve çeşniler",
+  "price": 60.0,
+  "discount_price": 0.0,
+  "unit": "TL",
+  "image": "img/products/baharat/نكهة-الذرة.jpg",
+  "description": "",
+  "available": true,
+  "cuts": [],
+  "sell_mode": 0,
+  "approx_kg": 0
+}

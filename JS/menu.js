@@ -1474,22 +1474,24 @@ function updateCartUI() {
 }
 
 /* ===== رسالة واتساب القديمة (اختياري لو الرابط لسه موجود) ===== */
+function buildMenuWhatsAppLine(item) {
+  const nameText = labelFor(item.name);
+  if (!nameText) return "";
+  const segments = [`${t("menu.whatsapp.quantity")}: ${qtyForMessage(item)}`];
+  const cutText = item.cut ? labelFor(item.cut) : "";
+  if (cutText) segments.push(`${t("menu.whatsapp.cut")}: ${cutText}`);
+  if (item.note) segments.push(`${t("menu.whatsapp.noteLabel")}: ${item.note}`);
+  const priceLabel = priceLabelForMessage(item);
+  if (priceLabel)
+    segments.push(`${priceLabel}: ${moneyTL(item.price)}`);
+  return segments.length ? `• ${nameText} — ${segments.join(" • ")}` : `• ${nameText}`;
+}
+
 function updateWALink() {
   if (!els.waCheckout) return; // لو اتشال اللينك من الـ HTML
-  const lines = state.cart.map((item) => {
-    const nameText = labelFor(item.name);
-    const parts = [
-      `• ${nameText}`,
-      `      ${priceLabelForMessage(item)}: ${moneyTL(item.price)}`,
-      `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(item)}`,
-    ];
-    const cutText = item.cut ? labelFor(item.cut) : "";
-    if (cutText)
-      parts.push(`      ${t("menu.whatsapp.cut")}: ${cutText}`);
-    if (item.note)
-      parts.push(`      ${t("menu.whatsapp.noteLabel")}: ${item.note}`);
-    return parts.join("\n");
-  });
+  const lines = state.cart
+    .map((item) => buildMenuWhatsAppLine(item))
+    .filter(Boolean);
 
   const { total, hasUnpriced } = calcTotals();
   const header = t("menu.whatsapp.header", { brand: t("common.brandName") });
@@ -1501,12 +1503,9 @@ function updateWALink() {
 
   const msgRaw = [
     header,
-    "",
     detailsLabel,
     ...lines,
-    "",
     totalLine,
-    "",
     approxLine,
   ]
     .filter(Boolean)

@@ -395,6 +395,19 @@ function priceLabelForMessage(it) {
   return t("menu.price.unitKg");
 }
 
+function buildConfirmWhatsAppLine(it) {
+  const nameText = labelFor(it.name);
+  if (!nameText) return "";
+  const segments = [`${t("menu.whatsapp.quantity")}: ${qtyForMessage(it)}`];
+  const cutText = it.cut ? labelFor(it.cut) : "";
+  if (cutText) segments.push(`${t("confirm.whatsapp.cut")}: ${cutText}`);
+  if (it.note) segments.push(`${t("confirm.whatsapp.note")}: ${it.note}`);
+  const priceLabel = priceLabelForMessage(it);
+  if (priceLabel)
+    segments.push(`${priceLabel}: ${moneyTL(it.price)}`);
+  return segments.length ? `• ${nameText} — ${segments.join(" • ")}` : `• ${nameText}`;
+}
+
 function buildCartSnapshot() {
   if (!order || !Array.isArray(order.items)) return [];
   return order.items.map((it, idx) => {
@@ -810,19 +823,9 @@ sendBtn.addEventListener("click", () => {
 
   if (!pay) return toast(t("confirm.toast.needPayment"), "error");
 
-  const lines = order.items.map((it) => {
-    const nameText = labelFor(it.name);
-    const cutText = it.cut ? labelFor(it.cut) : "";
-    const parts = [
-      `• ${nameText}`,
-      `      ${priceLabelForMessage(it)}: ${moneyTL(it.price)}`,
-      `      ${t("menu.whatsapp.quantity")}: ${qtyForMessage(it)}`,
-    ];
-    if (cutText)
-      parts.push(`      ${t("confirm.whatsapp.cut")}: ${cutText}`);
-    if (it.note) parts.push(`      ${t("confirm.whatsapp.note")}: ${it.note}`);
-    return parts.join("\n");
-  });
+  const lines = order.items
+    .map((it) => buildConfirmWhatsAppLine(it))
+    .filter(Boolean);
 
   const totalLine = t("confirm.whatsapp.total", {
     total: moneyTL(calcTotal()),
@@ -861,26 +864,25 @@ sendBtn.addEventListener("click", () => {
 
   const msgParts = [
     header,
-    "",
     t("confirm.whatsapp.details"),
     ...lines,
-    "",
     totalLine,
-    "",
-    ...customerBlock,
-    "",
-    addressLine,
   ];
 
+  if (approxNote) msgParts.push(approxNote);
+
+  msgParts.push("");
+  msgParts.push(...customerBlock);
+
+  if (addressLine) msgParts.push(addressLine);
+
   if (locationLines.length) {
-    msgParts.push("", ...locationLines);
+    msgParts.push(...locationLines);
   }
 
   if (payLine) {
-    msgParts.push("", payLine);
+    msgParts.push(payLine);
   }
-
-  msgParts.push("", approxNote);
 
   const msg = msgParts
     .filter((line) => line !== null && line !== undefined && line !== false)

@@ -1,22 +1,22 @@
-﻿الاسم_عربي,الاسم_تركي,القسم_عربي,القسم_تركي,السعر,سعر_الخصم,خيارات_التقطيع_عربي,خيارات_التقطيع_تركي,الصورة,وضع_البيع,وزن_تقريبي_كجم
-لحم عجل دهن وسط,Dana Et Orta Yağlı,لحم عجل,Dana eti,720,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/orta-yagli.jpg,1,
-لحم عجل دهن قليل,Dana Et Az Yağlı,لحم عجل,Dana eti,750,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/az-yagli.JPG,1,
-لحم عجل بدون دهن,Dana  Et Yağsız,لحم عجل,Dana eti,790,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/yagsiz-et.jpg,1,
-مفروم عجل دهن وسط,Dana Kiyma Orta Yağlı,لحم عجل,Dana eti,720,,,,img/products/dana-etti/orta-kiyma.png,1,
-مفروم عجل دهن قليل,Dana Kiyma Az Yağlı,لحم عجل,Dana eti,750,,,,img/products/dana-etti/az-kiyma.png,1,
-مفروم عجل بدون دهن,Dana Kiyma Yağsız,لحم عجل,Dana eti,790,,,,img/products/dana-etti/yagsiz-kiyma.jpg,1,
-وش فخذه,Dana Tiranç,لحم عجل,Dana eti,820,,"بدون تقطيع,استيك,بوفتيك,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Biftek, Bonfile, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/tiranc.JPG,1,
-عرق تربيانكو,Dana Nuar,لحم عجل,Dana eti,850,,"بدون تقطيع,مربوط,شرائح","Bütün, Bağlı, Dilim",img/products/dana-etti/nuar.jpg,1,
-عرق انتركوت,Dana Antrikot,لحم عجل,Dana eti,950,,"بدون تقطيع,استيك,بوفتيك","Bütün, Biftek, Bonfile",img/products/dana-etti/antrikot.jpg,1,
-عرق فلتو,Dana Bonfile,لحم عجل,Dana eti,1220,,"بدون تقطيع,استيك,بوفتيك","Bütün, Biftek, Bonfile",img/products/dana-etti/bonfile.JPG,2,1.5
-موزه عجل,Dana İncik,لحم عجل,Dana eti,795,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/incik.png,1,
-موزه عجل بالعظم,Dana Kemikli İncik,لحم عجل,Dana eti,680,,,,img/products/dana-etti/kemikli-incik.JPG,1,
-بيت لوح,Dana Kurek,لحم عجل,Dana eti,820,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/dana-kurek.JPG,1,
-لحم عجل بالعظم,Dana Kemikli Et,لحم عجل,Dana eti,520,,,,img/products/dana-etti/kemikli-et.jpg,1,
+الاسم_عربي,الاسم_تركي,القسم_عربي,القسم_تركي,السعر,سعر_الخصم,خيارات_التقطيع_عربي,خيارات_التقطيع_تركي,الصورة,وضع_البيع,وزن_تقريبي_كجم
+لحم عجل دهن وسط,Dana Et Orta Yağlı,لحم عجل,Dana eti,800,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/orta-yagli.jpg,1,
+لحم عجل دهن قليل,Dana Et Az Yağlı,لحم عجل,Dana eti,850,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/az-yagli.JPG,1,
+لحم عجل بدون دهن,Dana  Et Yağsız,لحم عجل,Dana eti,900,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/yagsiz-et.jpg,1,
+مفروم عجل دهن وسط,Dana Kiyma Orta Yağlı,لحم عجل,Dana eti,750,,,,img/products/dana-etti/orta-kiyma.png,1,
+مفروم عجل دهن قليل,Dana Kiyma Az Yağlı,لحم عجل,Dana eti,825,,,,img/products/dana-etti/az-kiyma.png,1,
+مفروم عجل بدون دهن,Dana Kiyma Yağsız,لحم عجل,Dana eti,900,,,,img/products/dana-etti/yagsiz-kiyma.jpg,1,
+وش فخذه,Dana Tiranç,لحم عجل,Dana eti,950,,"بدون تقطيع,استيك,بوفتيك,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Biftek, Bonfile, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/tiranc.JPG,1,
+عرق تربيانكو,Dana Nuar,لحم عجل,Dana eti,1000,,"بدون تقطيع,مربوط,شرائح","Bütün, Bağlı, Dilim",img/products/dana-etti/nuar.jpg,1,
+عرق انتركوت,Dana Antrikot,لحم عجل,Dana eti,1000,,"بدون تقطيع,استيك,بوفتيك","Bütün, Biftek, Bonfile",img/products/dana-etti/antrikot.jpg,1,
+عرق فلتو,Dana Bonfile,لحم عجل,Dana eti,1500,,"بدون تقطيع,استيك,بوفتيك","Bütün, Biftek, Bonfile",img/products/dana-etti/bonfile.JPG,2,1.5
+	موزه عجل,Dana İncik,لحم عجل,Dana eti,875,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/incik.png,1,
+موزه عجل بالعظم,Dana Kemikli İncik,لحم عجل,Dana eti,750,,,,img/products/dana-etti/kemikli-incik.JPG,1,
+بيت لوح,Dana Kurek,لحم عجل,Dana eti,900,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/dana-kurek.JPG,1,
+لحم عجل بالعظم,Dana Kemikli Et,لحم عجل,Dana eti,650,,,,img/products/dana-etti/kemikli-et.jpg,1,
 ريش عجل,Dana Pirzola,لحم عجل,Dana eti,790,,,,img/products/dana-etti/pirzola.jpg,,
 كتف خروف,Kuzu Kol,لحم خروف,Kuzu eti,650,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف (بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-kol.jpg,2,3
-فخذه خروف,Kuzu But,لحم خروف,Kuzu eti,650,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف(بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-but.jpg,2,5
-رقبه خروف,Kuzu Gerdan,لحم خروف,Kuzu eti,495,,"بدون تقطيع,تقطيع شرائح,تشفيه","Bütün, Dilim kesim, Kemiksiz",img/products/kuzu-etti/kuzu-gerdan.jpg,1,
+فخذه خروف,Kuzu But,لحم خروف,Kuzu eti,700,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف(بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-but.jpg,2,5
+رقبه خروف,Kuzu Gerdan,لحم خروف,Kuzu eti,550,,"بدون تقطيع,تقطيع شرائح,تشفيه","Bütün, Dilim kesim, Kemiksiz",img/products/kuzu-etti/kuzu-gerdan.jpg,1,
 ضلوع خروف,Kuzu Kaburga,لحم خروف,Kuzu eti,0,,,,img/products/kuzu-etti/kuzu-kaburga.jpg,1,
 ريش خروف,Kuzu Pirzola,لحم خروف,Kuzu eti,0,,,,img/products/kuzu-etti/kuzu-pirzola.jpg,1,
 لحم خروف مشفي,Kuzu Kemiksiz Et,لحم خروف,Kuzu eti,1400,,,,img/products/kuzu-etti/kuzu-kiyma.jpg,1,
@@ -31,15 +31,15 @@
 دهن عجل,Dana Yağı,سقطات,Sakatatlar,120,,,,img/products/sakatat/yag.png,1,
 عكاوي عجل,Dana Pöç,سقطات,Sakatatlar,390,,,,img/products/sakatat/poc.png,2,1.5
 قلب عجل,Dana Yürek,سقطات,Sakatatlar,230,,,,img/products/sakatat/yurek.png,1,
-كبده عجل,Dana Ciğer,سقطات,Sakatatlar,620,,"تقطيع شرائح بانيه,تقطيع اسكندراني (صوابع,جوليان),تقطيع رأس عصفور,بدون تقطيع","Bütün, Pane dilim, Julienne, Kuşbaşı",img/products/sakatat/ciger.png,1,
+كبده عجل,Dana Ciğer,سقطات,Sakatatlar,680,,"تقطيع شرائح بانيه,تقطيع اسكندراني (صوابع,جوليان),تقطيع رأس عصفور,بدون تقطيع","Bütün, Pane dilim, Julienne, Kuşbaşı",img/products/sakatat/ciger.png,1,
 كرشه عجل,Dana İşkembe,سقطات,Sakatatlar,230,,"بدون تقطيع,شرائح,مكعبات","Bütün, Dilim, Küp",img/products/sakatat/iskembe.JPG,1,
 كلاوي عجل,Dana Böbrek,سقطات,Sakatatlar,120,,,,img/products/sakatat/bobrek.webp,2,0.7
 لحمه راس,Dana Kelle Etti,سقطات,Sakatatlar,300,,,,img/products/sakatat/kelle.jpg,1,
 ممبار مملح,Tuzlu Mumbar,سقطات,Sakatatlar,280,,,,img/products/sakatat/tuzlu-mumbar.jpg,0,
 مخ عجل,Dana Beyin,سقطات,Sakatatlar,150,,,,img/products/sakatat/beyin.JPG,,
-كوارع عجل,Dana Paça,سقطات,Sakatatlar,230,,,,img/products/sakatat/paca.JPG,,
+كوارع عجل,Dana Paça,سقطات,Sakatatlar,250,,,,img/products/sakatat/paca.JPG,,
 فشة عجل,Dana Akciğer,سقطات,Sakatatlar,60,,,,img/products/sakatat/akciger.JPG,,
-ماسوره عجل,Dana Illıklı Kemik,سقطات,Sakatatlar,90,,,,img/products/sakatat/illikli.JPG,,
+ماسوره عجل,Dana Illıklı Kemik,سقطات,Sakatatlar,100,,,,img/products/sakatat/illikli.JPG,,
 لسان عجل,Dana Dil,سقطات,Sakatatlar,440,,,,img/products/sakatat/dil.png,2,4
 طحال عجل,Dana Dalak,سقطات,Sakatatlar,60,,,,img/products/sakatat/dalak.png,,
 دنيس,Deniz Balık,اسماك,Balık,,,,,img/products/balik/deniz.jpg,1,

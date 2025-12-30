@@ -33,14 +33,14 @@
 قلب عجل,Dana Yürek,سقطات,Sakatatlar,230,,,,img/products/sakatat/yurek.png,1,
 كبده عجل,Dana Ciğer,سقطات,Sakatatlar,680,,"تقطيع شرائح بانيه,تقطيع اسكندراني (صوابع,جوليان),تقطيع رأس عصفور,بدون تقطيع","Bütün, Pane dilim, Julienne, Kuşbaşı",img/products/sakatat/ciger.png,1,
 كرشه عجل,Dana İşkembe,سقطات,Sakatatlar,230,,"بدون تقطيع,شرائح,مكعبات","Bütün, Dilim, Küp",img/products/sakatat/iskembe.JPG,1,
-كلاوي عجل,Dana Böbrek,سقطات,Sakatatlar,120,,,,img/products/sakatat/bobrek.webp,2,
+كلاوي عجل,Dana Böbrek,سقطات,Sakatatlar,120,,,,img/products/sakatat/bobrek.webp,1,
 لحمه راس,Dana Kelle Etti,سقطات,Sakatatlar,350,,,,img/products/sakatat/kelle.jpg,1,
 ممبار مملح,Tuzlu Mumbar,سقطات,Sakatatlar,280,,,,img/products/sakatat/tuzlu-mumbar.jpg,0,
 مخ عجل,Dana Beyin,سقطات,Sakatatlar,150,,,,img/products/sakatat/beyin.JPG,,
 كوارع عجل,Dana Paça,سقطات,Sakatatlar,250,,,,img/products/sakatat/paca.JPG,,
 فشة عجل,Dana Akciğer,سقطات,Sakatatlar,60,,,,img/products/sakatat/akciger.JPG,,
 ماسوره عجل,Dana Illıklı Kemik,سقطات,Sakatatlar,100,,,,img/products/sakatat/illikli.JPG,,
-لسان عجل,Dana Dil,سقطات,Sakatatlar,440,,,,img/products/sakatat/dil.png,2,4
+لسان عجل,Dana Dil,سقطات,Sakatatlar,440,,,,img/products/sakatat/dil.png,2,2-3
 طحال عجل,Dana Dalak,سقطات,Sakatatlar,100,,,,img/products/sakatat/dalak.png,1,
 برجر دجاج,Tavuk Burger,منتجات مزارع البركات,El Bereket ürünleri,250,200,,,img/products/elbereket-urunler/tavuk-burger.jpg,1,
 برجر لحم,Et Burger,منتجات مزارع البركات,El Bereket ürünleri,690,,,,img/products/elbereket-urunler/et-burger.jpg,1,
@@ -66,7 +66,7 @@
 تشوبانبينار ماء أكواب 180 مل × 60 قطعة,Çobanpınar Su Bardak 180ml × 60 Adet,مياه شرب,İçme suyu,,,,,img/products/icme-suyu/تشوبانبينار-ماء-أكواب-180مل.png,,
 تشوبانبينار ماء 330 مل × 12 قطعة,Çobanpınar Su 330ml × 12 Adet,مياه شرب,İçme suyu,,,,,img/products/icme-suyu/تشوبانبينار-ماء-أكواب-300مل.png,,
 تشوبانبينار ماء 0.5 لتر,Çobanpınar Su 0.5L,مياه شرب,İçme suyu,10,,,,img/products/icme-suyu/تشوبانبينار-ماء-0.5-لتر.png,,
-تشوبانبينار ماء .51 لتر,Çobanpınar Su 1.5L,مياه شرب,İçme suyu,20,,,,img/products/icme-suyu/تشوبانبينار-ماء-1-لتر.png,,
+تشوبانبينار ماء 1.5 لتر,Çobanpınar Su 1.5L,مياه شرب,İçme suyu,20,,,,img/products/icme-suyu/تشوبانبينار-ماء-1-لتر.png,,
 تشوبانبينار ماء 5 لتر,Çobanpınar Su 5L,مياه شرب,İçme suyu,25,,,,img/products/icme-suyu/تشوبانبينار-ماء-5-لتر.png,,
 دنيس,Deniz Balık,اسماك,Balık,,,,,img/products/balik/deniz.jpg,1,
 قاروص,Laverak Balık,اسماك,Balık,,,,,img/products/balik/laverak.jpg,1,
@@ -74,5 +74,6 @@
 جمبري جامبو,Karadies,اسماك,Balık,,,,,img/products/balik/karadies.jpg,1,
 هامسي,Hamsi,اسماك,Balık,,,,,img/products/balik/hamsi.jpg,1,
 سردين,Sardalya,اسماك,Balık,,,,,img/products/balik/serdayle.jpeg,1,
+
 
 

@@ -1,8 +1,8 @@
 الاسم_عربي,الاسم_تركي,القسم_عربي,القسم_تركي,السعر,سعر_الخصم,خيارات_التقطيع_عربي,خيارات_التقطيع_تركي,الصورة,وضع_البيع,وزن_تقريبي_كجم
-لحم عجل دهن وسط,Dana Et Orta Yağlı,لحم عجل,Dana eti,800,750,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/orta-yagli.jpg,1,
+لحم عجل دهن وسط,Dana Et Orta Yağlı,لحم عجل,Dana eti,800,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/orta-yagli.jpg,1,
 لحم عجل دهن قليل,Dana Et Az Yağlı,لحم عجل,Dana eti,850,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/az-yagli.JPG,1,
 لحم عجل بدون دهن,Dana  Et Yağsız,لحم عجل,Dana eti,900,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/yagsiz-et.jpg,1,
-مفروم عجل دهن وسط,Dana Kiyma Orta Yağlı,لحم عجل,Dana eti,800,699,,,img/products/dana-etti/orta-kiyma.png,1,
+مفروم عجل دهن وسط,Dana Kiyma Orta Yağlı,لحم عجل,Dana eti,800,,,,img/products/dana-etti/orta-kiyma.png,1,
 مفروم عجل دهن قليل,Dana Kiyma Az Yağlı,لحم عجل,Dana eti,850,,,,img/products/dana-etti/az-kiyma.png,1,
 مفروم عجل بدون دهن,Dana Kiyma Yağsız,لحم عجل,Dana eti,900,,,,img/products/dana-etti/yagsiz-kiyma.jpg,1,
 وش فخذه,Dana Tiranç,لحم عجل,Dana eti,950,,"بدون تقطيع,استيك,بوفتيك,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Biftek, Bonfile, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/tiranc.JPG,1,
@@ -12,7 +12,7 @@
 	موزه عجل,Dana İncik,لحم عجل,Dana eti,870,835,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/incik.png,1,
 موزه عجل بالعظم,Dana Kemikli İncik,لحم عجل,Dana eti,750,,,,img/products/dana-etti/kemikli-incik.JPG,1,
 بيت لوح,Dana Kurek,لحم عجل,Dana eti,900,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/dana-kurek.JPG,1,
-لحم عجل بالعظم,Dana Kemikli Et,لحم عجل,Dana eti,700,650,,,img/products/dana-etti/kemikli-et.jpg,1,
+لحم عجل بالعظم,Dana Kemikli Et,لحم عجل,Dana eti,700,,,,img/products/dana-etti/kemikli-et.jpg,1,
 ريش عجل,Dana Pirzola,لحم عجل,Dana eti,950,,,,img/products/dana-etti/pirzola.jpg,,
 كتف خروف,Kuzu Kol,لحم خروف,Kuzu eti,650,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف (بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-kol.jpg,2,2.5
 فخذه خروف,Kuzu But,لحم خروف,Kuzu eti,700,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف(بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-but.jpg,2,3.5
@@ -60,8 +60,8 @@
 فيجي تورك - مانجو مجمده,Vegie Türk - Dondurulmuş Mango,خضروات و فواكه مجمده,Dondurulmuş sebze & meyve,200,,,,img/products/dondurulmus/IMG-20251027-WA0134.jpg,,
 فيجي تورك - جوافة مجمده,Vegie Türk - Dondurulmuş Guava,خضروات و فواكه مجمده,Dondurulmuş sebze & meyve,220,,,,img/products/dondurulmus/IMG-20251027-WA0135.jpg,,
 فيجي تورك - باذنجان مشوي مجمد,Vegie Türk - Dondurulmuş Izgara Patlıcan,خضروات و فواكه مجمده,Dondurulmuş sebze & meyve,110,,,,img/products/dondurulmus/IMG-20251027-WA0136.jpg,,
-تشوبانبينار دامنجا 19 لتر ( تبديل بنفس الماركة),Çobanpınar Damacana 19L (Aynı Marka Değişim),مياه شرب,İçme suyu,100,,,,img/products/icme-suyu/تشوبانبينار-دامنجا-19-لتر.png,,
-تشوبانبينار دامنجا 19 لتر ( تبديل ماركة مختلفه ),Çobanpınar Damacana 19L (Farklı Marka Değişim),مياه شرب,İçme suyu,100,,,,img/products/icme-suyu/تشوبانبينار-دامنجا-19-لتر.png,,
+تشوبانبينار دامنجا 19 لتر ( تبديل بنفس الماركة),Çobanpınar Damacana 19L (Aynı Marka Değişim),مياه شرب,İçme suyu,110,,,,img/products/icme-suyu/تشوبانبينار-دامنجا-19-لتر.png,,
+تشوبانبينار دامنجا 19 لتر ( تبديل ماركة مختلفه ),Çobanpınar Damacana 19L (Farklı Marka Değişim),مياه شرب,İçme suyu,200,,,,img/products/icme-suyu/تشوبانبينار-دامنجا-19-لتر.png,,
 تشوبانبينار دامنجا 19 لتر ( بدون تبديل ),Çobanpınar Damacana 19L (Değişimsiz),مياه شرب,İçme suyu,250,,,,img/products/icme-suyu/تشوبانبينار-دامنجا-19-لتر.png,,
 تشوبانبينار ماء أكواب 180 مل × 60 قطعة,Çobanpınar Su Bardak 180ml × 60 Adet,مياه شرب,İçme suyu,,,,,img/products/icme-suyu/تشوبانبينار-ماء-أكواب-180مل.png,,
 تشوبانبينار ماء 330 مل × 12 قطعة,Çobanpınar Su 330ml × 12 Adet,مياه شرب,İçme suyu,,,,,img/products/icme-suyu/تشوبانبينار-ماء-أكواب-300مل.png,,
@@ -74,6 +74,7 @@
 جمبري جامبو,Karadies,اسماك,Balık,,,,,img/products/balik/karadies.jpg,1,
 هامسي,Hamsi,اسماك,Balık,,,,,img/products/balik/hamsi.jpg,1,
 سردين,Sardalya,اسماك,Balık,,,,,img/products/balik/serdayle.jpeg,1,
+
 
 
 

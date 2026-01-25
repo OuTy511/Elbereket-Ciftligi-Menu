@@ -14,6 +14,11 @@
 بيت لوح,Dana Kurek,لحم عجل,Dana eti,900,,"بدون تقطيع,قطع متوسطه,قطع كبيره,كباب حله,رأس عصفور","Bütün, Orta parça, Büyük parça, Tencere kebabı, Kuşbaşı",img/products/dana-etti/dana-kurek.JPG,1,
 لحم عجل بالعظم,Dana Kemikli Et,لحم عجل,Dana eti,700,,,,img/products/dana-etti/kemikli-et.jpg,1,
 ريش عجل,Dana Pirzola,لحم عجل,Dana eti,950,,,,img/products/dana-etti/pirzola.jpg,,
+كفتة بلدي,Kasap Köfte,لحم عجل,Dana eti,900,850,,,img/products/dana-etti/kasap-kofte.png,,
+شاورما متبله,Soslu Jülyen,لحم عجل,Dana eti,1500,1200,,,img/products/dana-etti/soslu-julyen.png,,
+لحم مفروم ساطور,Satır Kıyma,لحم عجل,Dana eti,900,850,,,img/products/dana-etti/satir-kiyma.png,,
+برجر لحم,Dana Burger,لحم عجل,Dana eti,900,850,,,img/products/dana-etti/dana-burger.png,1,
+سجق مصري,Mısırlı Sucuk,لحم عجل,Dana eti,690,,,,img/products/elbereket-urunler/misirli-sucuk.jpg,1,
 كتف خروف,Kuzu Kol,لحم خروف,Kuzu eti,700,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف (بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-kol.jpg,2,2.5
 فخذه خروف,Kuzu But,لحم خروف,Kuzu eti,750,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف(بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-but.jpg,2,3.5
 رقبه خروف,Kuzu Gerdan,لحم خروف,Kuzu eti,600,,"بدون تقطيع,تقطيع شرائح,تشفيه","Bütün, Dilim kesim, Kemiksiz",img/products/kuzu-etti/kuzu-gerdan.jpg,1,
@@ -28,6 +33,7 @@
 افخاد دجاج,Tavuk But,لحوم بيضاء,Beyaz et,80,,"بدون تقطيع,تشفيه من الفخذه,فصل الورك عن الدبوس","Bütün, Kemiksiz, But ve Baget ayrılmış",img/products/tavuk/but.jpg,1,
 اجنحه دجاج,Tavuk Kanat,لحوم بيضاء,Beyaz et,170,,"بدون تقطيع,تقطيع 2 عدد","Bütün, 2 adet kesim",img/products/tavuk/kanat.jpg,1,
 ظهر دجاج ( شورباليك ),Tavuk Çorbalık,لحوم بيضاء,Beyaz et,35,,,,img/products/tavuk/tavuk-corbalik.jpg,1,
+برجر دجاج,Tavuk Burger,لحوم بيضاء,Beyaz et,250,,,,img/products/elbereket-urunler/tavuk-burger.jpg,1,
 دهن عجل,Dana Yağı,سقطات,Sakatatlar,250,,,,img/products/sakatat/yag.png,1,
 عكاوي عجل,Dana Pöç,سقطات,Sakatatlar,500,,,,img/products/sakatat/poc.png,2,1.5
 قلب عجل,Dana Yürek,سقطات,Sakatatlar,300,,,,img/products/sakatat/yurek.png,1,
@@ -42,12 +48,6 @@
 ماسوره عجل,Dana Illıklı Kemik,سقطات,Sakatatlar,100,,,,img/products/sakatat/illikli.JPG,,
 لسان عجل,Dana Dil,سقطات,Sakatatlar,500,,,,img/products/sakatat/dil.png,2,2-3
 طحال عجل,Dana Dalak,سقطات,Sakatatlar,280,,,,img/products/sakatat/dalak.png,1,
-كفتة بلدي,Kasap Köfte,منتجات مزارع البركات,El Bereket ürünleri,900,850,,,img/products/dana-etti/kasap-kofte.png,,
-انتركوت متبل,Soslu Antrikot,منتجات مزارع البركات,El Bereket ürünleri,1500,1200,,,img/products/dana-etti/soslu-antrikot.png,,
-لحم مفروم ساطور,Satır Kıyma,منتجات مزارع البركات,El Bereket ürünleri,900,850,,,img/products/dana-etti/satir-kiyma.png,,
-برجر لحم,Dana Burger,منتجات مزارع البركات,El Bereket ürünleri,900,850,,,img/products/dana-etti/dana-burger.png,1,
-برجر دجاج,Tavuk Burger,منتجات مزارع البركات,El Bereket ürünleri,250,,,,img/products/elbereket-urunler/tavuk-burger.jpg,1,
-سجق مصري,Mısırlı Sucuk,منتجات مزارع البركات,El Bereket ürünleri,690,,,,img/products/elbereket-urunler/misirli-sucuk.jpg,1,
 سمنه بلدي,Eritilmiş Tereyağı,منتجات مزارع البركات,El Bereket ürünleri,700,,,,img/products/elbereket-urunler/tereyag.jpg,,
 زبده بلدي,Tereyağı,منتجات مزارع البركات,El Bereket ürünleri,495,,,,img/products/elbereket-urunler/tereyag-1.jpg,,
 بيض ابيض,Beyaz Yumurtası,منتجات مزارع البركات,El Bereket ürünleri,170,,,,img/products/elbereket-urunler/beyaz-yumurta.jpg,,
@@ -76,4 +76,5 @@
 جمبري جامبو,Karadies,اسماك,Balık,,,,,img/products/balik/karadies.jpg,1,
 هامسي,Hamsi,اسماك,Balık,,,,,img/products/balik/hamsi.jpg,1,
 سردين,Sardalya,اسماك,Balık,,,,,img/products/balik/serdayle.jpeg,1,
+
 

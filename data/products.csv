@@ -19,18 +19,18 @@
 سجق تركي,Kasap Sucuk,منتجات العجل,Dana Ürünleri,1250,,,,img/products/elbereket-urunler/kasap-sucuk.jpg,1,
 دهن عجل,Dana Yağı,منتجات العجل,Dana Ürünleri,250,,,,img/products/sakatat/yag.png,1,
 عكاوي عجل,Dana Pöç,منتجات العجل,Dana Ürünleri,550,,,,img/products/sakatat/poc.png,2,1.5
-قلب عجل,Dana Yürek,منتجات العجل,Dana Ürünleri,300,199,,,img/products/sakatat/yurek.png,1,
-كبده عجل,Dana Ciğer,منتجات العجل,Dana Ürünleri,770,599,"تقطيع شرائح بانيه,تقطيع اسكندراني (صوابع,جوليان),تقطيع رأس عصفور,بدون تقطيع","Bütün, Pane dilim, Julienne, Kuşbaşı",img/products/sakatat/ciger.png,1,
+قلب عجل,Dana Yürek,منتجات العجل,Dana Ürünleri,300,,,,img/products/sakatat/yurek.png,1,
+كبده عجل,Dana Ciğer,منتجات العجل,Dana Ürünleri,770,,"تقطيع شرائح بانيه,تقطيع اسكندراني (صوابع,جوليان),تقطيع رأس عصفور,بدون تقطيع","Bütün, Pane dilim, Julienne, Kuşbaşı",img/products/sakatat/ciger.png,1,
 كرشه عجل,Dana İşkembe,منتجات العجل,Dana Ürünleri,300,,"بدون تقطيع,شرائح,مكعبات","Bütün, Dilim, Küp",img/products/sakatat/iskembe.JPG,1,
-كلاوي عجل,Dana Böbrek,منتجات العجل,Dana Ürünleri,150,99,,,img/products/sakatat/bobrek.webp,1,
-لحمه راس,Dana Kelle Etti,منتجات العجل,Dana Ürünleri,350,270,,,img/products/sakatat/kelle.jpg,1,
+كلاوي عجل,Dana Böbrek,منتجات العجل,Dana Ürünleri,150,,,,img/products/sakatat/bobrek.webp,1,
+لحمه راس,Dana Kelle Etti,منتجات العجل,Dana Ürünleri,350,,,,img/products/sakatat/kelle.jpg,1,
 ممبار مملح,Tuzlu Mumbar,منتجات العجل,Dana Ürünleri,330,,,,img/products/sakatat/tuzlu-mumbar.jpg,0,
 مخ عجل,Dana Beyin,منتجات العجل,Dana Ürünleri,150,,,,img/products/sakatat/beyin.JPG,,
 كوارع عجل,Dana Paça,منتجات العجل,Dana Ürünleri,250,,,,img/products/sakatat/paca.JPG,,
 فشة عجل,Dana Akciğer,منتجات العجل,Dana Ürünleri,100,,,,img/products/sakatat/akciger.JPG,,
 ماسوره عجل,Dana Illıklı Kemik,منتجات العجل,Dana Ürünleri,100,,,,img/products/sakatat/illikli.JPG,,
-لسان عجل,Dana Dil,منتجات العجل,Dana Ürünleri,550,,,,img/products/sakatat/dil.png,2,2-3
-طحال عجل,Dana Dalak,منتجات العجل,Dana Ürünleri,100,50,,,img/products/sakatat/dalak.png,,
+لسان عجل,Dana Dil,منتجات العجل,Dana Ürünleri,550,,,,img/products/sakatat/dil.png,2,3-Feb
+طحال عجل,Dana Dalak,منتجات العجل,Dana Ürünleri,100,,,,img/products/sakatat/dalak.png,,
 كتف خروف,KUZU KOL,منتجات الخروف,Kuzu Ürünleri,800,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف (بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-kol.jpg,2,2.5
 فخد خروف,KUZU BUT,منتجات الخروف,Kuzu Ürünleri,800,,"بدون تقطيع,تشفيه ( مع كتابه طريقه التقطيع في الملاحظات ),تقطيع منسف(بالعظم),تقطيع خضار (بالعظم),تقطيع فرن (بالعظم)","Bütün, Ayıklanmış (kesim şekli notlara yazılacak), Mansaf kesim (kemikli), Sebze kesim (kemikli), Fırın kesim (kemikli)",img/products/kuzu-etti/kuzu-but.jpg,2,3.5
 رقبه خروف,KUZU GERDAN,منتجات الخروف,Kuzu Ürünleri,650,,"بدون تقطيع,تقطيع شرائح,تشفيه","Bütün, Dilim kesim, Kemiksiz",img/products/kuzu-etti/kuzu-gerdan.jpg,1,
@@ -51,19 +51,19 @@
 نص خروف باليه,Yarım Kuzu Kuyruklu,منتجات الخروف,Kuzu Ürünleri,,,,,img/products/kuzu-etti/kuzu-karkas.jpg,2,13
 نص خروف بدون ليه,Yarım Kuzu Kuyruksuz,منتجات الخروف,Kuzu Ürünleri,,,,,img/products/kuzu-etti/kuzu-karkas.jpg,2,10
 ربع خروف,Çeyrek Kuzu,منتجات الخروف,Kuzu Ürünleri,,,,,img/products/kuzu-etti/kuzu-karkas.jpg,2,6
-كبده خروف,Kuzu Ciğer,منتجات الخروف,Kuzu Ürünleri,1500,799,,,img/products/sakatat/kuzu-ciger.png,2,0.65
+كبده خروف,Kuzu Ciğer,منتجات الخروف,Kuzu Ürünleri,1500,,,,img/products/sakatat/kuzu-ciger.png,2,0.65
 كرشه ضاني,Dana İşkembe,منتجات الخروف,Kuzu Ürünleri,150,,"بدون تقطيع,شرائح,مكعبات","Bütün, Dilim, Küp",img/products/sakatat/iskembe.JPG,2,0.8
-دجاجه كامله,BUTUN TAVUK,منتجات الدجاج,Tavuk Ürünleri,125,109,"كامله بدون تقطيع,2 عدد تقطيع,4 عدد تقطيع,6 عدد تقطيع,8 عدد تقطيع","Tam, 2 adet kesim, 4 adet kesim, 6 adet kesim, 8 adet kesim",img/products/tavuk/tavuk.jpg,2,1.55
+دجاجه كامله,BUTUN TAVUK,منتجات الدجاج,Tavuk Ürünleri,125,,"كامله بدون تقطيع,2 عدد تقطيع,4 عدد تقطيع,6 عدد تقطيع,8 عدد تقطيع","Tam, 2 adet kesim, 4 adet kesim, 6 adet kesim, 8 adet kesim",img/products/tavuk/tavuk.jpg,2,1.55
 صدور بدون جلد,DERİSİZ BOFİLE,منتجات الدجاج,Tavuk Ürünleri,200,,"بدون تقطيع, شرائح بانيه,رأس عصفور,شيش طاووق,جوليان (اسكندراني),شاورما","Bütün, Pane dilim, Kuşbaşı, Şiş tavuk, Julienne (İskenderiye usulü), Döner",img/products/tavuk/bonfile.jpg,1,
 صدور بجلد,DERİLİ BONFİLE,منتجات الدجاج,Tavuk Ürünleri,165,,,,img/products/tavuk/derili-bonf.png,1,
 شورباليك & ظهر ,TAVUK ÇORBALIK,منتجات الدجاج,Tavuk Ürünleri,45,,,,img/products/tavuk/tavuk-corbalik.jpg,1,
 كلبك دجاج,TAVUK KELEBEK,منتجات الدجاج,Tavuk Ürünleri,109,,,,img/products/tavuk/tavuk-kelebek.png,1,
-مفروم دجاج,TAVUK KIYMA,منتجات الدجاج,Tavuk Ürünleri,200,124,,,img/products/tavuk/tavuk-kiyma.jpg,1,
-افخاد دجاج,KALÇALI BUT,منتجات الدجاج,Tavuk Ürünleri,90,79,"بدون تقطيع,تشفيه من الفخذه,فصل الورك عن الدبوس","Bütün, Kemiksiz, But ve Baget ayrılmış",img/products/tavuk/but.jpg,1,
-ورك دجاج,TAVUK SARMA,منتجات الدجاج,Tavuk Ürünleri,180,124,,,img/products/tavuk/sarma-tavuk.jpg,1,
-دبابيس دجاج,TAVUK BAGET,منتجات الدجاج,Tavuk Ürünleri,120,109,,,img/products/tavuk/baget.jpg,1,
-جناح دجاج كامل,UÇLU KANAT,منتجات الدجاج,Tavuk Ürünleri,170,147,"بدون تقطيع,تقطيع 2 عدد","Bütün, 2 adet kesim",img/products/tavuk/kanat.jpg,1,
-افخاد دجاج مشفي,KEMİKSİZ BUT,منتجات الدجاج,Tavuk Ürünleri,170,134,,,img/products/tavuk/kemiksiz-but.jpg,1,
+مفروم دجاج,TAVUK KIYMA,منتجات الدجاج,Tavuk Ürünleri,200,,,,img/products/tavuk/tavuk-kiyma.jpg,1,
+افخاد دجاج,KALÇALI BUT,منتجات الدجاج,Tavuk Ürünleri,90,,"بدون تقطيع,تشفيه من الفخذه,فصل الورك عن الدبوس","Bütün, Kemiksiz, But ve Baget ayrılmış",img/products/tavuk/but.jpg,1,
+ورك دجاج,TAVUK SARMA,منتجات الدجاج,Tavuk Ürünleri,180,,,,img/products/tavuk/sarma-tavuk.jpg,1,
+دبابيس دجاج,TAVUK BAGET,منتجات الدجاج,Tavuk Ürünleri,120,,,,img/products/tavuk/baget.jpg,1,
+جناح دجاج كامل,UÇLU KANAT,منتجات الدجاج,Tavuk Ürünleri,170,,"بدون تقطيع,تقطيع 2 عدد","Bütün, 2 adet kesim",img/products/tavuk/kanat.jpg,1,
+افخاد دجاج مشفي,KEMİKSİZ BUT,منتجات الدجاج,Tavuk Ürünleri,170,,,,img/products/tavuk/kemiksiz-but.jpg,1,
 قوانص دجاج,TAVUK TAŞLIK,منتجات الدجاج,Tavuk Ürünleri,,,,,img/products/tavuk/tavuk-ciger.jpg,1,
 كبده دجاج,TAVUK CİĞER,منتجات الدجاج,Tavuk Ürünleri,,,,,img/products/tavuk/tavuk-taslik.jpg,1,
 بط مصري,ORDEK,منتجات الدجاج,Tavuk Ürünleri,625,,,,img/products/tavuk/ordek.jpg,2,2

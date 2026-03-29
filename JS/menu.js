@@ -259,10 +259,40 @@ const sanitizeImageSrc = (value) => {
   return LEGACY_PLACEHOLDER_REGEX.test(clean) ? "" : clean;
 };
 
+const shouldOptimizeImages = () => {
+  if (typeof window === "undefined") return false;
+  const { protocol = "", hostname = "" } = window.location || {};
+  if (!hostname || protocol === "file:") return false;
+  return !["localhost", "127.0.0.1", "::1"].includes(hostname);
+};
+
+const buildImageSources = (src) => {
+  const clean = sanitizeImageSrc(src);
+  if (!clean) return { primary: "", fallback: "" };
+  if (/^data:/i.test(clean) || /^https?:\/\//i.test(clean))
+    return { primary: clean, fallback: "" };
+
+  if (!shouldOptimizeImages()) return { primary: clean, fallback: "" };
+
+  const separator = clean.includes("?") ? "&" : "?";
+  const optimized =
+    `${clean}${separator}` +
+    "nf_resize=fit&w=600&nf_format=auto&nf_quality=70";
+  return { primary: optimized, fallback: clean };
+};
+
 const applyImageFallback = (img) => {
   if (!img || img.dataset.fallbackBound) return;
   img.dataset.fallbackBound = "1";
   img.addEventListener("error", () => {
+    if (img.dataset?.fallbackTried !== "1") {
+      const fallback = (img.dataset?.fallbackSrc || "").trim();
+      if (fallback) {
+        img.dataset.fallbackTried = "1";
+        img.src = fallback;
+        return;
+      }
+    }
     if (img.src !== placeholder) img.src = placeholder;
   });
 };
@@ -273,6 +303,7 @@ const loadLazyImage = (img) => {
   if (!src) return;
   img.src = src;
   delete img.dataset.src;
+  if (img.dataset) delete img.dataset.fallbackTried;
 };
 
 const lazyLoader = (() => {
@@ -311,15 +342,21 @@ const prepareLazyImage = (img, src) => {
   applyImageFallback(img);
   img.setAttribute("loading", "lazy");
   img.setAttribute("decoding", "async");
-  const cleanSrc = sanitizeImageSrc(src);
-  if (cleanSrc) {
+  const { primary, fallback } = buildImageSources(src);
+  if (fallback) img.dataset.fallbackSrc = fallback;
+  else if (img.dataset) delete img.dataset.fallbackSrc;
+  if (primary) {
     img.src = placeholder;
-    img.dataset.src = cleanSrc;
+    img.dataset.src = primary;
   } else {
-    if (img.dataset) delete img.dataset.src;
+    if (img.dataset) {
+      delete img.dataset.src;
+      delete img.dataset.fallbackSrc;
+      delete img.dataset.fallbackTried;
+    }
     img.src = placeholder;
   }
-  return cleanSrc;
+  return primary;
 };
 
 const setImmediateImage = (img, src) => {
@@ -327,9 +364,14 @@ const setImmediateImage = (img, src) => {
   applyImageFallback(img);
   img.removeAttribute("loading");
   img.setAttribute("decoding", "async");
-  if (img.dataset) delete img.dataset.src;
-  const cleanSrc = sanitizeImageSrc(src);
-  img.src = cleanSrc || placeholder;
+  if (img.dataset) {
+    delete img.dataset.src;
+    delete img.dataset.fallbackTried;
+  }
+  const { primary, fallback } = buildImageSources(src);
+  if (fallback) img.dataset.fallbackSrc = fallback;
+  else if (img.dataset) delete img.dataset.fallbackSrc;
+  img.src = primary || fallback || placeholder;
 };
 
 const priceFmt = (n) => `${(+n || 0).toLocaleString("tr-TR")}₺`;
